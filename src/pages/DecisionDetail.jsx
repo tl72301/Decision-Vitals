@@ -87,8 +87,8 @@ export default function DecisionDetail() {
         <span className="font-medium text-stone-600">Assumptions</span> are what
         this decision depends on;{" "}
         <span className="font-medium text-stone-600">evidence</span> is what
-        you've learned since. Add at least one piece of evidence, then run a
-        review to grade each assumption against it.
+        you've learned since. Add at least one piece of evidence, then review the
+        decision to grade each assumption against it.
       </p>
 
       {/* Two-column: assumptions + evidence */}
@@ -140,7 +140,7 @@ export default function DecisionDetail() {
             to={`/decision/${id}/run`}
             className="inline-flex items-center rounded-lg bg-stone-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-stone-700"
           >
-            Run review{reports.length > 0 ? ` #${reports.length + 1}` : ""}
+            {reports.length > 0 ? "Review decision again" : "Review decision"}
           </Link>
         ) : (
           <>
@@ -149,12 +149,12 @@ export default function DecisionDetail() {
               disabled
               className="inline-flex cursor-not-allowed items-center rounded-lg bg-stone-300 px-5 py-2.5 text-sm font-medium text-white"
             >
-              Run review
+              Review decision
             </button>
             <p className="text-xs text-stone-500">
               {assumptions.length === 0
                 ? "This decision has no assumptions to review."
-                : "Add at least one evidence snippet to run a review."}
+                : "Add at least one piece of evidence to review this decision."}
             </p>
           </>
         )}

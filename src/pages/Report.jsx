@@ -195,9 +195,9 @@ export default function Report() {
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             <div>
               <h3 className="text-sm font-semibold text-stone-700">
-                Shaping{" "}
+                Strengthen it{" "}
                 <span className="font-normal text-stone-400">
-                  (strengthen the assumption)
+                  (make the assumption more likely to hold)
                 </span>
               </h3>
               <ul className="mt-2 space-y-2">
@@ -221,9 +221,9 @@ export default function Report() {
             </div>
             <div>
               <h3 className="text-sm font-semibold text-stone-700">
-                Hedging{" "}
+                Prepare a fallback{" "}
                 <span className="font-normal text-stone-400">
-                  (prepare for it failing)
+                  (in case it turns out wrong)
                 </span>
               </h3>
               <ul className="mt-2 space-y-2">

@@ -35,24 +35,26 @@ export function healthGradeMeta(grade) {
 }
 
 /**
- * Assumption tier. Colorless by design: load-bearing is the single filled
- * (near-black) chip, the others are outlined neutrals of decreasing weight.
+ * How important an assumption is to the decision. Colorless by design: a
+ * Critical assumption is the single filled (near-black) chip, the others are
+ * outlined neutrals of decreasing weight. (Internal keys stay load_bearing /
+ * vulnerable / lower_risk; only the labels are business-facing.)
  */
 export const TIER = {
   load_bearing: {
-    label: "Load-bearing",
+    label: "Critical",
     chip: "bg-stone-900 text-white ring-stone-900",
-    help: "If this is false, the decision fails or needs major rework.",
+    help: "This one could seriously weaken or break the decision if it turns out to be wrong.",
   },
   vulnerable: {
-    label: "Vulnerable",
+    label: "Supporting",
     chip: "bg-white text-stone-700 ring-stone-300",
-    help: "Could realistically become false within the decision's horizon.",
+    help: "Still matters, but the decision can probably survive even if it changes.",
   },
   lower_risk: {
-    label: "Lower-risk",
+    label: "Minor",
     chip: "bg-white text-stone-500 ring-stone-200",
-    help: "Not decision-breaking and not especially likely to fail.",
+    help: "Not likely to break the decision, and not especially likely to change.",
   },
 };
 
@@ -63,7 +65,7 @@ export function tierMeta(tier) {
 /** Per-assumption status. Neutral chip + colored dot. */
 export const STATUS = {
   untested: {
-    label: "Untested",
+    label: "Not checked yet",
     chip: "bg-white text-stone-500 ring-stone-200",
     dot: "bg-stone-300",
   },

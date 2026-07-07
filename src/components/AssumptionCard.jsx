@@ -64,7 +64,7 @@ export default function AssumptionCard({ assumption, locked, onSave, onDelete })
             </select>
           </div>
           <div>
-            <label className="text-xs font-medium text-stone-500">Signpost</label>
+            <label className="text-xs font-medium text-stone-500">Warning signal</label>
             <input
               value={draft.signpost}
               onChange={(e) =>
@@ -131,7 +131,7 @@ export default function AssumptionCard({ assumption, locked, onSave, onDelete })
       <p className="mt-2 text-sm text-stone-800">{assumption.text}</p>
       {assumption.signpost && (
         <p className="mt-2 text-xs text-stone-500">
-          <span className="font-medium text-stone-600">Signpost:</span>{" "}
+          <span className="font-medium text-stone-600">Warning signal:</span>{" "}
           {assumption.signpost}
         </p>
       )}
