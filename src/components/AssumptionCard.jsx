@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { tierMeta, statusMeta, TIER } from "../lib/labels.js";
+import Chip from "./Chip.jsx";
 
 // One assumption. Before the first review it supports inline reword / retier /
 // re-signpost and delete (human-in-the-loop). After a review it is read-only.
@@ -98,17 +99,10 @@ export default function AssumptionCard({ assumption, locked, onSave, onDelete })
     <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
       <div className="flex items-start justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2">
-          <span
-            title={tier.help}
-            className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${tier.chip}`}
-          >
+          <Chip tone={tier.chip} title={tier.help}>
             {tier.label}
-          </span>
-          <span
-            className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${status.chip}`}
-          >
-            {status.label}
-          </span>
+          </Chip>
+          <Chip tone={status.chip}>{status.label}</Chip>
           {assumption.userEdited && (
             <span className="text-xs text-slate-400">edited</span>
           )}

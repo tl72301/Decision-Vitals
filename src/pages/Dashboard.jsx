@@ -5,6 +5,7 @@ import { loadSamples } from "../lib/samples.js";
 import { useStoreSync } from "../lib/useStore.js";
 import { formatDate, statusMeta } from "../lib/labels.js";
 import HealthBadge from "../components/HealthBadge.jsx";
+import Chip from "../components/Chip.jsx";
 
 // Statuses worth calling out on a card, in severity order. "untested" is implied
 // by "Not yet reviewed" so it is not listed individually.
@@ -25,12 +26,9 @@ function AssumptionSummary({ decisionId, reviewed }) {
       </span>
       {reviewed ? (
         SUMMARY_STATUSES.filter((s) => counts[s]).map((s) => (
-          <span
-            key={s}
-            className={`inline-flex items-center rounded-full px-2 py-0.5 font-medium ring-1 ring-inset ${statusMeta(s).chip}`}
-          >
+          <Chip key={s} tone={statusMeta(s).chip}>
             {counts[s]} {statusMeta(s).label.toLowerCase()}
-          </span>
+          </Chip>
         ))
       ) : (
         <span className="text-slate-400">· not yet reviewed</span>
@@ -113,15 +111,10 @@ export default function Dashboard() {
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-slate-900">
-            Your decisions
-          </h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Vital signs for the decisions you've already made.
-          </p>
-        </div>
+      <div className="mb-6 flex items-center justify-between gap-4">
+        <h1 className="text-2xl font-semibold text-slate-900">
+          Your decisions
+        </h1>
         <button
           type="button"
           onClick={() => navigate("/new")}
