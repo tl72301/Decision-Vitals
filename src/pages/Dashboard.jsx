@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { listDecisions, assumptionsByDecision } from "../lib/store.js";
+import { loadSamples } from "../lib/samples.js";
 import { useStoreSync } from "../lib/useStore.js";
 import { formatDate, statusMeta } from "../lib/labels.js";
 import HealthBadge from "../components/HealthBadge.jsx";
@@ -101,10 +102,13 @@ export default function Dashboard() {
   const decisions = listDecisions();
   const [notice, setNotice] = useState("");
 
-  // Sample decisions and their loader arrive in a later build step (PLAN.md
-  // Section 9, items 12–13). The button is wired now and activated then.
   function handleLoadSamples() {
-    setNotice("Sample decisions are added in a later build step.");
+    const n = loadSamples();
+    setNotice(
+      n > 0
+        ? `Loaded ${n} sample decision${n === 1 ? "" : "s"}.`
+        : "Sample decisions are already loaded."
+    );
   }
 
   return (

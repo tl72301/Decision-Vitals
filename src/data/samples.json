@@ -1,0 +1,223 @@
+{
+  "decisions": [
+    {
+      "id": "sample-pricing",
+      "title": "Move to usage-based billing in Q4",
+      "statement": "Migrate our B2B SaaS product from per-seat pricing to usage-based billing in Q4.",
+      "context": "Flat NRR, sales says seats are capping deal sizes, two competitors moved to usage-based this year.",
+      "owner": "",
+      "createdAt": "2026-06-15T09:00:00.000Z",
+      "healthGrade": null,
+      "assumptions": [
+        {
+          "id": "sample-pricing-a1",
+          "text": "Enough current customers will accept usage-based pricing at renewal to protect NRR.",
+          "loadBearing": true,
+          "vulnerable": true,
+          "tier": "load_bearing",
+          "signpost": "Renewal conversations where procurement rejects or escalates usage-based terms."
+        },
+        {
+          "id": "sample-pricing-a2",
+          "text": "Metering infrastructure can be production-ready before the Q4 billing cutover.",
+          "loadBearing": true,
+          "vulnerable": true,
+          "tier": "load_bearing",
+          "signpost": "Billing team timeline estimates slipping past the 5-week plan or new cross-team dependencies."
+        },
+        {
+          "id": "sample-pricing-a3",
+          "text": "Usage-based pricing will expand deal sizes in the current sales pipeline.",
+          "loadBearing": false,
+          "vulnerable": true,
+          "tier": "vulnerable",
+          "signpost": "Late-stage deals not asking about usage pricing, or AEs reporting no expansion effect."
+        },
+        {
+          "id": "sample-pricing-a4",
+          "text": "The market shift toward usage-based pricing in our category will continue.",
+          "loadBearing": false,
+          "vulnerable": true,
+          "tier": "vulnerable",
+          "signpost": "Competitors walking back usage pricing or reintroducing seat-based elements."
+        }
+      ],
+      "evidence": [
+        {
+          "id": "sample-pricing-e1",
+          "text": "Renewal call with Meridian: CFO said per-seat is the only pricing model their procurement will approve this fiscal year. Usage-based would push renewal to committee.",
+          "sourceType": "customer_feedback",
+          "date": "2026-06-20",
+          "addedAt": "2026-06-20T14:00:00.000Z"
+        },
+        {
+          "id": "sample-pricing-e2",
+          "text": "Competitor B walked back part of its usage pricing after churn in mid-market accounts, reintroducing a seat-based floor.",
+          "sourceType": "market_update",
+          "date": "2026-06-24",
+          "addedAt": "2026-06-24T10:00:00.000Z"
+        },
+        {
+          "id": "sample-pricing-e3",
+          "text": "Billing team estimates metering infrastructure at 9 weeks, not the 5 in the original plan. Two dependencies on the platform team.",
+          "sourceType": "status_update",
+          "date": "2026-06-26",
+          "addedAt": "2026-06-26T16:00:00.000Z"
+        },
+        {
+          "id": "sample-pricing-e4",
+          "text": "Sales pipeline review: 3 of 7 late-stage deals asked about usage pricing unprompted. AEs believe it would have expanded 2 of them.",
+          "sourceType": "meeting_notes",
+          "date": "2026-06-27",
+          "addedAt": "2026-06-27T11:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "id": "sample-3pl",
+      "title": "Outsource fulfillment to a 3PL by Q2",
+      "statement": "Move e-commerce fulfillment from our in-house warehouse to a third-party logistics provider (3PL) by Q2.",
+      "context": "Order volume up 60 percent year over year; warehouse lease renewal due in 8 months; 3PL quotes suggest 18 percent cost savings at current volume.",
+      "owner": "",
+      "createdAt": "2026-06-10T09:00:00.000Z",
+      "healthGrade": null,
+      "assumptions": [
+        {
+          "id": "sample-3pl-a1",
+          "text": "The 3PL can match our in-house shipping speed and accuracy closely enough that customers don't notice.",
+          "loadBearing": true,
+          "vulnerable": true,
+          "tier": "load_bearing",
+          "signpost": "Pilot same-day-ship rate or mispick rate diverging from in-house baselines; shipping complaints rising."
+        },
+        {
+          "id": "sample-3pl-a2",
+          "text": "The quoted 18 percent cost savings will hold at our actual volumes and SKU count.",
+          "loadBearing": true,
+          "vulnerable": true,
+          "tier": "load_bearing",
+          "signpost": "Pricing-tier triggers in the contract, such as SKU count or volume thresholds, coming into play."
+        },
+        {
+          "id": "sample-3pl-a3",
+          "text": "The 3PL will remain stable and able to onboard us fully before our warehouse lease decision.",
+          "loadBearing": false,
+          "vulnerable": true,
+          "tier": "vulnerable",
+          "signpost": "Ownership changes, onboarding freezes, or client-reported service disruptions at the 3PL."
+        },
+        {
+          "id": "sample-3pl-a4",
+          "text": "Our product data feed is clean enough to drive a third party's pick-and-pack operation.",
+          "loadBearing": false,
+          "vulnerable": true,
+          "tier": "vulnerable",
+          "signpost": "Fulfillment errors traced to catalog or data-feed issues rather than 3PL execution."
+        }
+      ],
+      "evidence": [
+        {
+          "id": "sample-3pl-e1",
+          "text": "3PL pilot, week 3: 94 percent of orders shipped same-day vs our 97 percent in-house. Two mispicks on bundled SKUs, both traced to our product data feed.",
+          "sourceType": "status_update",
+          "date": "2026-06-18",
+          "addedAt": "2026-06-18T09:00:00.000Z"
+        },
+        {
+          "id": "sample-3pl-e2",
+          "text": "Post-purchase survey trend: 'fast shipping' mentions in 5-star reviews dropped from 31 percent to 24 percent during the pilot region rollout.",
+          "sourceType": "customer_feedback",
+          "date": "2026-06-22",
+          "addedAt": "2026-06-22T13:00:00.000Z"
+        },
+        {
+          "id": "sample-3pl-e3",
+          "text": "The 3PL announced acquisition by a larger logistics group; two of their mid-size clients publicly flagged onboarding freezes during the transition.",
+          "sourceType": "market_update",
+          "date": "2026-06-25",
+          "addedAt": "2026-06-25T10:00:00.000Z"
+        },
+        {
+          "id": "sample-3pl-e4",
+          "text": "Ops review: 3PL pricing assumes our current SKU count. Planned Q3 product line expansion adds 40 SKUs, which triggers their next pricing tier.",
+          "sourceType": "meeting_notes",
+          "date": "2026-06-27",
+          "addedAt": "2026-06-27T15:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "id": "sample-selfserve",
+      "title": "Launch a self-serve tier in January",
+      "statement": "Launch a self-serve tier in January to expand from enterprise into mid-market without growing the sales team.",
+      "context": "CAC on enterprise deals rising; board wants efficient growth; product currently requires white-glove onboarding.",
+      "owner": "",
+      "createdAt": "2026-06-05T09:00:00.000Z",
+      "healthGrade": null,
+      "assumptions": [
+        {
+          "id": "sample-selfserve-a1",
+          "text": "Mid-market buyers in our category will convert through a purely self-serve funnel.",
+          "loadBearing": true,
+          "vulnerable": true,
+          "tier": "load_bearing",
+          "signpost": "Category benchmarks or our own trials showing sales-assisted conversion far above self-serve."
+        },
+        {
+          "id": "sample-selfserve-a2",
+          "text": "Onboarding can be automated enough that customers connect their data without human help.",
+          "loadBearing": true,
+          "vulnerable": true,
+          "tier": "load_bearing",
+          "signpost": "Trial drop-off concentrated at the data-connection step; automation project slipping."
+        },
+        {
+          "id": "sample-selfserve-a3",
+          "text": "Self-serve customers can be supported profitably at mid-market price points.",
+          "loadBearing": true,
+          "vulnerable": true,
+          "tier": "load_bearing",
+          "signpost": "Support ticket volume per customer staying at levels that break unit economics below target ARPU."
+        },
+        {
+          "id": "sample-selfserve-a4",
+          "text": "A January launch window is achievable with the current engineering roadmap.",
+          "loadBearing": false,
+          "vulnerable": true,
+          "tier": "vulnerable",
+          "signpost": "Onboarding-automation completion percentage stalling through Q4."
+        }
+      ],
+      "evidence": [
+        {
+          "id": "sample-selfserve-e1",
+          "text": "Industry report: mid-market buyers in this category still convert 3x better with sales-assisted trials than pure self-serve.",
+          "sourceType": "market_update",
+          "date": "2026-06-12",
+          "addedAt": "2026-06-12T09:00:00.000Z"
+        },
+        {
+          "id": "sample-selfserve-e2",
+          "text": "Trial exit survey, n=41: top drop-off reason was 'couldn't connect our data without help' (58 percent).",
+          "sourceType": "customer_feedback",
+          "date": "2026-06-17",
+          "addedAt": "2026-06-17T11:00:00.000Z"
+        },
+        {
+          "id": "sample-selfserve-e3",
+          "text": "Onboarding automation project is 70 percent complete; the remaining 30 percent covers exactly the data-connection step.",
+          "sourceType": "status_update",
+          "date": "2026-06-23",
+          "addedAt": "2026-06-23T14:00:00.000Z"
+        },
+        {
+          "id": "sample-selfserve-e4",
+          "text": "Support lead: current ticket volume per customer would make self-serve unprofitable below $400/mo unless deflection improves.",
+          "sourceType": "meeting_notes",
+          "date": "2026-06-26",
+          "addedAt": "2026-06-26T16:00:00.000Z"
+        }
+      ]
+    }
+  ]
+}
