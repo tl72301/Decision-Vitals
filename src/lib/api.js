@@ -1,21 +1,33 @@
 // src/lib/api.js
 //
-// Thin client for the server-side agent route. Every specialist call goes
-// through here so error handling is consistent across screens.
+// Single entry point for running a specialist. In Demo Mode the call is served
+// by the replay engine (recorded real runs, zero API calls). In Live Mode it
+// goes to /api/agent with the passphrase header, which the server re-checks.
+
+import { isDemo, getPassphrase } from "./mode.js";
+import { replayAgent } from "./replay.js";
 
 /**
- * Run one specialist via /api/agent and return its parsed JSON output.
+ * Run one specialist and return its parsed JSON output.
  * Throws an Error with a readable message on any failure.
- * @param {string} agent  specialist slug (e.g. "intake", "classifier")
+ * @param {string} agent  specialist slug (e.g. "intake", "evidence_review")
  * @param {object|string} payload  the input for that specialist
+ * @param {{decisionId?: string}} [opts]  decisionId enables Demo Mode replay
  * @returns {Promise<object>}
  */
-export async function runAgent(agent, payload) {
+export async function runAgent(agent, payload, { decisionId } = {}) {
+  if (isDemo()) {
+    return replayAgent(agent, decisionId);
+  }
+
   let res;
   try {
     res = await fetch("/api/agent", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "x-live-passphrase": getPassphrase(),
+      },
       body: JSON.stringify({ agent, payload }),
     });
   } catch {
@@ -33,4 +45,18 @@ export async function runAgent(agent, payload) {
     throw new Error(data?.error || `The ${agent} agent failed (${res.status}).`);
   }
   return data.output;
+}
+
+/** Verify a Live Mode passphrase with the server. Returns { ok, configured }. */
+export async function verifyLivePassphrase(passphrase) {
+  const res = await fetch("/api/live", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ passphrase }),
+  });
+  try {
+    return await res.json();
+  } catch {
+    return { ok: false, error: `Verification failed (${res.status}).` };
+  }
 }

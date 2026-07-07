@@ -1,0 +1,5 @@
+{
+  "_meta": {
+    "note": "Recorded real agent runs, replayed in Demo Mode. Keyed by decision id, then agent slug. Populated from live runs via the 'Copy run JSON' button (PLAN.md Section 9, item 15)."
+  }
+}
