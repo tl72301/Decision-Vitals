@@ -1,19 +1,33 @@
 // src/lib/labels.js
 //
 // Human labels and Tailwind chip styles for the enums in the data model.
-// Centralized so the Dashboard, cards, and report all read the same way.
-// Colors get a dedicated polish pass later (PLAN.md Section 9, item 17).
+// Design language: near-monochrome. Chips are neutral (white/stone) and a small
+// colored dot carries the semantic meaning, so the UI stays muted while status
+// remains scannable. Tiers are colorless: load-bearing is the one filled chip.
 
 /** Overall decision health grade. `null` means no review has run yet. */
 export const HEALTH_GRADE = {
-  healthy: { label: "Healthy", chip: "bg-emerald-100 text-emerald-800 ring-emerald-200" },
-  watch: { label: "Watch", chip: "bg-amber-100 text-amber-800 ring-amber-200" },
-  at_risk: { label: "At Risk", chip: "bg-rose-100 text-rose-800 ring-rose-200" },
+  healthy: {
+    label: "Healthy",
+    chip: "bg-white text-stone-700 ring-stone-200",
+    dot: "bg-emerald-500",
+  },
+  watch: {
+    label: "Watch",
+    chip: "bg-white text-stone-700 ring-stone-200",
+    dot: "bg-amber-500",
+  },
+  at_risk: {
+    label: "At Risk",
+    chip: "bg-white text-stone-700 ring-stone-200",
+    dot: "bg-rose-500",
+  },
 };
 
 export const HEALTH_GRADE_UNREVIEWED = {
   label: "Not yet reviewed",
-  chip: "bg-slate-100 text-slate-600 ring-slate-200",
+  chip: "bg-white text-stone-400 ring-stone-200",
+  dot: "bg-stone-300",
 };
 
 export function healthGradeMeta(grade) {
@@ -21,24 +35,23 @@ export function healthGradeMeta(grade) {
 }
 
 /**
- * Assumption tier (derived label for the UI). Tiers are OUTLINED (white bg,
- * colored ring) while statuses are FILLED, so a tier chip and a status chip
- * read as different kinds of information when they sit side by side.
+ * Assumption tier. Colorless by design: load-bearing is the single filled
+ * (near-black) chip, the others are outlined neutrals of decreasing weight.
  */
 export const TIER = {
   load_bearing: {
     label: "Load-bearing",
-    chip: "bg-white text-indigo-700 ring-indigo-300",
+    chip: "bg-stone-900 text-white ring-stone-900",
     help: "If this is false, the decision fails or needs major rework.",
   },
   vulnerable: {
     label: "Vulnerable",
-    chip: "bg-white text-amber-700 ring-amber-300",
+    chip: "bg-white text-stone-700 ring-stone-300",
     help: "Could realistically become false within the decision's horizon.",
   },
   lower_risk: {
     label: "Lower-risk",
-    chip: "bg-white text-slate-600 ring-slate-300",
+    chip: "bg-white text-stone-500 ring-stone-200",
     help: "Not decision-breaking and not especially likely to fail.",
   },
 };
@@ -47,13 +60,33 @@ export function tierMeta(tier) {
   return TIER[tier] ?? TIER.lower_risk;
 }
 
-/** Per-assumption status after (or before) a review. */
+/** Per-assumption status. Neutral chip + colored dot. */
 export const STATUS = {
-  untested: { label: "Untested", chip: "bg-slate-100 text-slate-600 ring-slate-200" },
-  holding: { label: "Holding", chip: "bg-emerald-100 text-emerald-800 ring-emerald-200" },
-  weakened: { label: "Weakened", chip: "bg-amber-100 text-amber-800 ring-amber-200" },
-  invalidated: { label: "Invalidated", chip: "bg-rose-100 text-rose-800 ring-rose-200" },
-  needs_review: { label: "Needs review", chip: "bg-violet-100 text-violet-800 ring-violet-200" },
+  untested: {
+    label: "Untested",
+    chip: "bg-white text-stone-500 ring-stone-200",
+    dot: "bg-stone-300",
+  },
+  holding: {
+    label: "Holding",
+    chip: "bg-white text-stone-700 ring-stone-200",
+    dot: "bg-emerald-500",
+  },
+  weakened: {
+    label: "Weakened",
+    chip: "bg-white text-stone-700 ring-stone-200",
+    dot: "bg-amber-500",
+  },
+  invalidated: {
+    label: "Invalidated",
+    chip: "bg-white text-stone-700 ring-stone-200",
+    dot: "bg-rose-500",
+  },
+  needs_review: {
+    label: "Needs review",
+    chip: "bg-white text-stone-700 ring-stone-200",
+    dot: "bg-violet-400",
+  },
 };
 
 export function statusMeta(status) {

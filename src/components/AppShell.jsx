@@ -34,14 +34,10 @@ function ModeToggle() {
           ? "Switch to Live Mode (passphrase required)"
           : "Switch back to Demo Mode"
       }
-      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ring-1 ring-inset transition ${
-        demo
-          ? "bg-slate-100 text-slate-600 ring-slate-200 hover:bg-slate-200"
-          : "bg-emerald-100 text-emerald-800 ring-emerald-200 hover:bg-emerald-200"
-      }`}
+      className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-xs font-medium text-stone-600 ring-1 ring-inset ring-stone-300 transition hover:bg-stone-50"
     >
       <span
-        className={`h-1.5 w-1.5 rounded-full ${demo ? "bg-slate-400" : "bg-emerald-500"}`}
+        className={`h-1.5 w-1.5 rounded-full ${demo ? "bg-stone-400" : "bg-emerald-500"}`}
       />
       {demo ? "Demo mode" : "Live mode"}
     </button>
@@ -53,14 +49,14 @@ export default function AppShell({ children }) {
   useEffect(() => subscribeMode(() => setVersion((v) => v + 1)), []);
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
-      <header className="border-b border-slate-200 bg-white">
+    <div className="min-h-screen bg-stone-50 text-stone-900 antialiased">
+      <header className="sticky top-0 z-10 border-b border-stone-200/80 bg-white/85 backdrop-blur">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
           <Link to="/" className="flex flex-col leading-tight">
             <span className="text-lg font-semibold tracking-tight">
               Decision Vitals
             </span>
-            <span className="text-xs text-slate-500">
+            <span className="text-xs text-stone-500">
               Vital signs for the decisions you've already made
             </span>
           </Link>
@@ -68,7 +64,7 @@ export default function AppShell({ children }) {
         </div>
       </header>
       {isDemo() && (
-        <div className="border-b border-amber-200 bg-amber-50 px-4 py-1.5 text-center text-xs text-amber-800">
+        <div className="border-b border-stone-200 bg-stone-100/80 px-4 py-1.5 text-center text-xs text-stone-500">
           Demo mode: replaying recorded agent runs
         </div>
       )}

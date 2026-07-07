@@ -17,28 +17,28 @@ function StepRow({ def, state }) {
       <span className="mt-0.5">
         {state === "running" && <Spinner />}
         {state === "done" && (
-          <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500 text-[10px] font-bold text-white">
+          <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-stone-900 text-[10px] font-bold text-white">
             ✓
           </span>
         )}
         {state === "error" && (
-          <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white">
+          <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-rose-400 text-[10px] font-bold text-white">
             !
           </span>
         )}
         {state === "pending" && (
-          <span className="inline-block h-4 w-4 rounded-full border-2 border-slate-200" />
+          <span className="inline-block h-4 w-4 rounded-full border-2 border-stone-200" />
         )}
       </span>
       <div>
         <div
           className={`text-sm font-medium ${
-            state === "pending" ? "text-slate-400" : "text-slate-800"
+            state === "pending" ? "text-stone-400" : "text-stone-800"
           }`}
         >
           {def.label}
         </div>
-        <div className="text-xs text-slate-500">{def.role}</div>
+        <div className="text-xs text-stone-500">{def.role}</div>
       </div>
     </li>
   );
@@ -129,18 +129,18 @@ export default function NewDecision() {
   }
 
   const inputCls =
-    "mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-200";
+    "mt-1 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm text-stone-900 shadow-sm outline-none focus:border-stone-400 focus:ring-2 focus:ring-stone-200";
 
   return (
     <div className="mx-auto max-w-2xl">
-      <h1 className="text-2xl font-semibold text-slate-900">New decision</h1>
-      <p className="mt-1 text-sm text-slate-500">
+      <h1 className="text-2xl font-semibold text-stone-900">New decision</h1>
+      <p className="mt-1 text-sm text-stone-500">
         Describe a decision you've already made. Decision Vitals extracts the
         assumptions underneath it.
       </p>
 
       {demo && (
-        <div className="mt-4 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-800 ring-1 ring-inset ring-amber-200">
+        <div className="mt-4 rounded-lg border-l-2 border-stone-400 bg-stone-100/60 px-4 py-3 text-sm text-stone-600">
           Demo Mode replays recorded agent runs on the sample decisions, so it
           can't extract assumptions from a new decision. Switch to Live Mode
           (header toggle) to register your own.
@@ -149,7 +149,7 @@ export default function NewDecision() {
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-5">
         <div>
-          <label className="text-sm font-medium text-slate-700">
+          <label className="text-sm font-medium text-stone-700">
             Decision statement
           </label>
           <textarea
@@ -164,8 +164,8 @@ export default function NewDecision() {
         </div>
 
         <div>
-          <label className="text-sm font-medium text-slate-700">
-            Context <span className="font-normal text-slate-400">(optional)</span>
+          <label className="text-sm font-medium text-stone-700">
+            Context <span className="font-normal text-stone-400">(optional)</span>
           </label>
           <textarea
             value={form.context}
@@ -179,8 +179,8 @@ export default function NewDecision() {
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
-            <label className="text-sm font-medium text-slate-700">
-              Owner <span className="font-normal text-slate-400">(optional)</span>
+            <label className="text-sm font-medium text-stone-700">
+              Owner <span className="font-normal text-stone-400">(optional)</span>
             </label>
             <input
               type="text"
@@ -192,8 +192,8 @@ export default function NewDecision() {
             />
           </div>
           <div>
-            <label className="text-sm font-medium text-slate-700">
-              Date <span className="font-normal text-slate-400">(optional)</span>
+            <label className="text-sm font-medium text-stone-700">
+              Date <span className="font-normal text-stone-400">(optional)</span>
             </label>
             <input
               type="date"
@@ -209,16 +209,16 @@ export default function NewDecision() {
           <button
             type="submit"
             disabled={!canSubmit}
-            className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-40"
+            className="inline-flex items-center gap-2 rounded-lg bg-stone-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-stone-700 disabled:cursor-not-allowed disabled:opacity-40"
           >
-            {running && <Spinner className="border-slate-500 border-t-white" />}
+            {running && <Spinner className="border-stone-500 border-t-white" />}
             {running ? "Extracting assumptions…" : "Extract assumptions"}
           </button>
           <button
             type="button"
             onClick={() => navigate("/")}
             disabled={running}
-            className="text-sm text-slate-500 hover:text-slate-700 disabled:opacity-40"
+            className="text-sm text-stone-500 hover:text-stone-700 disabled:opacity-40"
           >
             Cancel
           </button>
@@ -226,8 +226,8 @@ export default function NewDecision() {
       </form>
 
       {(running || error) && (
-        <div className="mt-6 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-          <div className="text-sm font-medium text-slate-700">
+        <div className="mt-6 rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
+          <div className="text-sm font-medium text-stone-700">
             Running the assumption pipeline
           </div>
           <ol className="mt-3 space-y-3">
