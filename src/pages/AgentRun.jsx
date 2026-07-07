@@ -17,7 +17,7 @@ import JsonView from "../components/JsonView.jsx";
 const PIPELINE = [
   { agent: "evidence_review", name: "Evidence Review", role: "Maps each snippet to the assumptions it bears on" },
   { agent: "challenge", name: "Challenge", role: "Argues the strongest honest case against every assumption" },
-  { agent: "risk_ranking", name: "Risk Ranking", role: "Assigns each assumption a status, applying the hard rules" },
+  { agent: "risk_ranking", name: "Risk Ranking", role: "Assigns each assumption a status, applying the review rules" },
   { agent: "reporter", name: "Reporter", role: "Writes the Decision Health Report" },
 ];
 

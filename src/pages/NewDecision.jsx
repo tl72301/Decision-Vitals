@@ -8,7 +8,7 @@ import Spinner from "../components/Spinner.jsx";
 // The two Phase-A steps shown in the progress panel while agents run.
 const STEP_DEFS = [
   { key: "intake", label: "Decision Intake", role: "Cleans the decision and drafts candidate assumptions" },
-  { key: "classifier", label: "Assumption Classifier", role: "Labels each assumption load-bearing / vulnerable and adds a signpost" },
+  { key: "classifier", label: "Assumption Classifier", role: "Labels each assumption critical or supporting and adds a warning signal" },
 ];
 
 function StepRow({ def, state }) {
@@ -137,8 +137,8 @@ export default function NewDecision() {
       <p className="mt-1 text-sm text-stone-500">
         Describe a decision you've already made. When you submit, two agents
         read it and pull out the 3 to 5 assumptions it depends on, labeling
-        which are load-bearing (the decision fails if they're wrong). You add
-        evidence and run a full review on the next screen.
+        which are critical (the decision could break if they're wrong). You add
+        evidence and review the decision on the next screen.
       </p>
 
       {demo && (

@@ -68,7 +68,7 @@ const HOW_IT_WORKS = [
   {
     n: "1",
     title: "Register a decision",
-    body: "Two agents read it and pull out the handful of assumptions it depends on, flagging which are load-bearing (the decision fails if they're wrong).",
+    body: "Two agents read it and pull out the handful of assumptions it depends on, flagging which are critical (the decision could break if they're wrong).",
   },
   {
     n: "2",

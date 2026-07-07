@@ -47,7 +47,7 @@
         {
           "assumptionId": "sample-3pl-a1",
           "type": "evidenced",
-          "case": "The claim that customers won't notice a difference is already contradicted by pilot-stage data. E1 shows a 3-percentage-point gap in same-day-ship rates versus the in-house baseline during the pilot, before the added complexity of full-scale, multi-SKU volume. Pilots typically run under favorable, closely-monitored conditions with the 3PL's best attention; if a gap exists even here, it is likely to widen at scale when the account is no longer a novelty. Compounding this, E2 shows customer survey mentions of 'fast shipping' already declined from 31% to 24%, which is a direct behavioral signal that customers ARE noticing, the assumption's core premise is being falsified in real time, not just theoretically at risk. The strongest honest case is that this assumption is not merely 'vulnerable' but actively failing its own signpost test before the full decision has even been implemented.",
+          "case": "The claim that customers won't notice a difference is already contradicted by pilot-stage data. E1 shows a 3-percentage-point gap in same-day-ship rates versus the in-house baseline during the pilot, before the added complexity of full-scale, multi-SKU volume. Pilots typically run under favorable, closely-monitored conditions with the 3PL's best attention; if a gap exists even here, it is likely to widen at scale when the account is no longer a novelty. Compounding this, E2 shows customer survey mentions of 'fast shipping' already declined from 31% to 24%, which is a direct behavioral signal that customers ARE noticing, the assumption's core premise is being falsified in real time, not just theoretically at risk. The strongest honest case is that this assumption is not merely 'supporting' but actively failing its own warning signal test before the full decision has even been implemented.",
           "evidenceIds": [
             "sample-3pl-e1",
             "sample-3pl-e2"
@@ -85,7 +85,7 @@
           "assumptionId": "sample-3pl-a1",
           "status": "invalidated",
           "confidence": "high",
-          "rationale": "Pilot-stage data directly contradicts the core premise that customers won't notice a service difference. E1 documents a 3-percentage-point gap in same-day-ship rates versus in-house baseline. E2 provides behavioral confirmation: customer survey mentions of fast shipping declined from 31% to 24%, indicating customers are already perceiving degradation. Both conditions of the signpost (rate divergence and complaint rise) are being triggered under favorable pilot conditions, indicating the gap will likely widen at full scale. Load-bearing assumption with multiple contradicting evidence sources.",
+          "rationale": "Pilot-stage data directly contradicts the core premise that customers won't notice a service difference. E1 documents a 3-percentage-point gap in same-day-ship rates versus in-house baseline. E2 provides behavioral confirmation: customer survey mentions of fast shipping declined from 31% to 24%, indicating customers are already perceiving degradation. Both conditions of the warning signal (rate divergence and complaint rise) are being triggered under favorable pilot conditions, indicating the gap will likely widen at full scale. Critical assumption with multiple contradicting evidence sources.",
           "evidenceIds": [
             "sample-3pl-e1",
             "sample-3pl-e2"
@@ -95,7 +95,7 @@
           "assumptionId": "sample-3pl-a2",
           "status": "invalidated",
           "confidence": "high",
-          "rationale": "The 18% savings figure is not resilient to known, near-term constraints. E4 documents that a planned Q3 SKU expansion will trigger the 3PL's next pricing tier, directly invalidating the cost baseline underlying the entire financial case for outsourcing. This is a scheduled event, not speculative risk. Load-bearing assumption with strong contradicting evidence that cannot be holding.",
+          "rationale": "The 18% savings figure is not resilient to known, near-term constraints. E4 documents that a planned Q3 SKU expansion will trigger the 3PL's next pricing tier, directly invalidating the cost baseline underlying the entire financial case for outsourcing. This is a scheduled event, not speculative risk. Critical assumption with strong contradicting evidence that cannot be holding.",
           "evidenceIds": [
             "sample-3pl-e4"
           ]
@@ -122,7 +122,7 @@
     },
     "reporter": {
       "healthGrade": "at_risk",
-      "summary": "The decision to outsource fulfillment to a 3PL by Q2 is at risk: both load-bearing assumptions have been invalidated by evidence gathered before full rollout. Pilot data already shows the 3PL shipping slower than in-house and customers noticing the difference, while a scheduled Q3 SKU expansion is set to trigger a pricing-tier change that erodes the 18 percent savings case for outsourcing in the first place.",
+      "summary": "The decision to outsource fulfillment to a 3PL by Q2 is at risk: both critical assumptions have been invalidated by evidence gathered before full rollout. Pilot data already shows the 3PL shipping slower than in-house and customers noticing the difference, while a scheduled Q3 SKU expansion is set to trigger a pricing-tier change that erodes the 18 percent savings case for outsourcing in the first place.",
       "findings": [
         {
           "assumptionId": "sample-3pl-a1",
@@ -278,7 +278,7 @@
           "assumptionId": "sample-cafe-a1",
           "status": "needs_review",
           "confidence": "low",
-          "rationale": "Supporting evidence (sample-cafe-e1) measures raw foot-traffic volume (+40%) but provides no measurement of conversion rate, competitive saturation, or purchase intent. The challenge correctly identifies that downtown office-district foot traffic is structurally different (narrow rush windows, weekend/evening collapse, hybrid-work volatility) and likely faces higher competitive density and price-sensitive customers. For a load-bearing assumption, a foot-traffic proxy without conversion data, comparable-café revenue benchmarks, or office-occupancy risk factors is insufficient to establish that sales will meet current-location levels.",
+          "rationale": "Supporting evidence (sample-cafe-e1) measures raw foot-traffic volume (+40%) but provides no measurement of conversion rate, competitive saturation, or purchase intent. The challenge correctly identifies that downtown office-district foot traffic is structurally different (narrow rush windows, weekend/evening collapse, hybrid-work volatility) and likely faces higher competitive density and price-sensitive customers. For a critical assumption, a foot-traffic proxy without conversion data, comparable-café revenue benchmarks, or office-occupancy risk factors is insufficient to establish that sales will meet current-location levels.",
           "evidenceIds": [
             "sample-cafe-e1"
           ]
@@ -287,7 +287,7 @@
           "assumptionId": "sample-cafe-a2",
           "status": "invalidated",
           "confidence": "high",
-          "rationale": "Strong contradicting evidence (sample-cafe-e2) demonstrates the business is already unable to reliably staff a single location: six-week hiring cycles and one-month average turnover indicate existing bottlenecks before any expansion. This directly contradicts the assumption of 'adequate staffing, supply chain capacity, and operational systems' for two locations. Per the hard rule, a load-bearing assumption with strong contradicting evidence cannot hold. Opening a second site would require pulling trained staff from the original shop, guaranteeing service degradation at the existing location. No evidence of expanded recruitment capacity, supplier readiness, or management bench strength is presented.",
+          "rationale": "Strong contradicting evidence (sample-cafe-e2) demonstrates the business is already unable to reliably staff a single location: six-week hiring cycles and one-month average turnover indicate existing bottlenecks before any expansion. This directly contradicts the assumption of 'adequate staffing, supply chain capacity, and operational systems' for two locations. Per the hard rule, a critical assumption with strong contradicting evidence cannot hold. Opening a second site would require pulling trained staff from the original shop, guaranteeing service degradation at the existing location. No evidence of expanded recruitment capacity, supplier readiness, or management bench strength is presented.",
           "evidenceIds": [
             "sample-cafe-e2"
           ]
@@ -296,7 +296,7 @@
           "assumptionId": "sample-cafe-a3",
           "status": "weakened",
           "confidence": "medium",
-          "rationale": "Moderate contradicting evidence (sample-cafe-e3) shows approximately one-third of current regulars intend to switch to the downtown location, signaling substantial cannibalization rather than incremental demand. One-third customer migration directly contradicts the assumption that the new location will not pull a large share of existing-shop revenue. While customer intent is not identical to realized behavior (hence 'weakened' rather than full invalidation), the evidence is direct and credible. Vulnerable-tier status permits a weakened rating; however, the assumption's validity is in question and requires mitigation planning.",
+          "rationale": "Moderate contradicting evidence (sample-cafe-e3) shows approximately one-third of current regulars intend to switch to the downtown location, signaling substantial cannibalization rather than incremental demand. One-third customer migration directly contradicts the assumption that the new location will not pull a large share of existing-shop revenue. While customer intent is not identical to realized behavior (hence 'weakened' rather than full invalidation), the evidence is direct and credible. Supporting-tier status permits a weakened rating; however, the assumption's validity is in question and requires mitigation planning.",
           "evidenceIds": [
             "sample-cafe-e3"
           ]
@@ -305,7 +305,7 @@
           "assumptionId": "sample-cafe-a4",
           "status": "holding",
           "confidence": "medium",
-          "rationale": "Strong supporting evidence (sample-cafe-e4) confirms contractor completion two weeks before free-rent expiration. However, the challenge correctly identifies an untested margin-of-safety risk: a two-week buffer is thin and vulnerable to ordinary construction variance (permitting delays, inspections, equipment lead times, subcontractor conflicts). Contractor estimates are self-reported and typically optimistic; no historical performance data or contingency plan exists. Assumption holds based on the contractor's commitment, but confidence is medium because the buffer cannot absorb ordinary project risks, and failure to complete on time carries unquantified cost consequences.",
+          "rationale": "Strong supporting evidence (sample-cafe-e4) confirms contractor completion two weeks before free-rent expiration. However, the challenge correctly identifies an untested margin-of-safety risk: a two-week buffer is thin and supporting to ordinary construction variance (permitting delays, inspections, equipment lead times, subcontractor conflicts). Contractor estimates are self-reported and typically optimistic; no historical performance data or contingency plan exists. Assumption holds based on the contractor's commitment, but confidence is medium because the buffer cannot absorb ordinary project risks, and failure to complete on time carries unquantified cost consequences.",
           "evidenceIds": [
             "sample-cafe-e4"
           ]
@@ -314,7 +314,7 @@
     },
     "reporter": {
       "healthGrade": "at_risk",
-      "summary": "The decision to open a downtown café this fall is at risk because the load-bearing assumption that current operations can support two locations is invalidated: hiring takes about six weeks and a recent new hire quit within a month, meaning the business is already short-staffed before adding a second site. A second load-bearing assumption, that downtown foot traffic will translate into comparable sales, is unproven, resting only on raw pedestrian counts with no conversion, competition, or occupancy data. Cannibalization of the existing shop is also already signaled by customer intent data, compounding the operational risk.",
+      "summary": "The decision to open a downtown café this fall is at risk because the critical assumption that current operations can support two locations is invalidated: hiring takes about six weeks and a recent new hire quit within a month, meaning the business is already short-staffed before adding a second site. A second critical assumption, that downtown foot traffic will translate into comparable sales, is unproven, resting only on raw pedestrian counts with no conversion, competition, or occupancy data. Cannibalization of the existing shop is also already signaled by customer intent data, compounding the operational risk.",
       "findings": [
         {
           "assumptionId": "sample-cafe-a1",
@@ -444,7 +444,7 @@
         {
           "assumptionId": "sample-chat-a4",
           "type": "evidenced",
-          "case": "Evidence sample-chat-e2 directly contradicts this assumption: the ticketing system integration is confirmed missing, requiring manual workarounds for chat-to-ticket linking. This is not a hypothetical risk but a documented current-state gap in a 'critical tool' integration named explicitly in the assumption's own signpost criteria. Beyond ticketing, there is no evidence confirming successful, reliable integration with project management, CRM, or monitoring tools either, the one integration point that has been checked failed, and the others remain unverified. This suggests the assumption is already falsified for at least one critical system and unproven for the rest, undermining confidence that 'adequate' integration will be achieved anywhere close to migration timing.",
+          "case": "Evidence sample-chat-e2 directly contradicts this assumption: the ticketing system integration is confirmed missing, requiring manual workarounds for chat-to-ticket linking. This is not a hypothetical risk but a documented current-state gap in a 'critical tool' integration named explicitly in the assumption's own warning signal criteria. Beyond ticketing, there is no evidence confirming successful, reliable integration with project management, CRM, or monitoring tools either, the one integration point that has been checked failed, and the others remain unverified. This suggests the assumption is already falsified for at least one critical system and unproven for the rest, undermining confidence that 'adequate' integration will be achieved anywhere close to migration timing.",
           "evidenceIds": [
             "sample-chat-e2"
           ]
@@ -452,7 +452,7 @@
         {
           "assumptionId": "sample-chat-a5",
           "type": "untested_risk",
-          "case": "The only evidence offered (sample-chat-e4) is a rollout plan tracking toward completion one month before renewal, this is a forward-looking schedule, not a demonstrated outcome, and migration plans are notoriously prone to slippage, especially for a quarter-bound, leadership-driven timeline with no evidence of buffer built in for the failures already surfacing elsewhere (e.g., the missing ticketing integration under sample-chat-a4, and untested data migration under sample-chat-a2). A one-month planned buffer can evaporate quickly if even one of the other load-bearing assumptions breaks, which the evidence base already suggests is happening. The most important untested risk: there is no historical evidence of this team or vendor completing comparable migrations on schedule, so the 'plan tracks to one month early' claim should be treated as an aspirational milestone, not a reliable predictor of actual runway sufficiency.",
+          "case": "The only evidence offered (sample-chat-e4) is a rollout plan tracking toward completion one month before renewal, this is a forward-looking schedule, not a demonstrated outcome, and migration plans are notoriously prone to slippage, especially for a quarter-bound, leadership-driven timeline with no evidence of buffer built in for the failures already surfacing elsewhere (e.g., the missing ticketing integration under sample-chat-a4, and untested data migration under sample-chat-a2). A one-month planned buffer can evaporate quickly if even one of the other critical assumptions breaks, which the evidence base already suggests is happening. The most important untested risk: there is no historical evidence of this team or vendor completing comparable migrations on schedule, so the 'plan tracks to one month early' claim should be treated as an aspirational milestone, not a reliable predictor of actual runway sufficiency.",
           "evidenceIds": []
         }
       ]
@@ -463,21 +463,21 @@
           "assumptionId": "sample-chat-a1",
           "status": "needs_review",
           "confidence": "low",
-          "rationale": "Load-bearing assumption with zero supporting evidence and comprehensive untested risk: no uptime history, SLA terms, incident logs, or comparable deployment data exist for the new platform. The challenge documents that the entire premise rests on an unverified assumption that lower cost implies higher reliability, a logical fallacy. Switching from a known unreliable baseline to an unknown reliability profile without first-month production data, load testing, or vendor incident history creates unacceptable risk for a critical assumption.",
+          "rationale": "Critical assumption with zero supporting evidence and comprehensive untested risk: no uptime history, SLA terms, incident logs, or comparable deployment data exist for the new platform. The challenge documents that the entire premise rests on an unverified assumption that lower cost implies higher reliability, a logical fallacy. Switching from a known unreliable baseline to an unknown reliability profile without first-month production data, load testing, or vendor incident history creates unacceptable risk for a critical assumption.",
           "evidenceIds": []
         },
         {
           "assumptionId": "sample-chat-a2",
           "status": "needs_review",
           "confidence": "low",
-          "rationale": "Load-bearing assumption with zero migration validation evidence. No test migration, pilot audit, trial-run data, or export/import compatibility confirmation exists. The challenge correctly identifies that full-fidelity chat history migration (threading, attachments, metadata) is a common failure point, and the pressure to complete before contract renewal increases risk that validation gets rushed or skipped entirely, making post-cutover data loss discovery irreversible.",
+          "rationale": "Critical assumption with zero migration validation evidence. No test migration, pilot audit, trial-run data, or export/import compatibility confirmation exists. The challenge correctly identifies that full-fidelity chat history migration (threading, attachments, metadata) is a common failure point, and the pressure to complete before contract renewal increases risk that validation gets rushed or skipped entirely, making post-cutover data loss discovery irreversible.",
           "evidenceIds": []
         },
         {
           "assumptionId": "sample-chat-a3",
           "status": "needs_review",
           "confidence": "medium",
-          "rationale": "Conflicting evidence on load-bearing assumption. Supporting evidence (sample-chat-e1: marketing pilot 90% adoption in two weeks) is moderate in strength but non-representative; marketing workflows typically have lower integration complexity and less operational dependency than engineering/support/ops teams. Challenge correctly notes no error rates beyond two weeks, no satisfaction survey data, and no evidence of reversion behavior under deadline pressure. Generalizing departmental pilot results to mandatory full-team migration underestimates adoption friction for teams with heavier tool dependencies.",
+          "rationale": "Conflicting evidence on critical assumption. Supporting evidence (sample-chat-e1: marketing pilot 90% adoption in two weeks) is moderate in strength but non-representative; marketing workflows typically have lower integration complexity and less operational dependency than engineering/support/ops teams. Challenge correctly notes no error rates beyond two weeks, no satisfaction survey data, and no evidence of reversion behavior under deadline pressure. Generalizing departmental pilot results to mandatory full-team migration underestimates adoption friction for teams with heavier tool dependencies.",
           "evidenceIds": [
             "sample-chat-e1"
           ]
@@ -486,7 +486,7 @@
           "assumptionId": "sample-chat-a4",
           "status": "weakened",
           "confidence": "high",
-          "rationale": "Strong contradicting evidence (sample-chat-e2) confirms that ticketing system integration, explicitly named as a critical tool in the assumption's own signpost, is missing and requires manual workarounds. Per hard rule, a load-bearing assumption cannot hold when strong contradicting evidence exists. The ticketing integration failure is not hypothetical; it is a documented current-state gap. Beyond ticketing, no evidence confirms successful integration with project management, CRM, or monitoring tools either, leaving the 'adequate integration' claim undermined across the board.",
+          "rationale": "Strong contradicting evidence (sample-chat-e2) confirms that ticketing system integration, explicitly named as a critical tool in the assumption's own warning signal, is missing and requires manual workarounds. Per hard rule, a critical assumption cannot hold when strong contradicting evidence exists. The ticketing integration failure is not hypothetical; it is a documented current-state gap. Beyond ticketing, no evidence confirms successful integration with project management, CRM, or monitoring tools either, leaving the 'adequate integration' claim undermined across the board.",
           "evidenceIds": [
             "sample-chat-e2"
           ]
@@ -495,7 +495,7 @@
           "assumptionId": "sample-chat-a5",
           "status": "needs_review",
           "confidence": "medium",
-          "rationale": "Conflicting evidence on load-bearing assumption. Supporting evidence (sample-chat-e4: rollout plan tracking one month early) is moderate but forward-looking and unproven, a schedule, not a demonstrated outcome. Migration plans are notoriously prone to slippage. Critically, the one-month planned buffer is vulnerable to being consumed by failures already surfacing in other load-bearing assumptions (missing ticketing integration under sample-chat-a4, untested migration under sample-chat-a2). No historical precedent of this team or vendor completing comparable migrations on schedule exists. Buffer sufficiency cannot be validated until upstream assumption risks are resolved.",
+          "rationale": "Conflicting evidence on critical assumption. Supporting evidence (sample-chat-e4: rollout plan tracking one month early) is moderate but forward-looking and unproven, a schedule, not a demonstrated outcome. Migration plans are notoriously prone to slippage. Critically, the one-month planned buffer is supporting to being consumed by failures already surfacing in other critical assumptions (missing ticketing integration under sample-chat-a4, untested migration under sample-chat-a2). No historical precedent of this team or vendor completing comparable migrations on schedule exists. Buffer sufficiency cannot be validated until upstream assumption risks are resolved.",
           "evidenceIds": [
             "sample-chat-e4"
           ]
@@ -504,7 +504,7 @@
     },
     "reporter": {
       "healthGrade": "watch",
-      "summary": "The decision to migrate the team chat platform before contract renewal is at Watch status, not yet At Risk. The single most important finding: the critical integration assumption is already weakened by confirmed evidence that the new platform's ticketing system connector is missing, forcing manual workarounds on a tool named explicitly as critical. Three other load-bearing assumptions, platform reliability, data migration fidelity, and timeline sufficiency, currently rest on zero or weak validating evidence, meaning much of this migration is proceeding on unverified assumptions under deadline pressure.",
+      "summary": "The decision to migrate the team chat platform before contract renewal is at Watch status, not yet At Risk. The single most important finding: the critical integration assumption is already weakened by confirmed evidence that the new platform's ticketing system connector is missing, forcing manual workarounds on a tool named explicitly as critical. Three other critical assumptions, platform reliability, data migration fidelity, and timeline sufficiency, currently rest on zero or weak validating evidence, meaning much of this migration is proceeding on unverified assumptions under deadline pressure.",
       "findings": [
         {
           "assumptionId": "sample-chat-a1",
@@ -543,7 +543,7 @@
         {
           "assumptionId": "sample-chat-a5",
           "status": "needs_review",
-          "rationale": "The one-month buffer is a forward-looking schedule claim, not a demonstrated outcome, and migration plans are prone to slippage. That buffer is especially vulnerable given failures already surfacing in the integration and data-migration assumptions, which could consume the runway.",
+          "rationale": "The one-month buffer is a forward-looking schedule claim, not a demonstrated outcome, and migration plans are prone to slippage. That buffer is especially supporting given failures already surfacing in the integration and data-migration assumptions, which could consume the runway.",
           "receipts": [
             {
               "evidenceId": "sample-chat-e4",

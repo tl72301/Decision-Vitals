@@ -1,5 +1,6 @@
-// About page: the portfolio case study (PLAN.md Section 12), drafted from the
-// outline. Plain content, muted styling, honest framing throughout.
+// About page: the portfolio case study. Business-facing language throughout;
+// the one academic reference (the RAND method that inspired it) lives only in
+// the small footer credit.
 
 const SectionTitle = ({ children }) => (
   <h2 className="mt-10 text-lg font-semibold tracking-tight text-stone-900">
@@ -23,120 +24,111 @@ export default function About() {
         Decision Vitals
       </h1>
       <P>
-        Vital signs for the decisions you've already made: a lightweight,
-        multi-agent implementation of Assumption-Based Planning that watches
-        the assumptions under a business decision and tells you when they stop
-        holding.
+        Vital signs for the decisions you've already made. Decision Vitals
+        watches the assumptions a business decision rests on and tells you when
+        the evidence starts to turn against one.
       </P>
 
       <SectionTitle>The problem</SectionTitle>
       <P>
         Decisions get made once and reviewed never. The assumptions underneath
-        them, about customers, capacity, timing, and the market, quietly expire,
-        and nobody notices until the damage shows up in the numbers. Most
-        organizations monitor decisions by vibes: the review happens after the
-        failure, not before it.
+        them, about customers, capacity, timing, and the market, quietly go out
+        of date, and nobody notices until the damage shows up in the numbers.
+        Most teams monitor their decisions by gut feel: the review happens after
+        the failure, not before it.
       </P>
 
-      <SectionTitle>The inspiration: Assumption-Based Planning</SectionTitle>
+      <SectionTitle>The idea</SectionTitle>
       <P>
-        Assumption-Based Planning is a RAND methodology built on a simple
-        taxonomy: identify the assumptions a plan rests on, mark the ones that
-        are <em>load-bearing</em> (the plan fails if they're false) and{" "}
-        <em>vulnerable</em> (plausibly false within the plan's horizon), attach{" "}
-        <em>signposts</em> (observable signals that an assumption is failing),
-        and prepare <em>shaping actions</em> (strengthen the assumption) and{" "}
-        <em>hedging actions</em> (prepare for its failure). It rarely gets used
-        outside defense planning for one reason: it's heavy. It assumes a
-        planning staff. The thesis of this project is that language-model
-        agents make ABP cheap enough to run continuously on ordinary business
-        decisions.
+        Every decision rests on a few assumptions. Some are{" "}
+        <strong>critical</strong>: if they turn out to be wrong, the decision
+        could seriously weaken or break. Others are{" "}
+        <strong>supporting</strong>: they still matter, but the decision can
+        probably survive if they change. For each one there is a{" "}
+        <strong>warning signal</strong>, the specific thing you should watch for
+        that would show the assumption may no longer be true. This way of
+        pressure-testing a plan comes from a decades-old risk-planning method
+        (credited below); the bet here is that AI agents make it light enough to
+        actually use on everyday decisions.
       </P>
 
       <SectionTitle>What it does</SectionTitle>
       <P>
-        You register a decision and Decision Vitals extracts its assumptions,
-        tiers them, and gives each one a signpost. You paste in evidence as it
-        accumulates: meeting notes, tickets, customer feedback, market
-        updates. When you run a review, four specialist agents map evidence to
-        assumptions, argue against every assumption, apply status rules, and
-        write a Decision Health Report: a grade, per-assumption verdicts with
-        quoted evidence receipts, the strongest disconfirming case, and
-        concrete shaping and hedging actions. Reviews are versioned, so a
-        decision accumulates a health history instead of a single verdict.
+        You register a decision and Decision Vitals pulls out the assumptions
+        underneath it, marks which are critical, and gives each a warning signal
+        to watch. You paste in evidence as it accumulates: meeting notes,
+        tickets, customer feedback, market updates. When you review the
+        decision, four specialist agents map the evidence to each assumption,
+        argue against every one of them, grade where each stands, and write a
+        Decision Health Report: an overall grade, a verdict for each assumption
+        with the quoted evidence behind it, the strongest case against, and
+        concrete next steps. Reviews are numbered, so a decision builds up a
+        health history instead of a single one-time verdict.
       </P>
 
-      <SectionTitle>Agent architecture</SectionTitle>
+      <SectionTitle>How it's built</SectionTitle>
       <P>
-        Six specialist agents run on Claude Managed Agents, each a named,
-        versioned agent definition on the Claude Platform: Intake and
-        Classifier at registration; Evidence Review, Challenge, Risk Ranking,
-        and Reporter at review time. Judgment-heavy roles (Challenge, Reporter)
-        run on a Sonnet-class model; structured extraction runs on Haiku. The
-        application orchestrates them as a deterministic sequential pipeline
-        with typed JSON contracts, where each agent's output schema is the next
-        agent's input contract, and every run produces a traceable session in
-        the Claude Console.
+        Six specialist agents run on Claude Managed Agents, each its own named,
+        versioned configuration: two extract and label the assumptions when you
+        register a decision, and four (Evidence Review, Challenge, Risk Ranking,
+        and Reporter) run the review. The heavier-judgment roles run on a
+        larger model; the structured extraction runs on a faster one. The app
+        runs them in a fixed sequence with a typed handoff between each step,
+        and every run is traceable back to its session on the platform.
       </P>
       <P>
-        Deterministic rules are layered on top of model judgment. A
-        load-bearing assumption with strong contradicting evidence can never be
-        marked "holding," and the health grade derives mechanically from
-        assumption statuses; the app enforces both even if a model drifts.
-        The platform's research-preview agent-to-agent coordination was
-        skipped deliberately: app-driven sequencing is simpler, not
-        access-gated, and easier to reason about. Platform-level coordination
-        is the obvious next step, and it's on the roadmap.
+        A few rules sit on top of the model's judgment so the results stay
+        consistent: a critical assumption with strong evidence against it can
+        never be marked as still holding, and the overall health grade is
+        computed from the individual verdicts rather than left to the model.
+        Multi-agent coordination on the platform was left out on purpose, an
+        app-driven sequence is simpler to reason about and is the obvious place
+        to go next.
       </P>
 
       <SectionTitle>Product decisions</SectionTitle>
       <P>
-        <strong>Paste-only evidence.</strong> No integrations, no parsing.
-        Adoption beats automation for a tool like this: if capturing evidence
-        takes more than a paste, it doesn't happen.
+        <strong>Paste-only evidence.</strong> No integrations, no file parsing.
+        Adoption beats automation for a tool like this: if capturing a piece of
+        evidence takes more than a paste, it doesn't happen.
       </P>
       <P>
-        <strong>User-editable assumptions.</strong> You can reword, retier, or
-        delete assumptions before the first review: human judgment enters the
-        loop before machine review, not after.
+        <strong>You edit the assumptions.</strong> Before the first review you
+        can reword, re-rank, or delete any assumption, so human judgment goes in
+        before the machine's, not after.
       </P>
       <P>
-        <strong>Versioned reviews, not background monitoring.</strong> Each
-        review is an explicit, numbered event with an immutable evidence
-        trail. That's the honest, lightweight version of "continuous
-        monitoring."
+        <strong>Numbered reviews, not silent monitoring.</strong> Each review is
+        an explicit, dated event with an evidence trail that doesn't change after
+        the fact. That's the honest, lightweight version of "always watching."
       </P>
       <P>
-        <strong>Demo Mode.</strong> The public site replays recorded real
-        agent runs, labeled as such. Recorded, not faked, and the live
-        pipeline is passphrase-gated so the demo stays reliable and free to
-        host.
+        <strong>Demo mode.</strong> The public site replays real recorded agent
+        runs, labeled as such, so anyone can try it with no cost; live runs are
+        passphrase-protected.
       </P>
 
       <SectionTitle>Limitations</SectionTitle>
       <P>
-        Evidence quality is user-dependent, and sources aren't weighted: a
-        rumor and an audited number carry the same formal weight. Scope is
-        single-decision: there's no dependency tracking between decisions. And
-        the model's judgment on evidence direction and strength is not
-        calibrated; the deterministic rules bound its worst failure modes, but
-        they don't eliminate judgment error.
+        Results are only as good as the evidence you paste in, and sources
+        aren't weighted, a rumor and an audited number count the same. It works
+        on one decision at a time, with no links between related decisions. And
+        the model's read on how strongly a piece of evidence cuts is a judgment
+        call, the built-in rules limit the worst mistakes but don't remove them.
       </P>
 
-      <SectionTitle>What I'd build next</SectionTitle>
+      <SectionTitle>What's next</SectionTitle>
       <P>
-        Scheduled evidence pulls from one source (a project tool is the
-        natural first candidate), assumption dependency links across decisions,
-        and signpost alerting: notify the owner when a signpost fires rather
-        than waiting for a manual review. Cross-decision propagation, where one
-        invalidated assumption cascades into every decision that shares it, is
-        the follow-on project.
+        Pulling evidence automatically from one source (a project tool is the
+        natural first one), linking related decisions so a broken assumption in
+        one flags the others, and alerting the owner the moment a warning signal
+        shows up rather than waiting for a manual review.
       </P>
 
       <div className="mt-10 border-t border-stone-200 pt-6 text-sm text-stone-500">
         <p>
           Built with Claude Code on the web; agents hosted on Claude Managed
-          Agents; deployed on Vercel.{" "}
+          Agents; deployed on Vercel. Inspired by{" "}
           <a
             href="https://www.rand.org/pubs/monograph_reports/MR114.html"
             target="_blank"
@@ -145,6 +137,7 @@ export default function About() {
           >
             Assumption-Based Planning (RAND)
           </a>
+          .
         </p>
       </div>
     </div>
