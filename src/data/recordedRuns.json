@@ -1,5 +1,177 @@
 {
   "_meta": {
-    "note": "Recorded real agent runs, replayed in Demo Mode. Keyed by decision id, then agent slug. Populated from live runs via the 'Copy run JSON' button (PLAN.md Section 9, item 15)."
+    "note": "Recorded real agent runs, replayed in Demo Mode. Keyed by decision id, then agent slug. Populated from live runs via the 'Copy run JSON' button (PLAN.md Section 9, item 15). Outputs are verbatim captures of live Managed Agents sessions."
+  },
+  "sample-pricing": {
+    "evidence_review": {
+      "mappings": [
+        {
+          "evidenceId": "sample-pricing-e1",
+          "assumptionId": "sample-pricing-a1",
+          "direction": "contradicts",
+          "strength": "strong",
+          "reading": "Major customer explicitly rejected usage-based model at renewal, escalating to committee review."
+        },
+        {
+          "evidenceId": "sample-pricing-e2",
+          "assumptionId": "sample-pricing-a4",
+          "direction": "contradicts",
+          "strength": "strong",
+          "reading": "Competitor reversed course on usage pricing after mid-market churn, reintroducing seat-based floor."
+        },
+        {
+          "evidenceId": "sample-pricing-e3",
+          "assumptionId": "sample-pricing-a2",
+          "direction": "contradicts",
+          "strength": "strong",
+          "reading": "Billing team revised estimate to 9 weeks with cross-team dependencies, slipping past 5-week production-ready target."
+        },
+        {
+          "evidenceId": "sample-pricing-e4",
+          "assumptionId": "sample-pricing-a3",
+          "direction": "supports",
+          "strength": "moderate",
+          "reading": "Limited sample shows 29% deal ask-through on usage pricing with AE belief of expansion in 2 of 7 deals."
+        }
+      ]
+    },
+    "challenge": {
+      "challenges": [
+        {
+          "assumptionId": "sample-pricing-a1",
+          "type": "evidenced",
+          "case": "The assumption that enough customers will accept usage-based terms at renewal to protect NRR is directly contradicted by sample-pricing-e1, where a major customer not only rejected the new model but escalated to committee review — the strongest form of renewal friction possible short of outright churn. If this is representative rather than an outlier, the 'enough customers' threshold may not hold: a single major account escalating suggests procurement teams are treating this as a contract renegotiation event, not a routine renewal, which typically lengthens sales cycles, invites discounting, and creates precedent for other accounts to demand exceptions or grandfathering. There is no evidence presented of a base rate (how many renewals have occurred, what fraction accepted vs. rejected), so the sample may be unrepresentative in either direction — but the one data point available points toward rejection, not acceptance, undercutting the assumption's directional confidence.",
+          "evidenceIds": ["sample-pricing-e1"]
+        },
+        {
+          "assumptionId": "sample-pricing-a2",
+          "type": "evidenced",
+          "case": "The assumption that metering infrastructure will be production-ready before Q4 cutover is contradicted by sample-pricing-e3: the billing team's own revised estimate is 9 weeks with new cross-team dependencies, nearly double the 5-week plan the assumption was implicitly built on. Revised estimates that slip this dramatically (80% overrun) after work has begun are a strong signal of underestimated complexity rather than a one-off scheduling hiccup, and the emergence of 'cross-team dependencies' suggests scope was not fully understood at the time the Q4 date was set. This is not a marginal miss — it likely pushes readiness past the Q4 window entirely, meaning the cutover date and the infrastructure assumption may already be incompatible.",
+          "evidenceIds": ["sample-pricing-e3"]
+        },
+        {
+          "assumptionId": "sample-pricing-a3",
+          "type": "evidenced",
+          "case": "The only evidence offered for this assumption, sample-pricing-e4, is far weaker than its 'supports' label implies and can be read as undermining the assumption rather than confirming it. A 29% ask-through rate on usage pricing in a late-stage pipeline means over 70% of deals show no signal of interest in the new model at all, and only 2 of 7 AEs (29%) believe it drove expansion — a minority view from a small, likely non-random sample. This is consistent with the assumption's own stated disconfirming signpost ('AEs reporting no expansion effect'), which is already partially triggered by 5 of 7 AEs not reporting an expansion effect. Treating this data as support rather than a warning sign risks confirmation bias; the more honest reading is that deal expansion from usage pricing is unproven and possibly limited to a narrow subset of deals.",
+          "evidenceIds": ["sample-pricing-e4"]
+        },
+        {
+          "assumptionId": "sample-pricing-a4",
+          "type": "evidenced",
+          "case": "The assumption that the market-wide shift to usage-based pricing will continue is directly contradicted by sample-pricing-e2: a competitor has already reversed course, reintroducing a seat-based floor after experiencing mid-market churn attributed to usage pricing. This is a leading indicator that the category-wide trend may not be monotonic or durable — if usage-based pricing causes churn in the segment most sensitive to bill volatility (mid-market), the same dynamic could apply to this company's own mid-market base, and other competitors may follow suit in walking back usage pricing. The decision context cites 'two competitors moved to usage-based this year' as supporting rationale, but if one of those two is the one now reversing, the competitive momentum argument is weaker than presented and may be actively eroding rather than strengthening.",
+          "evidenceIds": ["sample-pricing-e2"]
+        }
+      ]
+    },
+    "risk_ranking": {
+      "rankings": [
+        {
+          "assumptionId": "sample-pricing-a1",
+          "status": "weakened",
+          "confidence": "low",
+          "rationale": "Strong contradicting evidence (sample-pricing-e1) documents a major customer explicitly rejecting usage-based terms at renewal and escalating to committee review. This is the strongest form of renewal friction and directly contradicts the assumption's 'enough customers will accept' threshold. However, a single data point lacks base-rate context (total renewals, fraction accepted vs. rejected), so the contradiction cannot be deemed conclusive yet. Nonetheless, the direction of available evidence points toward rejection, not acceptance, and the hard rule prohibits 'holding' status given a load_bearing assumption with strong contradicting evidence.",
+          "evidenceIds": ["sample-pricing-e1"]
+        },
+        {
+          "assumptionId": "sample-pricing-a2",
+          "status": "invalidated",
+          "confidence": "high",
+          "rationale": "Strong contradicting evidence (sample-pricing-e3) from the billing team's own revised estimate (9 weeks vs. 5-week plan) represents an 80% overrun and emergence of cross-team dependencies not accounted for in the original assumption. This magnitude of slip after work has begun signals underestimated complexity rather than a marginal scheduling adjustment, and likely pushes infrastructure readiness past the Q4 cutover window entirely. The estimate comes from an authoritative source (billing team) and contradicts the load_bearing assumption directly and conclusively.",
+          "evidenceIds": ["sample-pricing-e3"]
+        },
+        {
+          "assumptionId": "sample-pricing-a3",
+          "status": "weakened",
+          "confidence": "medium",
+          "rationale": "Evidence (sample-pricing-e4) labeled as supporting is substantially weaker than claimed. A 29% ask-through rate means 71% of late-stage deals show no signal of interest in usage pricing, and only 2 of 7 AEs (29%) report expansion effect — a minority view. This aligns precisely with the assumption's own disconfirming signpost ('AEs reporting no expansion effect'), which is already partially triggered. The data does not substantiate the expansion premise and instead reveals the early warning sign embedded in the assumption's own failure condition.",
+          "evidenceIds": ["sample-pricing-e4"]
+        },
+        {
+          "assumptionId": "sample-pricing-a4",
+          "status": "weakened",
+          "confidence": "medium",
+          "rationale": "Strong contradicting evidence (sample-pricing-e2) shows a competitor has reversed course on usage-based pricing due to mid-market churn, reintroducing a seat-based floor. This is a leading indicator that the market shift may not be durable or monotonic. If usage pricing drives churn in the mid-market segment, the same dynamic threatens this company's own mid-market base, and competitor follow-through on reversals could accelerate. While the broader category trend is not disproven by a single competitor action, the momentum assumption is eroding rather than strengthening.",
+          "evidenceIds": ["sample-pricing-e2"]
+        }
+      ]
+    },
+    "reporter": {
+      "healthGrade": "at_risk",
+      "summary": "The move to usage-based billing in Q4 is at risk: the billing team's own revised estimate puts metering infrastructure at 9 weeks against a 5-week plan, likely missing the Q4 cutover entirely. Renewal risk is also mounting — a major customer rejected usage-based terms outright and escalated to committee review — while the competitive momentum cited to justify the shift is already cracking, with one competitor reversing its own usage-pricing move after mid-market churn.",
+      "findings": [
+        {
+          "assumptionId": "sample-pricing-a1",
+          "status": "weakened",
+          "rationale": "A major customer explicitly rejected usage-based terms at renewal and escalated to committee review, the strongest form of renewal friction short of churn. This is a single data point without base-rate context on total renewals, so it is not yet conclusive, but the only evidence available points toward rejection rather than acceptance.",
+          "receipts": [
+            {
+              "evidenceId": "sample-pricing-e1",
+              "quote": "per-seat is the only pricing model their procurement will approve"
+            }
+          ]
+        },
+        {
+          "assumptionId": "sample-pricing-a2",
+          "status": "invalidated",
+          "rationale": "The billing team's own revised estimate is 9 weeks, not 5, an 80% overrun, with new cross-team dependencies discovered after work began. This is an authoritative, direct contradiction that likely pushes infrastructure readiness past the Q4 cutover window.",
+          "receipts": [
+            {
+              "evidenceId": "sample-pricing-e3",
+              "quote": "metering infrastructure at 9 weeks, not the 5 in the original plan"
+            }
+          ]
+        },
+        {
+          "assumptionId": "sample-pricing-a3",
+          "status": "weakened",
+          "rationale": "The only evidence cited as 'supporting' this assumption is weaker than labeled: just under a third of late-stage deals showed unprompted interest in usage pricing, and AEs believed it drove expansion in only 2 of 7 deals. This partially triggers the assumption's own disconfirming signpost (AEs reporting no expansion effect) rather than confirming it.",
+          "receipts": [
+            {
+              "evidenceId": "sample-pricing-e4",
+              "quote": "3 of 7 late-stage deals asked about usage pricing unprompted"
+            }
+          ]
+        },
+        {
+          "assumptionId": "sample-pricing-a4",
+          "status": "weakened",
+          "rationale": "A competitor already reversed course on usage-based pricing after mid-market churn, reintroducing a seat-based floor. This undercuts the decision's own stated rationale that competitor moves support the shift, and suggests the mid-market segment may react the same way to this company's pricing change.",
+          "receipts": [
+            {
+              "evidenceId": "sample-pricing-e2",
+              "quote": "walked back part of its usage pricing after churn in mid-market accounts"
+            }
+          ]
+        }
+      ],
+      "challengeHighlights": [
+        "A single major account (Meridian) explicitly rejected usage-based terms and escalated to committee review — the strongest form of renewal friction short of outright churn.",
+        "The billing team's 9-week revised estimate, against a 5-week plan, with new cross-team dependencies, likely pushes infrastructure readiness past the Q4 cutover.",
+        "Only 29% of late-stage deals showed unprompted interest in usage pricing; 71% showed none, partially triggering the assumption's own stated failure signpost.",
+        "One of the competitors cited as evidence of market momentum has already reversed its usage-pricing move after mid-market churn, weakening the decision's competitive rationale."
+      ],
+      "actions": [
+        {
+          "type": "hedging",
+          "assumptionId": "sample-pricing-a2",
+          "text": "Have the billing lead present a revised go-live plan by next steering committee — either a phased/partial metering rollout for Q4 or a formal cutover date change — given the 9-week estimate exceeds the current timeline."
+        },
+        {
+          "type": "shaping",
+          "assumptionId": "sample-pricing-a1",
+          "text": "Have customer success run structured renewal conversations with the next 10 at-risk accounts before Q4 lock-in to establish a real acceptance rate, not just the single Meridian data point."
+        },
+        {
+          "type": "hedging",
+          "assumptionId": "sample-pricing-a4",
+          "text": "Have competitive intelligence document the competitor's seat-based reversal in detail (which segments, what triggered churn) and brief the pricing team on whether the same risk applies to this company's mid-market base."
+        },
+        {
+          "type": "shaping",
+          "assumptionId": "sample-pricing-a3",
+          "text": "Have sales ops survey all AEs on the full late-stage pipeline (not just the 7-deal sample) to confirm or disconfirm the expansion effect before using it to justify the pricing change."
+        }
+      ]
+    }
   }
 }
