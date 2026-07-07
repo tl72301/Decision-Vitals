@@ -394,5 +394,193 @@
         }
       ]
     }
+  },
+  "sample-cafe": {
+    "evidence_review": {
+      "mappings": [
+        {
+          "evidenceId": "sample-cafe-e1",
+          "assumptionId": "sample-cafe-a1",
+          "direction": "supports",
+          "strength": "moderate",
+          "reading": "Downtown foot traffic exceeds current location by 40%, suggesting strong customer availability"
+        },
+        {
+          "evidenceId": "sample-cafe-e2",
+          "assumptionId": "sample-cafe-a2",
+          "direction": "contradicts",
+          "strength": "strong",
+          "reading": "Six-week hiring cycles and one-month turnover indicate existing staffing bottlenecks before expansion"
+        },
+        {
+          "evidenceId": "sample-cafe-e3",
+          "assumptionId": "sample-cafe-a3",
+          "direction": "contradicts",
+          "strength": "moderate",
+          "reading": "Approximately one-third of regulars report intent to switch to downtown location"
+        },
+        {
+          "evidenceId": "sample-cafe-e4",
+          "assumptionId": "sample-cafe-a4",
+          "direction": "supports",
+          "strength": "strong",
+          "reading": "Contractor confirms completion two weeks before free-rent period expires"
+        }
+      ]
+    },
+    "challenge": {
+      "challenges": [
+        {
+          "assumptionId": "sample-cafe-a1",
+          "type": "untested_risk",
+          "case": "The only evidence offered (sample-cafe-e1) measures raw foot-traffic counts, not conversion into paying café customers. Downtown business-district foot traffic is structurally different from the current location's: it is dominated by office workers with narrow, predictable rush windows (a single morning surge and a lunch surge), collapses on evenings, weekends, and holidays, and is highly sensitive to hybrid/remote-work attendance patterns that can shrink 20-40% on any given day. A district with 40% more pedestrians may also have far more entrenched coffee competition (chains, other independents, lobby kiosks) absorbing that traffic before it ever reaches a new storefront, and higher rents typically signal higher customer price sensitivity to a like-for-like menu. No data on actual conversion rate, competitive density, average daily office occupancy, or comparable-café sales in that district has been presented. The most important untested risk is that foot-traffic volume is being used as a proxy for revenue potential without any measurement of purchase intent or competitive saturation in that specific corridor.",
+          "evidenceIds": []
+        },
+        {
+          "assumptionId": "sample-cafe-a2",
+          "type": "evidenced",
+          "case": "The operational readiness assumption is directly undermined by existing-shop data: six-week hiring cycles and one-month average staff turnover (sample-cafe-e2) show the business is already unable to reliably staff a single location, let alone hire, train, and retain enough additional staff to open a second site without depleting the first. Opening a downtown location this fall would likely require pulling trained staff from the original shop to cover the new site during its ramp-up, degrading service exactly where the business is already at capacity. There is no evidence of expanded supplier capacity, a second-location staffing plan, or a management bench able to run two sites simultaneously — the existing bottleneck evidence suggests the opposite of 'adequate systems,' not merely an absence of proof.",
+          "evidenceIds": [
+            "sample-cafe-e2"
+          ]
+        },
+        {
+          "assumptionId": "sample-cafe-a3",
+          "type": "evidenced",
+          "case": "Roughly a third of current regulars report they intend to switch to the downtown location (sample-cafe-e3). This is a direct, moderate-strength signal that the new store will substantially cannibalize existing-location revenue rather than purely capturing incremental downtown demand. If a third of the customer base migrates, the combined-location sales gain could be far smaller than the standalone downtown revenue projection implies, and the original shop's unit economics (which depend on volume to justify its own staffing and lease) could deteriorate. The assumption as stated should be treated as already contradicted, not merely at risk.",
+          "evidenceIds": [
+            "sample-cafe-e3"
+          ]
+        },
+        {
+          "assumptionId": "sample-cafe-a4",
+          "type": "untested_risk",
+          "case": "The contractor's own estimate (sample-cafe-e4) leaves only a two-week buffer before the free-rent period expires — a margin thin enough to be erased by a single permitting delay, inspection failure, equipment lead-time slip, or subcontractor scheduling conflict, all of which are common in commercial build-outs and none of which are addressed by the evidence. Contractor completion estimates are also self-reported and typically optimistic; no historical base rate for this contractor's on-time delivery, no contingency plan for a delay, and no analysis of what a delay would cost (paying rent before revenue starts, or losing the incentive entirely) has been presented. The most important untested risk is that a two-week buffer provides no real protection against the ordinary variance in commercial construction timelines, and the decision has no stated fallback if the buffer is consumed.",
+          "evidenceIds": []
+        }
+      ]
+    },
+    "risk_ranking": {
+      "rankings": [
+        {
+          "assumptionId": "sample-cafe-a1",
+          "status": "needs_review",
+          "confidence": "low",
+          "rationale": "Supporting evidence (sample-cafe-e1) measures raw foot-traffic volume (+40%) but provides no measurement of conversion rate, competitive saturation, or purchase intent. The challenge correctly identifies that downtown office-district foot traffic is structurally different (narrow rush windows, weekend/evening collapse, hybrid-work volatility) and likely faces higher competitive density and price-sensitive customers. For a load-bearing assumption, a foot-traffic proxy without conversion data, comparable-café revenue benchmarks, or office-occupancy risk factors is insufficient to establish that sales will meet current-location levels.",
+          "evidenceIds": [
+            "sample-cafe-e1"
+          ]
+        },
+        {
+          "assumptionId": "sample-cafe-a2",
+          "status": "invalidated",
+          "confidence": "high",
+          "rationale": "Strong contradicting evidence (sample-cafe-e2) demonstrates the business is already unable to reliably staff a single location: six-week hiring cycles and one-month average turnover indicate existing bottlenecks before any expansion. This directly contradicts the assumption of 'adequate staffing, supply chain capacity, and operational systems' for two locations. Per the hard rule, a load-bearing assumption with strong contradicting evidence cannot hold. Opening a second site would require pulling trained staff from the original shop, guaranteeing service degradation at the existing location. No evidence of expanded recruitment capacity, supplier readiness, or management bench strength is presented.",
+          "evidenceIds": [
+            "sample-cafe-e2"
+          ]
+        },
+        {
+          "assumptionId": "sample-cafe-a3",
+          "status": "weakened",
+          "confidence": "medium",
+          "rationale": "Moderate contradicting evidence (sample-cafe-e3) shows approximately one-third of current regulars intend to switch to the downtown location, signaling substantial cannibalization rather than incremental demand. One-third customer migration directly contradicts the assumption that the new location will not pull a large share of existing-shop revenue. While customer intent is not identical to realized behavior (hence 'weakened' rather than full invalidation), the evidence is direct and credible. Vulnerable-tier status permits a weakened rating; however, the assumption's validity is in question and requires mitigation planning.",
+          "evidenceIds": [
+            "sample-cafe-e3"
+          ]
+        },
+        {
+          "assumptionId": "sample-cafe-a4",
+          "status": "holding",
+          "confidence": "medium",
+          "rationale": "Strong supporting evidence (sample-cafe-e4) confirms contractor completion two weeks before free-rent expiration. However, the challenge correctly identifies an untested margin-of-safety risk: a two-week buffer is thin and vulnerable to ordinary construction variance (permitting delays, inspections, equipment lead times, subcontractor conflicts). Contractor estimates are self-reported and typically optimistic; no historical performance data or contingency plan exists. Assumption holds based on the contractor's commitment, but confidence is medium because the buffer cannot absorb ordinary project risks, and failure to complete on time carries unquantified cost consequences.",
+          "evidenceIds": [
+            "sample-cafe-e4"
+          ]
+        }
+      ]
+    },
+    "reporter": {
+      "healthGrade": "at_risk",
+      "summary": "The decision to open a downtown café this fall is at risk because the load-bearing assumption that current operations can support two locations is invalidated: hiring takes about six weeks and a recent new hire quit within a month, meaning the business is already short-staffed before adding a second site. A second load-bearing assumption, that downtown foot traffic will translate into comparable sales, is unproven, resting only on raw pedestrian counts with no conversion, competition, or occupancy data. Cannibalization of the existing shop is also already signaled by customer intent data, compounding the operational risk.",
+      "findings": [
+        {
+          "assumptionId": "sample-cafe-a1",
+          "status": "needs_review",
+          "rationale": "The only supporting evidence measures raw pedestrian volume, not paying customers. Downtown office traffic is concentrated in narrow rush windows, collapses on evenings/weekends, and may face denser coffee competition, none of which has been measured.",
+          "receipts": [
+            {
+              "evidenceId": "sample-cafe-e1",
+              "quote": "about 40 percent more weekday foot traffic than the street our current café"
+            }
+          ]
+        },
+        {
+          "assumptionId": "sample-cafe-a2",
+          "status": "invalidated",
+          "rationale": "The business cannot currently staff its one existing location reliably, undermining any claim that it has the systems to run two locations without service degradation.",
+          "receipts": [
+            {
+              "evidenceId": "sample-cafe-e2",
+              "quote": "took about six weeks to fill"
+            },
+            {
+              "evidenceId": "sample-cafe-e2",
+              "quote": "one of those new hires left within a month"
+            }
+          ]
+        },
+        {
+          "assumptionId": "sample-cafe-a3",
+          "status": "weakened",
+          "rationale": "A third of existing regulars say they'll switch to the downtown location, indicating substantial revenue cannibalization rather than purely incremental demand.",
+          "receipts": [
+            {
+              "evidenceId": "sample-cafe-e3",
+              "quote": "roughly a third of them work downtown and say they would visit"
+            }
+          ]
+        },
+        {
+          "assumptionId": "sample-cafe-a4",
+          "status": "holding",
+          "rationale": "Contractor confirms a two-week buffer before free rent expires, but self-reported estimates and thin margins leave no room for ordinary permitting or supply delays, and no contingency plan exists.",
+          "receipts": [
+            {
+              "evidenceId": "sample-cafe-e4",
+              "quote": "on track to finish about two weeks before the free-rent period ends"
+            }
+          ]
+        }
+      ],
+      "challengeHighlights": [
+        "Foot-traffic volume is being treated as a revenue proxy with no data on conversion rate, competitive density, or office occupancy volatility in the downtown corridor.",
+        "Existing hiring and turnover bottlenecks suggest the business would need to pull trained staff from its current shop to open a second location, degrading service at the original site.",
+        "One-third of regulars intending to switch downtown means the assumption of minimal cannibalization should be treated as already contradicted, not merely at risk.",
+        "A two-week rent-free buffer offers no real protection against ordinary commercial construction variance, and no fallback plan exists if it's consumed."
+      ],
+      "actions": [
+        {
+          "type": "hedging",
+          "assumptionId": "sample-cafe-a2",
+          "text": "Store manager to finalize and document a staffing plan, hire and fully train at least 2 additional baristas plus a backup shift lead, before committing to an opening date."
+        },
+        {
+          "type": "shaping",
+          "assumptionId": "sample-cafe-a1",
+          "text": "Marketing lead to run a 2-week downtown pop-up or partner kiosk test measuring actual transactions per 100 pedestrians, not just foot-traffic counts, before signing the lease."
+        },
+        {
+          "type": "hedging",
+          "assumptionId": "sample-cafe-a3",
+          "text": "Ops manager to set up unique promo codes or loyalty tracking at both locations to measure real customer migration in the first 60 days, with a pre-set staffing/hours adjustment trigger at the original shop if migration exceeds 20%."
+        },
+        {
+          "type": "shaping",
+          "assumptionId": "sample-cafe-a4",
+          "text": "Owner to obtain a written contingency schedule from the contractor (permit status, inspection dates, equipment lead times) and negotiate a two-week rent-extension option with the landlord as insurance against delay."
+        }
+      ]
+    }
   }
 }
