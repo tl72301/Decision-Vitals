@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { createEvidence, evidenceByDecision, deleteEvidence } from "../lib/store.js";
 import { SOURCE_TYPE, sourceTypeLabel, formatDate } from "../lib/labels.js";
+import Chip from "./Chip.jsx";
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -81,9 +82,9 @@ export default function EvidencePanel({ decisionId, locked }) {
           >
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2 text-xs">
-                <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 font-medium text-slate-600 ring-1 ring-inset ring-slate-200">
+                <Chip tone="bg-slate-100 text-slate-600 ring-slate-200">
                   {sourceTypeLabel(ev.sourceType)}
-                </span>
+                </Chip>
                 {ev.date && <span className="text-slate-400">{formatDate(ev.date)}</span>}
               </div>
               {!locked && (

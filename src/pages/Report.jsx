@@ -14,6 +14,7 @@ import {
   sourceTypeLabel,
   formatDate,
 } from "../lib/labels.js";
+import Chip from "../components/Chip.jsx";
 
 function NotFound({ id }) {
   return (
@@ -48,20 +49,13 @@ function FindingRow({ finding, assumption }) {
   const status = statusMeta(finding.status);
   const tier = assumption ? tierMeta(assumption.tier) : null;
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
       <div className="flex flex-wrap items-center gap-2">
-        <span
-          className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${status.chip}`}
-        >
-          {status.label}
-        </span>
+        <Chip tone={status.chip}>{status.label}</Chip>
         {tier && (
-          <span
-            title={tier.help}
-            className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${tier.chip}`}
-          >
+          <Chip tone={tier.chip} title={tier.help}>
             {tier.label}
-          </span>
+          </Chip>
         )}
       </div>
       <p className="mt-2 text-sm font-medium text-slate-900">
@@ -111,7 +105,7 @@ export default function Report() {
               Decision Health Report · Review #{report.runNumber} ·{" "}
               {formatDate(report.createdAt)}
             </p>
-            <h1 className="mt-1 text-xl font-semibold text-slate-900">
+            <h1 className="mt-1 text-xl font-semibold leading-snug text-slate-900 sm:text-2xl">
               {decision.statement || decision.title}
             </h1>
           </div>
@@ -122,7 +116,7 @@ export default function Report() {
           </span>
         </div>
         {report.summary && (
-          <p className="mt-3 text-sm leading-relaxed text-slate-700">
+          <p className="mt-4 max-w-prose text-base leading-relaxed text-slate-700">
             {report.summary}
           </p>
         )}
@@ -197,7 +191,7 @@ export default function Report() {
           <h2 className="text-lg font-semibold text-slate-900">Next actions</h2>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             <div>
-              <h3 className="text-sm font-medium text-slate-600">
+              <h3 className="text-sm font-semibold text-slate-700">
                 Shaping{" "}
                 <span className="font-normal text-slate-400">
                   — strengthen the assumption
@@ -223,7 +217,7 @@ export default function Report() {
               </ul>
             </div>
             <div>
-              <h3 className="text-sm font-medium text-slate-600">
+              <h3 className="text-sm font-semibold text-slate-700">
                 Hedging{" "}
                 <span className="font-normal text-slate-400">
                   — prepare for it failing

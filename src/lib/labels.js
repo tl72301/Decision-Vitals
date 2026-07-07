@@ -20,21 +20,25 @@ export function healthGradeMeta(grade) {
   return HEALTH_GRADE[grade] ?? HEALTH_GRADE_UNREVIEWED;
 }
 
-/** Assumption tier (derived label for the UI). */
+/**
+ * Assumption tier (derived label for the UI). Tiers are OUTLINED (white bg,
+ * colored ring) while statuses are FILLED, so a tier chip and a status chip
+ * read as different kinds of information when they sit side by side.
+ */
 export const TIER = {
   load_bearing: {
     label: "Load-bearing",
-    chip: "bg-indigo-100 text-indigo-800 ring-indigo-200",
+    chip: "bg-white text-indigo-700 ring-indigo-300",
     help: "If this is false, the decision fails or needs major rework.",
   },
   vulnerable: {
     label: "Vulnerable",
-    chip: "bg-amber-100 text-amber-800 ring-amber-200",
+    chip: "bg-white text-amber-700 ring-amber-300",
     help: "Could realistically become false within the decision's horizon.",
   },
   lower_risk: {
     label: "Lower-risk",
-    chip: "bg-slate-100 text-slate-700 ring-slate-200",
+    chip: "bg-white text-slate-600 ring-slate-300",
     help: "Not decision-breaking and not especially likely to fail.",
   },
 };
