@@ -7,6 +7,7 @@ import {
   evidenceByDecision,
   createAgentRun,
   updateAgentRun,
+  purgeOrphanRuns,
 } from "../lib/store.js";
 import { buildAndSaveReport } from "../lib/review.js";
 import Spinner from "../components/Spinner.jsx";
@@ -89,6 +90,10 @@ export default function AgentRun() {
       sourceType: e.sourceType,
       date: e.date,
     }));
+
+    // Clear out failed/abandoned runs so this review's number lines up with
+    // the reports that actually exist.
+    purgeOrphanRuns(id);
 
     // Local working copy of the steps that we mirror into the stored AgentRun.
     let working = PIPELINE.map((p) => ({
