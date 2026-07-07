@@ -394,5 +394,205 @@
         }
       ]
     }
+  },
+  "sample-selfserve": {
+    "evidence_review": {
+      "mappings": [
+        {
+          "evidenceId": "sample-selfserve-e1",
+          "assumptionId": "sample-selfserve-a1",
+          "direction": "contradicts",
+          "strength": "strong",
+          "reading": "Industry benchmark shows mid-market buyers convert 3x better with sales assistance, not self-serve alone."
+        },
+        {
+          "evidenceId": "sample-selfserve-e2",
+          "assumptionId": "sample-selfserve-a2",
+          "direction": "contradicts",
+          "strength": "strong",
+          "reading": "58% of trial dropoff is at data-connection step; the process we must automate remains the primary blocker."
+        },
+        {
+          "evidenceId": "sample-selfserve-e3",
+          "assumptionId": "sample-selfserve-a2",
+          "direction": "contradicts",
+          "strength": "moderate",
+          "reading": "30% of automation work remains on the exact data-connection step causing 58% of trial failures."
+        },
+        {
+          "evidenceId": "sample-selfserve-e3",
+          "assumptionId": "sample-selfserve-a4",
+          "direction": "contradicts",
+          "strength": "moderate",
+          "reading": "Critical onboarding automation work is only 70% complete with January deadline in focus."
+        },
+        {
+          "evidenceId": "sample-selfserve-e4",
+          "assumptionId": "sample-selfserve-a3",
+          "direction": "contradicts",
+          "strength": "strong",
+          "reading": "Current support ticket volume makes self-serve unprofitable below $400/mo unless deflection improves materially."
+        }
+      ]
+    },
+    "challenge": {
+      "challenges": [
+        {
+          "assumptionId": "sample-selfserve-a1",
+          "type": "evidenced",
+          "case": "The entire premise of this launch is 'expand into mid-market without growing the sales team' — but sample-selfserve-e1 shows the category benchmark runs directly counter to that: mid-market buyors convert 3x better with sales assistance than through self-serve alone. If this category-level pattern holds for us, a pure self-serve funnel isn't just suboptimal, it may fail to produce enough volume to justify the investment at all. The strongest counter-case: management may be forced to quietly reintroduce sales-assisted touches to rescue conversion, which reinstates the CAC problem this launch was supposed to solve, only now split across two motions with added complexity and no proof the self-serve segment alone can carry revenue targets.",
+          "evidenceIds": [
+            "sample-selfserve-e1"
+          ]
+        },
+        {
+          "assumptionId": "sample-selfserve-a2",
+          "type": "evidenced",
+          "case": "This assumption is contradicted at its most concrete and specific point: sample-selfserve-e2 shows 58% of trial drop-off is concentrated exactly at the data-connection step — the step this assumption claims can be automated away. sample-selfserve-e3 compounds this by showing the automation project addressing that exact step is only ~70% complete, meaning the unresolved 30% overlaps precisely with the majority failure point. The strongest case against: this isn't a general onboarding friction problem that can be smoothed over with UX polish — it's a specific, unsolved technical dependency sitting at the single largest point of customer loss, and there is no evidence the remaining automation work will close the gap before real customers hit it.",
+          "evidenceIds": [
+            "sample-selfserve-e2",
+            "sample-selfserve-e3"
+          ]
+        },
+        {
+          "assumptionId": "sample-selfserve-a3",
+          "type": "evidenced",
+          "case": "sample-selfserve-e4 directly contradicts the profitability premise: current support ticket volume makes self-serve customers unprofitable below $400/mo unless deflection improves materially. If mid-market ARPU lands below that threshold — plausible given mid-market buyers typically pay less than enterprise — every self-serve customer acquired could be a net economic drag rather than the efficient growth the board is asking for. The strongest case: this tier could hit its adoption goals (customers sign up) while simultaneously making unit economics worse, not better, because support cost per customer wasn't sized for a lower-price, higher-volume segment. No evidence is cited showing deflection improvements are underway or funded.",
+          "evidenceIds": [
+            "sample-selfserve-e4"
+          ]
+        },
+        {
+          "assumptionId": "sample-selfserve-a4",
+          "type": "evidenced",
+          "case": "sample-selfserve-e3 shows the critical onboarding-automation work — the same dependency underlying a2 — is only 70% complete with January as the stated deadline. A January launch assumes this remaining 30% (which sits at the highest-failure point in the funnel per e2) closes on schedule, but no evidence in the record shows an accelerated plan, added engineering capacity, or a track record of hitting recent milestones. The strongest case against: launching in January without this gap closed doesn't just risk a delayed release — it risks shipping into the exact broken step that already drives 58% of trial failure, converting a timeline slip into a launch-day product failure visible to the first cohort of new customers.",
+          "evidenceIds": [
+            "sample-selfserve-e3"
+          ]
+        }
+      ]
+    },
+    "risk_ranking": {
+      "rankings": [
+        {
+          "assumptionId": "sample-selfserve-a1",
+          "status": "invalidated",
+          "confidence": "high",
+          "rationale": "Strong contradicting evidence from industry benchmark (sample-selfserve-e1) shows mid-market buyers convert 3x better with sales assistance than self-serve alone. This directly contradicts the core premise of the purely self-serve funnel. Load-bearing assumption with strong contradicting evidence cannot hold. The challenge case demonstrates this invalidates the entire cost model the launch depends on.",
+          "evidenceIds": [
+            "sample-selfserve-e1"
+          ]
+        },
+        {
+          "assumptionId": "sample-selfserve-a2",
+          "status": "invalidated",
+          "confidence": "high",
+          "rationale": "Strong contradicting evidence (sample-selfserve-e2) shows 58% of trial dropoff concentrates at the exact data-connection step this assumption claims can be automated. Compounding evidence (sample-selfserve-e3) shows 30% of automation work remains on that same critical step. Load-bearing assumption with strong contradicting evidence at its most concrete failure point cannot hold. No evidence supports closure of this gap before customer exposure.",
+          "evidenceIds": [
+            "sample-selfserve-e2",
+            "sample-selfserve-e3"
+          ]
+        },
+        {
+          "assumptionId": "sample-selfserve-a3",
+          "status": "invalidated",
+          "confidence": "high",
+          "rationale": "Strong contradicting evidence (sample-selfserve-e4) establishes current support ticket volume makes self-serve unprofitable below $400/mo. If mid-market ARPU lands below this profitability threshold—plausible for the segment—self-serve customers become net economic drag, not efficient growth. Load-bearing assumption with strong contradicting evidence cannot hold. Challenge case identifies no evidence of funded deflection improvements.",
+          "evidenceIds": [
+            "sample-selfserve-e4"
+          ]
+        },
+        {
+          "assumptionId": "sample-selfserve-a4",
+          "status": "weakened",
+          "confidence": "medium",
+          "rationale": "Moderate contradicting evidence (sample-selfserve-e3) shows critical onboarding automation is only 70% complete with January deadline. The remaining 30% overlaps the highest-failure point in the funnel (58% drop at data-connection per sample-selfserve-e2). Credible evidence of scheduling risk without conclusive proof of miss. Vulnerable tier: weakened rather than invalidated. No evidence cited for accelerated plans or track record of recent milestone hits.",
+          "evidenceIds": [
+            "sample-selfserve-e3"
+          ]
+        }
+      ]
+    },
+    "reporter": {
+      "healthGrade": "at_risk",
+      "summary": "The decision to launch a self-serve tier in January to expand into mid-market rests on three load-bearing assumptions, and all three are invalidated by direct evidence. The most important finding: industry data shows mid-market buyers convert 3x better with sales assistance than pure self-serve, undermining the core premise that this segment can be won without a sales motion at all. Compounding this, the onboarding automation needed to remove human touch is unfinished at the exact step causing most trial failures, and current support costs would make self-serve unprofitable at likely mid-market price points.",
+      "findings": [
+        {
+          "assumptionId": "sample-selfserve-a1",
+          "status": "invalidated",
+          "rationale": "Category benchmark data directly contradicts the core premise of a purely self-serve funnel for mid-market buyers.",
+          "receipts": [
+            {
+              "evidenceId": "sample-selfserve-e1",
+              "quote": "convert 3x better with sales-assisted trials than pure self-serve"
+            }
+          ]
+        },
+        {
+          "assumptionId": "sample-selfserve-a2",
+          "status": "invalidated",
+          "rationale": "The majority of trial drop-off occurs at the exact data-connection step this assumption claims can be automated, and the automation project's remaining work covers precisely that step.",
+          "receipts": [
+            {
+              "evidenceId": "sample-selfserve-e2",
+              "quote": "couldn't connect our data without help"
+            },
+            {
+              "evidenceId": "sample-selfserve-e3",
+              "quote": "remaining 30 percent covers exactly the data-connection step"
+            }
+          ]
+        },
+        {
+          "assumptionId": "sample-selfserve-a3",
+          "status": "invalidated",
+          "rationale": "Current support cost structure makes self-serve unprofitable below a price point mid-market customers are likely to fall under, with no funded plan to change that.",
+          "receipts": [
+            {
+              "evidenceId": "sample-selfserve-e4",
+              "quote": "unprofitable below $400/mo unless deflection improves"
+            }
+          ]
+        },
+        {
+          "assumptionId": "sample-selfserve-a4",
+          "status": "weakened",
+          "rationale": "The onboarding automation needed for January is incomplete, and the unfinished portion is the same step responsible for most trial failures, with no evidence of an accelerated plan.",
+          "receipts": [
+            {
+              "evidenceId": "sample-selfserve-e3",
+              "quote": "Onboarding automation project is 70 percent complete"
+            }
+          ]
+        }
+      ],
+      "challengeHighlights": [
+        "If category-level sales-assistance advantage holds, self-serve alone may not produce enough volume to justify the launch, forcing a quiet reintroduction of sales touches that reinstates the original CAC problem.",
+        "Onboarding automation is unsolved at the single largest point of customer loss (58% drop-off), not a general UX issue that can be smoothed over before launch.",
+        "The tier could hit adoption targets while still making unit economics worse, since support costs weren't sized for a lower-price, higher-volume segment and no deflection funding is evidenced."
+      ],
+      "actions": [
+        {
+          "type": "shaping",
+          "assumptionId": "sample-selfserve-a1",
+          "text": "Run a small paid pilot testing pure self-serve conversion against a sales-assisted control group in mid-market before committing to a January launch date."
+        },
+        {
+          "type": "hedging",
+          "assumptionId": "sample-selfserve-a2",
+          "text": "Have engineering leadership confirm in writing whether the data-connection automation will be fully complete and tested before January, with a fallback plan (e.g., temporary concierge onboarding) if it slips."
+        },
+        {
+          "type": "shaping",
+          "assumptionId": "sample-selfserve-a3",
+          "text": "Have the support lead model ticket-deflection improvements needed to reach profitability at the actual planned mid-market ARPU, and get funding committed for those improvements before launch."
+        },
+        {
+          "type": "hedging",
+          "assumptionId": "sample-selfserve-a4",
+          "text": "Set a go/no-go checkpoint in early December tied to automation completion percentage, with an explicit decision owner authorized to delay the January launch if the data-connection step isn't resolved."
+        }
+      ]
+    }
   }
 }
