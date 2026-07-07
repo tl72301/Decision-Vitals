@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { runAgent } from "../lib/api.js";
 import { createDecision, createAssumptions } from "../lib/store.js";
+import { isDemo, subscribeMode } from "../lib/mode.js";
 import Spinner from "../components/Spinner.jsx";
 
 // The two Phase-A steps shown in the progress panel while agents run.
@@ -55,10 +56,14 @@ export default function NewDecision() {
   const [steps, setSteps] = useState({ intake: "pending", classifier: "pending" });
   const [error, setError] = useState("");
 
+  const [, setModeVersion] = useState(0);
+  useEffect(() => subscribeMode(() => setModeVersion((v) => v + 1)), []);
+  const demo = isDemo();
+
   const update = (field) => (e) =>
     setForm((f) => ({ ...f, [field]: e.target.value }));
 
-  const canSubmit = form.statement.trim().length > 0 && !running;
+  const canSubmit = form.statement.trim().length > 0 && !running && !demo;
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -133,6 +138,14 @@ export default function NewDecision() {
         Describe a decision you've already made. Decision Vitals extracts the
         assumptions underneath it.
       </p>
+
+      {demo && (
+        <div className="mt-4 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-800 ring-1 ring-inset ring-amber-200">
+          Demo Mode replays recorded agent runs on the sample decisions, so it
+          can't extract assumptions from a new decision. Switch to Live Mode
+          (header toggle) to register your own.
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-5">
         <div>

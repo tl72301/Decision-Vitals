@@ -137,6 +137,16 @@ export default async function handler(req, res) {
     return res.status(405).json({ ok: false, error: "Method not allowed" });
   }
 
+  // Live Mode gate: when LIVE_MODE_PASSPHRASE is set, every real agent run
+  // must present it. Demo Mode never reaches this route.
+  const requiredPassphrase = process.env.LIVE_MODE_PASSPHRASE;
+  if (requiredPassphrase && req.headers["x-live-passphrase"] !== requiredPassphrase) {
+    return res.status(401).json({
+      ok: false,
+      error: "Live Mode requires the correct passphrase. Unlock it via the header toggle.",
+    });
+  }
+
   const body = req.body ?? {};
   const { agent: agentSlug, payload } = body;
   const def = agentSlug && agentByKey(agentSlug);
