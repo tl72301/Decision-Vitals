@@ -1,75 +1,148 @@
 {
   "decisions": [
     {
-      "id": "sample-pricing",
-      "title": "Move to usage-based billing in Q4",
-      "statement": "Migrate our B2B SaaS product from per-seat pricing to usage-based billing in Q4.",
-      "context": "Flat NRR, sales says seats are capping deal sizes, two competitors moved to usage-based this year.",
+      "id": "sample-cafe",
+      "title": "Expand café to downtown business district",
+      "statement": "Open a second café location in the downtown business district this fall.",
+      "context": "Our single shop is at capacity on weekday mornings; a downtown storefront just opened up with three months of free rent; the owner wants to grow before a competitor takes the spot.",
       "owner": "",
-      "createdAt": "2026-06-15T09:00:00.000Z",
+      "createdAt": "2026-07-01T09:00:00.000Z",
       "healthGrade": null,
       "assumptions": [
         {
-          "id": "sample-pricing-a1",
-          "text": "Enough current customers will accept usage-based pricing at renewal to protect NRR.",
+          "id": "sample-cafe-a1",
+          "text": "Downtown foot traffic will support sales close to what our current location does.",
           "loadBearing": true,
-          "vulnerable": true,
+          "vulnerable": false,
           "tier": "load_bearing",
-          "signpost": "Renewal conversations where procurement rejects or escalates usage-based terms."
+          "signpost": "Weekday foot-traffic counts, or early sales at the new site, coming in well below the current shop"
         },
         {
-          "id": "sample-pricing-a2",
-          "text": "Metering infrastructure can be production-ready before the Q4 billing cutover.",
+          "id": "sample-cafe-a2",
+          "text": "The business has adequate staffing, supply chain capacity, and operational systems to manage two locations simultaneously without degrading service quality.",
           "loadBearing": true,
-          "vulnerable": true,
+          "vulnerable": false,
           "tier": "load_bearing",
-          "signpost": "Billing team timeline estimates slipping past the 5-week plan or new cross-team dependencies."
+          "signpost": "Customer complaints about wait times or order errors increase at the original location; staff turnover accelerates; supplier delivery delays or stockouts occur; order-to-service time exceeds historical averages at either location."
         },
         {
-          "id": "sample-pricing-a3",
-          "text": "Usage-based pricing will expand deal sizes in the current sales pipeline.",
+          "id": "sample-cafe-a3",
+          "text": "The new location will not pull a large share of sales away from our existing shop.",
           "loadBearing": false,
           "vulnerable": true,
           "tier": "vulnerable",
-          "signpost": "Late-stage deals not asking about usage pricing, or AEs reporting no expansion effect."
+          "signpost": "Existing-store sales dropping once the downtown location opens."
         },
         {
-          "id": "sample-pricing-a4",
-          "text": "The market shift toward usage-based pricing in our category will continue.",
+          "id": "sample-cafe-a4",
+          "text": "The build-out will be finished before the three months of free rent run out.",
           "loadBearing": false,
           "vulnerable": true,
           "tier": "vulnerable",
-          "signpost": "Competitors walking back usage pricing or reintroducing seat-based elements."
+          "signpost": "The contractor timeline slipping past the free-rent window."
         }
       ],
       "evidence": [
         {
-          "id": "sample-pricing-e1",
-          "text": "Renewal call with Meridian: CFO said per-seat is the only pricing model their procurement will approve this fiscal year. Usage-based would push renewal to committee.",
-          "sourceType": "customer_feedback",
-          "date": "2026-06-20",
-          "addedAt": "2026-06-20T14:00:00.000Z"
-        },
-        {
-          "id": "sample-pricing-e2",
-          "text": "Competitor B walked back part of its usage pricing after churn in mid-market accounts, reintroducing a seat-based floor.",
+          "id": "sample-cafe-e1",
+          "text": "A pedestrian-count study of the downtown block shows about 40 percent more weekday foot traffic than the street our current café is on.",
           "sourceType": "market_update",
-          "date": "2026-06-24",
-          "addedAt": "2026-06-24T10:00:00.000Z"
+          "date": "2026-06-15",
+          "addedAt": "2026-06-15T09:00:00.000Z"
         },
         {
-          "id": "sample-pricing-e3",
-          "text": "Billing team estimates metering infrastructure at 9 weeks, not the 5 in the original plan. Two dependencies on the platform team.",
+          "id": "sample-cafe-e2",
+          "text": "Our last two barista job postings each took about six weeks to fill, and one of those new hires left within a month",
           "sourceType": "status_update",
-          "date": "2026-06-26",
-          "addedAt": "2026-06-26T16:00:00.000Z"
+          "date": "2026-06-18",
+          "addedAt": "2026-06-18T09:00:00.000Z"
         },
         {
-          "id": "sample-pricing-e4",
-          "text": "Sales pipeline review: 3 of 7 late-stage deals asked about usage pricing unprompted. AEs believe it would have expanded 2 of them.",
+          "id": "sample-cafe-e3",
+          "text": "A quick survey of our regulars found that roughly a third of them work downtown and say they would visit the new location instead of the current one",
+          "sourceType": "customer_feedback",
+          "date": "2026-06-21",
+          "addedAt": "2026-06-21T09:00:00.000Z"
+        },
+        {
+          "id": "sample-cafe-e4",
+          "text": "The contractor confirmed the build-out is on track to finish about two weeks before the free-rent period ends.",
+          "sourceType": "status_update",
+          "date": "2026-06-24",
+          "addedAt": "2026-06-24T09:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "id": "sample-bakery",
+      "title": "Start opening the bakery on Sundays",
+      "statement": "Open our bakery on Sundays year-round, on top of our current Tuesday-to-Saturday schedule.",
+      "context": "Weekends are our best days and customers keep asking for Sunday hours, but we are not sure the added labor and supplier costs pencil out.",
+      "owner": "",
+      "createdAt": "2026-06-20T09:00:00.000Z",
+      "healthGrade": null,
+      "assumptions": [
+        {
+          "id": "sample-bakery-a1",
+          "text": "Sunday sales will be strong enough to cover the added labor and utility costs of opening a seventh day.",
+          "loadBearing": true,
+          "vulnerable": true,
+          "tier": "load_bearing",
+          "signpost": "Early Sunday sales landing below the level needed to cover staffing and overhead."
+        },
+        {
+          "id": "sample-bakery-a2",
+          "text": "We can staff Sundays without burning out our current team or relying on margin-eating overtime.",
+          "loadBearing": true,
+          "vulnerable": true,
+          "tier": "load_bearing",
+          "signpost": "Current staff declining Sunday shifts, or overtime hours climbing week over week."
+        },
+        {
+          "id": "sample-bakery-a3",
+          "text": "Sunday hours will add new sales rather than just shifting customers away from our busy Saturday.",
+          "loadBearing": false,
+          "vulnerable": true,
+          "tier": "vulnerable",
+          "signpost": "Saturday sales dropping once Sundays open."
+        },
+        {
+          "id": "sample-bakery-a4",
+          "text": "Our main flour supplier can deliver for a seventh day without a surcharge that eats the added margin.",
+          "loadBearing": false,
+          "vulnerable": true,
+          "tier": "vulnerable",
+          "signpost": "The supplier quoting weekend delivery fees, or refusing a Sunday or Monday drop."
+        }
+      ],
+      "evidence": [
+        {
+          "id": "sample-bakery-e1",
+          "text": "A counter survey found that 62 percent of our weekday regulars said they would come in on Sundays if we were open.",
+          "sourceType": "customer_feedback",
+          "date": "2026-06-15",
+          "addedAt": "2026-06-15T09:00:00.000Z"
+        },
+        {
+          "id": "sample-bakery-e2",
+          "text": "Two of our four bakers said they do not want Sunday shifts; covering Sundays would mean paying overtime to the other two.",
+          "sourceType": "status_update",
+          "date": "2026-06-18",
+          "addedAt": "2026-06-18T09:00:00.000Z"
+        },
+        {
+          "id": "sample-bakery-e3",
+          "text": "The bakery two blocks over that added Sunday hours last year says Sunday is now their second-busiest day, with no real drop in Saturday sales.",
+          "sourceType": "market_update",
+          "date": "2026-06-21",
+          "addedAt": "2026-06-21T09:00:00.000Z"
+        },
+        {
+          "id": "sample-bakery-e4",
+          "text": "Our flour supplier confirmed that adding a Sunday delivery would come with a 40-dollar weekend surcharge per drop.",
           "sourceType": "meeting_notes",
-          "date": "2026-06-27",
-          "addedAt": "2026-06-27T11:00:00.000Z"
+          "date": "2026-06-24",
+          "addedAt": "2026-06-24T09:00:00.000Z"
         }
       ]
     },
@@ -143,79 +216,6 @@
           "sourceType": "meeting_notes",
           "date": "2026-06-27",
           "addedAt": "2026-06-27T15:00:00.000Z"
-        }
-      ]
-    },
-    {
-      "id": "sample-cafe",
-      "title": "Expand café to downtown business district",
-      "statement": "Open a second café location in the downtown business district this fall.",
-      "context": "Our single shop is at capacity on weekday mornings; a downtown storefront just opened up with three months of free rent; the owner wants to grow before a competitor takes the spot.",
-      "owner": "",
-      "createdAt": "2026-06-14T09:00:00.000Z",
-      "healthGrade": null,
-      "assumptions": [
-        {
-          "id": "sample-cafe-a1",
-          "text": "Downtown foot traffic will support sales close to what our current location does.",
-          "loadBearing": true,
-          "vulnerable": false,
-          "tier": "load_bearing",
-          "signpost": "Weekday foot-traffic counts, or early sales at the new site, coming in well below the current shop"
-        },
-        {
-          "id": "sample-cafe-a2",
-          "text": "The business has adequate staffing, supply chain capacity, and operational systems to manage two locations simultaneously without degrading service quality.",
-          "loadBearing": true,
-          "vulnerable": false,
-          "tier": "load_bearing",
-          "signpost": "Customer complaints about wait times or order errors increase at the original location; staff turnover accelerates; supplier delivery delays or stockouts occur; order-to-service time exceeds historical averages at either location."
-        },
-        {
-          "id": "sample-cafe-a3",
-          "text": "The new location will not pull a large share of sales away from our existing shop.",
-          "loadBearing": false,
-          "vulnerable": true,
-          "tier": "vulnerable",
-          "signpost": "Existing-store sales dropping once the downtown location opens."
-        },
-        {
-          "id": "sample-cafe-a4",
-          "text": "The build-out will be finished before the three months of free rent run out.",
-          "loadBearing": false,
-          "vulnerable": true,
-          "tier": "vulnerable",
-          "signpost": "The contractor timeline slipping past the free-rent window."
-        }
-      ],
-      "evidence": [
-        {
-          "id": "sample-cafe-e1",
-          "text": "A pedestrian-count study of the downtown block shows about 40 percent more weekday foot traffic than the street our current café is on.",
-          "sourceType": "market_update",
-          "date": "2026-06-15",
-          "addedAt": "2026-06-15T09:00:00.000Z"
-        },
-        {
-          "id": "sample-cafe-e2",
-          "text": "Our last two barista job postings each took about six weeks to fill, and one of those new hires left within a month",
-          "sourceType": "status_update",
-          "date": "2026-06-18",
-          "addedAt": "2026-06-18T09:00:00.000Z"
-        },
-        {
-          "id": "sample-cafe-e3",
-          "text": "A quick survey of our regulars found that roughly a third of them work downtown and say they would visit the new location instead of the current one",
-          "sourceType": "customer_feedback",
-          "date": "2026-06-21",
-          "addedAt": "2026-06-21T09:00:00.000Z"
-        },
-        {
-          "id": "sample-cafe-e4",
-          "text": "The contractor confirmed the build-out is on track to finish about two weeks before the free-rent period ends.",
-          "sourceType": "status_update",
-          "date": "2026-06-24",
-          "addedAt": "2026-06-24T09:00:00.000Z"
         }
       ]
     }
