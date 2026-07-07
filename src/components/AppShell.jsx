@@ -60,7 +60,15 @@ export default function AppShell({ children }) {
               Vital signs for the decisions you've already made
             </span>
           </Link>
-          <ModeToggle />
+          <div className="flex items-center gap-4">
+            <Link
+              to="/about"
+              className="text-xs font-medium text-stone-500 hover:text-stone-800"
+            >
+              About
+            </Link>
+            <ModeToggle />
+          </div>
         </div>
       </header>
       {isDemo() && (
@@ -69,6 +77,21 @@ export default function AppShell({ children }) {
         </div>
       )}
       <main className="mx-auto max-w-5xl px-4 py-6 sm:py-8">{children}</main>
+      <footer className="mx-auto max-w-5xl px-4 pb-8 pt-4 text-xs text-stone-400">
+        Inspired by{" "}
+        <a
+          href="https://www.rand.org/pubs/monograph_reports/MR114.html"
+          target="_blank"
+          rel="noreferrer"
+          className="underline decoration-stone-300 underline-offset-2 hover:text-stone-600"
+        >
+          Assumption-Based Planning
+        </a>{" "}
+        (RAND) ·{" "}
+        <Link to="/about" className="underline decoration-stone-300 underline-offset-2 hover:text-stone-600">
+          Case study
+        </Link>
+      </footer>
     </div>
   );
 }

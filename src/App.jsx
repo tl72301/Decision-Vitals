@@ -6,6 +6,7 @@ import NewDecision from "./pages/NewDecision.jsx";
 import DecisionDetail from "./pages/DecisionDetail.jsx";
 import AgentRun from "./pages/AgentRun.jsx";
 import Report from "./pages/Report.jsx";
+import About from "./pages/About.jsx";
 import NotFound from "./pages/NotFound.jsx";
 
 export default function App() {
@@ -18,6 +19,7 @@ export default function App() {
           <Route path="/decision/:id" element={<DecisionDetail />} />
           <Route path="/decision/:id/run" element={<AgentRun />} />
           <Route path="/decision/:id/report/:runId" element={<Report />} />
+          <Route path="/about" element={<About />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </ErrorBoundary>
