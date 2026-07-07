@@ -74,75 +74,75 @@
       ]
     },
     {
-      "id": "sample-bakery",
-      "title": "Start opening the bakery on Sundays",
-      "statement": "Open our bakery on Sundays year-round, on top of our current Tuesday-to-Saturday schedule.",
-      "context": "Weekends are our best days and customers keep asking for Sunday hours, but we are not sure the added labor and supplier costs pencil out.",
+      "id": "sample-chat",
+      "title": "Switch the team to a new chat app",
+      "statement": "Move our whole team off our current chat app onto a new one this quarter.",
+      "context": "Our current chat tool keeps going down and the new one is cheaper, and leadership wants the switch done before the current contract renews.",
       "owner": "",
       "createdAt": "2026-06-20T09:00:00.000Z",
       "healthGrade": null,
       "assumptions": [
         {
-          "id": "sample-bakery-a1",
-          "text": "Sunday sales will be strong enough to cover the added labor and utility costs of opening a seventh day.",
+          "id": "sample-chat-a1",
+          "text": "The team will actually adopt the new app instead of drifting back to the old tool or email.",
           "loadBearing": true,
           "vulnerable": true,
           "tier": "load_bearing",
-          "signpost": "Early Sunday sales landing below the level needed to cover staffing and overhead."
+          "signpost": "Message volume on the new app staying low, or people still working in the old tool weeks after the switch."
         },
         {
-          "id": "sample-bakery-a2",
-          "text": "We can staff Sundays without burning out our current team or relying on margin-eating overtime.",
+          "id": "sample-chat-a2",
+          "text": "The new app connects to the other tools we rely on, like our calendar, file storage, and ticketing.",
           "loadBearing": true,
           "vulnerable": true,
           "tier": "load_bearing",
-          "signpost": "Current staff declining Sunday shifts, or overtime hours climbing week over week."
+          "signpost": "A key integration missing or breaking after the switch."
         },
         {
-          "id": "sample-bakery-a3",
-          "text": "Sunday hours will add new sales rather than just shifting customers away from our busy Saturday.",
+          "id": "sample-chat-a3",
+          "text": "The new app will not end up costing more than the tool we are replacing once everyone is added.",
           "loadBearing": false,
           "vulnerable": true,
           "tier": "vulnerable",
-          "signpost": "Saturday sales dropping once Sundays open."
+          "signpost": "Per-user pricing tiers pushing the bill above what we pay today."
         },
         {
-          "id": "sample-bakery-a4",
-          "text": "Our main flour supplier can deliver for a seventh day without a surcharge that eats the added margin.",
+          "id": "sample-chat-a4",
+          "text": "We can move everyone over before the current contract renews.",
           "loadBearing": false,
           "vulnerable": true,
           "tier": "vulnerable",
-          "signpost": "The supplier quoting weekend delivery fees, or refusing a Sunday or Monday drop."
+          "signpost": "The rollout slipping past the renewal date."
         }
       ],
       "evidence": [
         {
-          "id": "sample-bakery-e1",
-          "text": "A counter survey found that 62 percent of our weekday regulars said they would come in on Sundays if we were open.",
-          "sourceType": "customer_feedback",
-          "date": "2026-06-15",
-          "addedAt": "2026-06-15T09:00:00.000Z"
-        },
-        {
-          "id": "sample-bakery-e2",
-          "text": "Two of our four bakers said they do not want Sunday shifts; covering Sundays would mean paying overtime to the other two.",
+          "id": "sample-chat-e1",
+          "text": "A pilot with the marketing team saw about 90 percent of them using the new app every day within two weeks.",
           "sourceType": "status_update",
-          "date": "2026-06-18",
-          "addedAt": "2026-06-18T09:00:00.000Z"
+          "date": "2026-06-16",
+          "addedAt": "2026-06-16T09:00:00.000Z"
         },
         {
-          "id": "sample-bakery-e3",
-          "text": "The bakery two blocks over that added Sunday hours last year says Sunday is now their second-busiest day, with no real drop in Saturday sales.",
-          "sourceType": "market_update",
-          "date": "2026-06-21",
-          "addedAt": "2026-06-21T09:00:00.000Z"
+          "id": "sample-chat-e2",
+          "text": "IT found the new app does not yet connect to our ticketing system, so linking a chat to a ticket has to be done by hand.",
+          "sourceType": "support_ticket",
+          "date": "2026-06-19",
+          "addedAt": "2026-06-19T09:00:00.000Z"
         },
         {
-          "id": "sample-bakery-e4",
-          "text": "Our flour supplier confirmed that adding a Sunday delivery would come with a 40-dollar weekend surcharge per drop.",
+          "id": "sample-chat-e3",
+          "text": "Finance pointed out that above 200 users the new app jumps to a higher price tier, which would wipe out the savings.",
           "sourceType": "meeting_notes",
-          "date": "2026-06-24",
-          "addedAt": "2026-06-24T09:00:00.000Z"
+          "date": "2026-06-22",
+          "addedAt": "2026-06-22T09:00:00.000Z"
+        },
+        {
+          "id": "sample-chat-e4",
+          "text": "The rollout plan is on track to finish about a month before the current contract renews.",
+          "sourceType": "status_update",
+          "date": "2026-06-25",
+          "addedAt": "2026-06-25T09:00:00.000Z"
         }
       ]
     },
