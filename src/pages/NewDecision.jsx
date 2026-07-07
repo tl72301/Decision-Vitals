@@ -135,8 +135,10 @@ export default function NewDecision() {
     <div className="mx-auto max-w-2xl">
       <h1 className="text-2xl font-semibold text-stone-900">New decision</h1>
       <p className="mt-1 text-sm text-stone-500">
-        Describe a decision you've already made. Decision Vitals extracts the
-        assumptions underneath it.
+        Describe a decision you've already made. When you submit, two agents
+        read it and pull out the 3 to 5 assumptions it depends on, labeling
+        which are load-bearing (the decision fails if they're wrong). You add
+        evidence and run a full review on the next screen.
       </p>
 
       {demo && (
