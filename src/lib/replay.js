@@ -2,7 +2,7 @@
 //
 // Demo Mode replay engine. Replays recorded real agent outputs (captured from
 // live runs) with staged 800–1500ms delays so the pipeline feels real, while
-// making zero API calls. Recorded, not faked — and labeled in the UI.
+// making zero API calls. Recorded, not faked, and labeled in the UI.
 
 import recorded from "../data/recordedRuns.json";
 
@@ -24,7 +24,7 @@ export async function replayAgent(agent, decisionId) {
   const output = decisionId && recorded[decisionId]?.[agent];
   if (!output) {
     throw new Error(
-      "No recorded run exists for this decision in Demo Mode. Demo Mode replays recorded agent runs on the sample decisions — switch to Live Mode (header toggle) to run real agents."
+      "No recorded run exists for this decision in Demo Mode. Demo Mode replays recorded agent runs on the sample decisions; switch to Live Mode (header toggle) to run real agents."
     );
   }
   return JSON.parse(JSON.stringify(output)); // never hand out the module object

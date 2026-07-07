@@ -173,7 +173,7 @@ export default function Report() {
             Challenge findings
           </h2>
           <p className="mt-1 text-sm text-stone-500">
-            The strongest case against each assumption — even the healthy ones.
+            The strongest case against each assumption, even the healthy ones.
           </p>
           <ul className="mt-4 space-y-2">
             {report.challengeHighlights.map((h, i) => (
@@ -197,7 +197,7 @@ export default function Report() {
               <h3 className="text-sm font-semibold text-stone-700">
                 Shaping{" "}
                 <span className="font-normal text-stone-400">
-                  — strengthen the assumption
+                  (strengthen the assumption)
                 </span>
               </h3>
               <ul className="mt-2 space-y-2">
@@ -223,7 +223,7 @@ export default function Report() {
               <h3 className="text-sm font-semibold text-stone-700">
                 Hedging{" "}
                 <span className="font-normal text-stone-400">
-                  — prepare for it failing
+                  (prepare for it failing)
                 </span>
               </h3>
               <ul className="mt-2 space-y-2">

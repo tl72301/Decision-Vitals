@@ -3,7 +3,7 @@
 // Demo/Live mode state. The app defaults to Demo Mode everywhere: recorded
 // agent runs are replayed with zero API calls. Live Mode runs real Managed
 // Agents sessions and is gated by a passphrase that the SERVER re-checks on
-// every /api/agent call — the client-side flag is convenience, not security.
+// every /api/agent call; the client-side flag is convenience, not security.
 
 const KEY = "decision_vitals_mode";
 
