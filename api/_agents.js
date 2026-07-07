@@ -21,6 +21,10 @@ export const ANTHROPIC_BASE = "https://api.anthropic.com";
 export const ANTHROPIC_BETA = "managed-agents-2026-04-01";
 export const ANTHROPIC_VERSION = "2023-06-01";
 
+// A single shared cloud sandbox is enough: these agents have no tools, so the
+// sandbox is inert — it exists only because a session requires an environment.
+export const ENV_NAME = "decision-vitals-env";
+
 /** Headers for every Managed Agents request. The key stays server-side. */
 export function apiHeaders(apiKey) {
   return {
@@ -89,4 +93,48 @@ export async function resolveAgentIds(apiKey) {
     if (existing) map[def.key] = existing.id;
   }
   return map;
+}
+
+// Cache the environment id across warm invocations so we don't re-resolve it
+// on every request. A cold start re-resolves by name (creating if missing).
+let envIdCache = null;
+
+/**
+ * Find the shared cloud environment by name, creating it if it does not exist.
+ * @returns {Promise<string>} environment id
+ */
+export async function resolveEnvironmentId(apiKey) {
+  if (envIdCache) return envIdCache;
+
+  // Try to find an existing environment by name.
+  try {
+    const url = new URL(`${ANTHROPIC_BASE}/v1/environments`);
+    url.searchParams.set("limit", "100");
+    const res = await fetch(url, { headers: apiHeaders(apiKey) });
+    if (res.ok) {
+      const json = await res.json();
+      const data = Array.isArray(json) ? json : json.data ?? [];
+      const found = data.find((e) => e && e.name === ENV_NAME);
+      if (found) {
+        envIdCache = found.id;
+        return envIdCache;
+      }
+    }
+  } catch {
+    // Fall through to creation.
+  }
+
+  const res = await fetch(`${ANTHROPIC_BASE}/v1/environments`, {
+    method: "POST",
+    headers: apiHeaders(apiKey),
+    body: JSON.stringify({
+      name: ENV_NAME,
+      config: { type: "cloud", networking: { type: "unrestricted" } },
+    }),
+  });
+  if (!res.ok) {
+    throw new Error(`Create environment failed (${res.status}): ${await res.text()}`);
+  }
+  envIdCache = (await res.json()).id;
+  return envIdCache;
 }
