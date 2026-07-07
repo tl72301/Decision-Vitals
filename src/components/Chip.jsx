@@ -1,5 +1,5 @@
 // Standard pill chip. `tone` carries the chip color classes from labels.js and
-// the optional `dot` a small colored indicator — the muted design's only color.
+// the optional `dot` a small colored indicator, the muted design's only color.
 export default function Chip({ tone = "", dot, title, className = "", children }) {
   return (
     <span

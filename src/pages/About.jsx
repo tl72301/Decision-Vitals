@@ -32,7 +32,7 @@ export default function About() {
       <SectionTitle>The problem</SectionTitle>
       <P>
         Decisions get made once and reviewed never. The assumptions underneath
-        them — about customers, capacity, timing, the market — quietly expire,
+        them, about customers, capacity, timing, and the market, quietly expire,
         and nobody notices until the damage shows up in the numbers. Most
         organizations monitor decisions by vibes: the review happens after the
         failure, not before it.
@@ -57,7 +57,7 @@ export default function About() {
       <P>
         You register a decision and Decision Vitals extracts its assumptions,
         tiers them, and gives each one a signpost. You paste in evidence as it
-        accumulates — meeting notes, tickets, customer feedback, market
+        accumulates: meeting notes, tickets, customer feedback, market
         updates. When you run a review, four specialist agents map evidence to
         assumptions, argue against every assumption, apply status rules, and
         write a Decision Health Report: a grade, per-assumption verdicts with
@@ -74,15 +74,15 @@ export default function About() {
         and Reporter at review time. Judgment-heavy roles (Challenge, Reporter)
         run on a Sonnet-class model; structured extraction runs on Haiku. The
         application orchestrates them as a deterministic sequential pipeline
-        with typed JSON contracts — each agent's output schema is the next
-        agent's input contract — and every run produces a traceable session in
+        with typed JSON contracts, where each agent's output schema is the next
+        agent's input contract, and every run produces a traceable session in
         the Claude Console.
       </P>
       <P>
         Deterministic rules are layered on top of model judgment. A
         load-bearing assumption with strong contradicting evidence can never be
         marked "holding," and the health grade derives mechanically from
-        assumption statuses — the app enforces both even if a model drifts.
+        assumption statuses; the app enforces both even if a model drifts.
         The platform's research-preview agent-to-agent coordination was
         skipped deliberately: app-driven sequencing is simpler, not
         access-gated, and easier to reason about. Platform-level coordination
@@ -97,7 +97,7 @@ export default function About() {
       </P>
       <P>
         <strong>User-editable assumptions.</strong> You can reword, retier, or
-        delete assumptions before the first review — human judgment enters the
+        delete assumptions before the first review: human judgment enters the
         loop before machine review, not after.
       </P>
       <P>
@@ -108,14 +108,14 @@ export default function About() {
       </P>
       <P>
         <strong>Demo Mode.</strong> The public site replays recorded real
-        agent runs, labeled as such. Recorded, not faked — and the live
+        agent runs, labeled as such. Recorded, not faked, and the live
         pipeline is passphrase-gated so the demo stays reliable and free to
         host.
       </P>
 
       <SectionTitle>Limitations</SectionTitle>
       <P>
-        Evidence quality is user-dependent, and sources aren't weighted — a
+        Evidence quality is user-dependent, and sources aren't weighted: a
         rumor and an audited number carry the same formal weight. Scope is
         single-decision: there's no dependency tracking between decisions. And
         the model's judgment on evidence direction and strength is not
@@ -127,7 +127,7 @@ export default function About() {
       <P>
         Scheduled evidence pulls from one source (a project tool is the
         natural first candidate), assumption dependency links across decisions,
-        and signpost alerting — notify the owner when a signpost fires rather
+        and signpost alerting: notify the owner when a signpost fires rather
         than waiting for a manual review. Cross-decision propagation, where one
         invalidated assumption cascades into every decision that shares it, is
         the follow-on project.

@@ -2,7 +2,7 @@
 //
 // A tiny localStorage-backed store for Decision Vitals. Everything lives under a
 // single key so the whole app state can be inspected, exported, or cleared in one
-// place. No database, no backend — per PLAN.md Section 4 and Section 13.
+// place. No database, no backend, per PLAN.md Section 4 and Section 13.
 //
 // Object shapes are documented as JSDoc typedefs below and match PLAN.md Section 4
 // exactly. Helpers are grouped by entity: decisions, assumptions, evidence,

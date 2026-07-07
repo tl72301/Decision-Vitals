@@ -74,14 +74,14 @@ export default function NewDecision() {
     setSteps({ intake: "running", classifier: "pending" });
 
     try {
-      // Step 1 — Intake: normalize the decision and draft candidate assumptions.
+      // Step 1 (Intake): normalize the decision and draft candidate assumptions.
       const intake = await runAgent("intake", {
         statement: form.statement.trim(),
         context: form.context.trim(),
       });
       setSteps({ intake: "done", classifier: "running" });
 
-      // Step 2 — Classifier: tier + signpost per candidate assumption.
+      // Step 2 (Classifier): tier + signpost per candidate assumption.
       const candidates = intake.assumptions ?? [];
       const classifier = await runAgent("classifier", {
         decision: { title: intake.title, statement: intake.statement },

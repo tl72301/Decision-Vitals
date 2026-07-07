@@ -1,5 +1,5 @@
 // Collapsible pretty-printed JSON. Used to expose each agent's real I/O in the
-// Agent Run view — the visible proof of the typed multi-agent handoffs.
+// Agent Run view: the visible proof of the typed multi-agent handoffs.
 export default function JsonView({ value, label = "View output", defaultOpen = false }) {
   return (
     <details open={defaultOpen} className="mt-3 rounded-lg bg-stone-900/95">

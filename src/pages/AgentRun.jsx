@@ -188,7 +188,7 @@ export default function AgentRun() {
     setDone(true);
   }
 
-  // Item 14: copy the full run — inputs and outputs per agent — to the clipboard.
+  // Item 14: copy the full run (inputs and outputs per agent) to the clipboard.
   async function copyRunJson() {
     const text = JSON.stringify(
       { ...fullRunRef.current, copiedAt: new Date().toISOString() },
@@ -200,7 +200,7 @@ export default function AgentRun() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      window.prompt("Clipboard unavailable — copy manually:", text);
+      window.prompt("Clipboard unavailable. Copy manually:", text);
     }
   }
 
@@ -242,7 +242,7 @@ export default function AgentRun() {
       <h1 className="mt-2 text-2xl font-semibold text-stone-900">Running review</h1>
       <p className="mt-1 text-sm text-stone-500">
         Four specialist agents run in sequence. Each card shows the real JSON it
-        returned — the typed handoff to the next agent.
+        returned: the typed handoff to the next agent.
       </p>
 
       <ol className="mt-6 space-y-4">
