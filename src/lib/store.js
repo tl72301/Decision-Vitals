@@ -452,6 +452,23 @@ export function deleteAgentRun(id) {
   }));
 }
 
+/**
+ * Delete this decision's runs that never produced a report (failed or
+ * abandoned mid-pipeline). Called before starting a fresh run so review
+ * numbering stays contiguous with actual reports.
+ */
+export function purgeOrphanRuns(decisionId) {
+  updateState((s) => {
+    const reported = new Set(s.reports.map((r) => r.runId));
+    return {
+      ...s,
+      agentRuns: s.agentRuns.filter(
+        (r) => r.decisionId !== decisionId || reported.has(r.id)
+      ),
+    };
+  });
+}
+
 // ---------------------------------------------------------------------------
 // Reports
 // ---------------------------------------------------------------------------
