@@ -147,75 +147,75 @@
       ]
     },
     {
-      "id": "sample-selfserve",
-      "title": "Launch a self-serve tier in January",
-      "statement": "Launch a self-serve tier in January to expand from enterprise into mid-market without growing the sales team.",
-      "context": "CAC on enterprise deals rising; board wants efficient growth; product currently requires white-glove onboarding.",
+      "id": "sample-cafe",
+      "title": "Open a second café location downtown",
+      "statement": "Open a second location of our café in the downtown business district this fall.",
+      "context": "Our single shop is at capacity on weekday mornings; a downtown storefront just opened up with three months of free rent; the owner wants to grow before a competitor takes the spot.",
       "owner": "",
-      "createdAt": "2026-06-05T09:00:00.000Z",
+      "createdAt": "2026-06-14T09:00:00.000Z",
       "healthGrade": null,
       "assumptions": [
         {
-          "id": "sample-selfserve-a1",
-          "text": "Mid-market buyers in our category will convert through a purely self-serve funnel.",
+          "id": "sample-cafe-a1",
+          "text": "Downtown foot traffic will support sales close to what our current location does.",
           "loadBearing": true,
           "vulnerable": true,
           "tier": "load_bearing",
-          "signpost": "Category benchmarks or our own trials showing sales-assisted conversion far above self-serve."
+          "signpost": "Weekday foot-traffic counts, or early sales at the new site, coming in well below the current shop."
         },
         {
-          "id": "sample-selfserve-a2",
-          "text": "Onboarding can be automated enough that customers connect their data without human help.",
+          "id": "sample-cafe-a2",
+          "text": "We can hire and keep enough baristas to staff a second location without thinning out the first.",
           "loadBearing": true,
           "vulnerable": true,
           "tier": "load_bearing",
-          "signpost": "Trial drop-off concentrated at the data-connection step; automation project slipping."
+          "signpost": "Job postings sitting unfilled for weeks, or staff leaving the original store to cover the new one."
         },
         {
-          "id": "sample-selfserve-a3",
-          "text": "Self-serve customers can be supported profitably at mid-market price points.",
-          "loadBearing": true,
-          "vulnerable": true,
-          "tier": "load_bearing",
-          "signpost": "Support ticket volume per customer staying at levels that break unit economics below target ARPU."
-        },
-        {
-          "id": "sample-selfserve-a4",
-          "text": "A January launch window is achievable with the current engineering roadmap.",
+          "id": "sample-cafe-a3",
+          "text": "The new location will not pull a large share of sales away from our existing shop.",
           "loadBearing": false,
           "vulnerable": true,
           "tier": "vulnerable",
-          "signpost": "Onboarding-automation completion percentage stalling through Q4."
+          "signpost": "Existing-store sales dropping once the downtown location opens."
+        },
+        {
+          "id": "sample-cafe-a4",
+          "text": "The build-out will be finished before the three months of free rent run out.",
+          "loadBearing": false,
+          "vulnerable": true,
+          "tier": "vulnerable",
+          "signpost": "The contractor timeline slipping past the free-rent window."
         }
       ],
       "evidence": [
         {
-          "id": "sample-selfserve-e1",
-          "text": "Industry report: mid-market buyers in this category still convert 3x better with sales-assisted trials than pure self-serve.",
+          "id": "sample-cafe-e1",
+          "text": "A pedestrian-count study of the downtown block shows about 40 percent more weekday foot traffic than the street our current café is on.",
           "sourceType": "market_update",
-          "date": "2026-06-12",
-          "addedAt": "2026-06-12T09:00:00.000Z"
+          "date": "2026-06-16",
+          "addedAt": "2026-06-16T09:00:00.000Z"
         },
         {
-          "id": "sample-selfserve-e2",
-          "text": "Trial exit survey, n=41: top drop-off reason was 'couldn't connect our data without help' (58 percent).",
-          "sourceType": "customer_feedback",
-          "date": "2026-06-17",
-          "addedAt": "2026-06-17T11:00:00.000Z"
-        },
-        {
-          "id": "sample-selfserve-e3",
-          "text": "Onboarding automation project is 70 percent complete; the remaining 30 percent covers exactly the data-connection step.",
+          "id": "sample-cafe-e2",
+          "text": "Our last two barista job postings each took about six weeks to fill, and one of those new hires left within a month.",
           "sourceType": "status_update",
-          "date": "2026-06-23",
-          "addedAt": "2026-06-23T14:00:00.000Z"
+          "date": "2026-06-19",
+          "addedAt": "2026-06-19T09:00:00.000Z"
         },
         {
-          "id": "sample-selfserve-e4",
-          "text": "Support lead: current ticket volume per customer would make self-serve unprofitable below $400/mo unless deflection improves.",
-          "sourceType": "meeting_notes",
-          "date": "2026-06-26",
-          "addedAt": "2026-06-26T16:00:00.000Z"
+          "id": "sample-cafe-e3",
+          "text": "A quick survey of our regulars found that roughly a third of them work downtown and say they would visit the new location instead of the current one.",
+          "sourceType": "customer_feedback",
+          "date": "2026-06-22",
+          "addedAt": "2026-06-22T09:00:00.000Z"
+        },
+        {
+          "id": "sample-cafe-e4",
+          "text": "The contractor confirmed the build-out is on track to finish about two weeks before the free-rent period ends.",
+          "sourceType": "status_update",
+          "date": "2026-06-25",
+          "addedAt": "2026-06-25T09:00:00.000Z"
         }
       ]
     }

@@ -83,8 +83,16 @@ export default function DecisionDetail() {
         )}
       </div>
 
+      <p className="mt-6 text-sm text-stone-500">
+        <span className="font-medium text-stone-600">Assumptions</span> are what
+        this decision depends on;{" "}
+        <span className="font-medium text-stone-600">evidence</span> is what
+        you've learned since. Add at least one piece of evidence, then run a
+        review to grade each assumption against it.
+      </p>
+
       {/* Two-column: assumptions + evidence */}
-      <div className="mt-6 grid gap-8 lg:grid-cols-2">
+      <div className="mt-4 grid gap-8 lg:grid-cols-2">
         <section>
           <div className="mb-3 flex items-baseline justify-between">
             <h2 className="text-lg font-semibold text-stone-900">Assumptions</h2>

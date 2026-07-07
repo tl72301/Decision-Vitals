@@ -64,17 +64,66 @@ function DecisionCard({ decision }) {
   );
 }
 
+const HOW_IT_WORKS = [
+  {
+    n: "1",
+    title: "Register a decision",
+    body: "Two agents read it and pull out the handful of assumptions it depends on, flagging which are load-bearing (the decision fails if they're wrong).",
+  },
+  {
+    n: "2",
+    title: "Add evidence over time",
+    body: "Paste in what you learn as it lands: meeting notes, support tickets, customer feedback, market updates.",
+  },
+  {
+    n: "3",
+    title: "Run a review",
+    body: "Four agents map the evidence to each assumption, argue against it, and grade the decision's health, with a receipt behind every verdict.",
+  },
+];
+
+function HowItWorks() {
+  return (
+    <div className="grid gap-4 sm:grid-cols-3">
+      {HOW_IT_WORKS.map((step) => (
+        <div
+          key={step.n}
+          className="rounded-xl border border-stone-200 bg-white p-4 text-left"
+        >
+          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-stone-900 text-xs font-semibold text-white">
+            {step.n}
+          </div>
+          <div className="mt-2 text-sm font-semibold text-stone-800">
+            {step.title}
+          </div>
+          <p className="mt-1 text-xs leading-relaxed text-stone-500">
+            {step.body}
+          </p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function EmptyState({ onLoadSamples, notice }) {
   return (
-    <div className="rounded-2xl border border-dashed border-stone-300 bg-white p-10 text-center">
-      <h2 className="text-lg font-semibold text-stone-900">
-        No decisions yet
-      </h2>
-      <p className="mx-auto mt-2 max-w-md text-sm text-stone-500">
-        Register a business decision and Decision Vitals extracts the
-        assumptions underneath it, then watches them as evidence comes in.
-      </p>
-      <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+    <div className="rounded-2xl border border-dashed border-stone-300 bg-white p-8 sm:p-10">
+      <div className="text-center">
+        <h2 className="text-lg font-semibold text-stone-900">
+          Watch the assumptions behind your decisions
+        </h2>
+        <p className="mx-auto mt-2 max-w-lg text-sm text-stone-500">
+          Every decision rests on a few assumptions about customers, capacity,
+          timing, or the market. Decision Vitals surfaces them and tells you
+          when the evidence starts to turn against one.
+        </p>
+      </div>
+
+      <div className="mt-8">
+        <HowItWorks />
+      </div>
+
+      <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
         <Link
           to="/new"
           className="inline-flex items-center rounded-lg bg-stone-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-stone-700"
@@ -89,7 +138,10 @@ function EmptyState({ onLoadSamples, notice }) {
           Load sample decisions
         </button>
       </div>
-      {notice && <p className="mt-4 text-xs text-stone-500">{notice}</p>}
+      <p className="mt-3 text-center text-xs text-stone-400">
+        New here? Loading the samples is the fastest way to see a finished review.
+      </p>
+      {notice && <p className="mt-2 text-center text-xs text-stone-500">{notice}</p>}
     </div>
   );
 }
