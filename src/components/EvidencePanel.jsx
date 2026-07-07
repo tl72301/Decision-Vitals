@@ -23,11 +23,11 @@ export default function EvidencePanel({ decisionId, locked }) {
   }
 
   const inputCls =
-    "w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-200";
+    "w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm outline-none focus:border-stone-400 focus:ring-2 focus:ring-stone-200";
 
   return (
     <div>
-      <form onSubmit={add} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      <form onSubmit={add} className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
@@ -37,7 +37,7 @@ export default function EvidencePanel({ decisionId, locked }) {
         />
         <div className="mt-3 flex flex-wrap items-end gap-3">
           <div className="min-w-[10rem] flex-1">
-            <label className="text-xs font-medium text-slate-500">Source type</label>
+            <label className="text-xs font-medium text-stone-500">Source type</label>
             <select
               value={sourceType}
               onChange={(e) => setSourceType(e.target.value)}
@@ -51,7 +51,7 @@ export default function EvidencePanel({ decisionId, locked }) {
             </select>
           </div>
           <div>
-            <label className="text-xs font-medium text-slate-500">Date</label>
+            <label className="text-xs font-medium text-stone-500">Date</label>
             <input
               type="date"
               value={date}
@@ -62,7 +62,7 @@ export default function EvidencePanel({ decisionId, locked }) {
           <button
             type="submit"
             disabled={!text.trim()}
-            className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-40"
+            className="rounded-lg bg-stone-900 px-4 py-2 text-sm font-medium text-white hover:bg-stone-700 disabled:opacity-40"
           >
             Add evidence
           </button>
@@ -71,33 +71,33 @@ export default function EvidencePanel({ decisionId, locked }) {
 
       <ul className="mt-4 space-y-3">
         {evidence.length === 0 && (
-          <li className="rounded-lg border border-dashed border-slate-300 p-4 text-center text-sm text-slate-400">
+          <li className="rounded-lg border border-dashed border-stone-300 p-4 text-center text-sm text-stone-400">
             No evidence yet. Add at least one snippet to run a review.
           </li>
         )}
         {evidence.map((ev) => (
           <li
             key={ev.id}
-            className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
+            className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm"
           >
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2 text-xs">
-                <Chip tone="bg-slate-100 text-slate-600 ring-slate-200">
+                <Chip tone="bg-stone-100 text-stone-600 ring-stone-200">
                   {sourceTypeLabel(ev.sourceType)}
                 </Chip>
-                {ev.date && <span className="text-slate-400">{formatDate(ev.date)}</span>}
+                {ev.date && <span className="text-stone-400">{formatDate(ev.date)}</span>}
               </div>
               {!locked && (
                 <button
                   type="button"
                   onClick={() => deleteEvidence(ev.id)}
-                  className="text-xs text-slate-400 hover:text-rose-600"
+                  className="text-xs text-stone-400 hover:text-rose-600"
                 >
                   Delete
                 </button>
               )}
             </div>
-            <p className="mt-2 text-sm text-slate-700">{ev.text}</p>
+            <p className="mt-2 text-sm text-stone-700">{ev.text}</p>
           </li>
         ))}
       </ul>

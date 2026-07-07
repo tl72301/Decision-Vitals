@@ -21,17 +21,17 @@ function AssumptionSummary({ decisionId, reviewed }) {
 
   return (
     <div className="mt-3 flex flex-wrap items-center gap-1.5 text-xs">
-      <span className="text-slate-500">
+      <span className="text-stone-500">
         {total} assumption{total === 1 ? "" : "s"}
       </span>
       {reviewed ? (
         SUMMARY_STATUSES.filter((s) => counts[s]).map((s) => (
-          <Chip key={s} tone={statusMeta(s).chip}>
+          <Chip key={s} tone={statusMeta(s).chip} dot={statusMeta(s).dot}>
             {counts[s]} {statusMeta(s).label.toLowerCase()}
           </Chip>
         ))
       ) : (
-        <span className="text-slate-400">· not yet reviewed</span>
+        <span className="text-stone-400">· not yet reviewed</span>
       )}
     </div>
   );
@@ -42,21 +42,21 @@ function DecisionCard({ decision }) {
   return (
     <Link
       to={`/decision/${decision.id}`}
-      className="group flex flex-col rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-slate-300 hover:shadow-md"
+      className="group flex flex-col rounded-xl border border-stone-200 bg-white p-4 shadow-sm transition hover:border-stone-300 hover:shadow-md"
     >
       <div className="flex items-start justify-between gap-3">
-        <h3 className="font-semibold leading-snug text-slate-900 group-hover:text-slate-700">
+        <h3 className="font-semibold leading-snug text-stone-900 group-hover:text-stone-700">
           {decision.title || decision.statement || "Untitled decision"}
         </h3>
         <HealthBadge grade={decision.healthGrade} className="shrink-0" />
       </div>
       {decision.statement && decision.title && (
-        <p className="mt-1 line-clamp-2 text-sm text-slate-500">
+        <p className="mt-1 line-clamp-2 text-sm text-stone-500">
           {decision.statement}
         </p>
       )}
       <AssumptionSummary decisionId={decision.id} reviewed={reviewed} />
-      <div className="mt-3 text-xs text-slate-400">
+      <div className="mt-3 text-xs text-stone-400">
         {formatDate(decision.createdAt)}
         {decision.owner ? ` · ${decision.owner}` : ""}
       </div>
@@ -66,30 +66,30 @@ function DecisionCard({ decision }) {
 
 function EmptyState({ onLoadSamples, notice }) {
   return (
-    <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center">
-      <h2 className="text-lg font-semibold text-slate-900">
+    <div className="rounded-2xl border border-dashed border-stone-300 bg-white p-10 text-center">
+      <h2 className="text-lg font-semibold text-stone-900">
         No decisions yet
       </h2>
-      <p className="mx-auto mt-2 max-w-md text-sm text-slate-500">
+      <p className="mx-auto mt-2 max-w-md text-sm text-stone-500">
         Register a business decision and Decision Vitals extracts the
         assumptions underneath it, then watches them as evidence comes in.
       </p>
       <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
         <Link
           to="/new"
-          className="inline-flex items-center rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700"
+          className="inline-flex items-center rounded-lg bg-stone-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-stone-700"
         >
           New decision
         </Link>
         <button
           type="button"
           onClick={onLoadSamples}
-          className="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+          className="inline-flex items-center rounded-lg border border-stone-300 bg-white px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-50"
         >
           Load sample decisions
         </button>
       </div>
-      {notice && <p className="mt-4 text-xs text-slate-500">{notice}</p>}
+      {notice && <p className="mt-4 text-xs text-stone-500">{notice}</p>}
     </div>
   );
 }
@@ -112,13 +112,13 @@ export default function Dashboard() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between gap-4">
-        <h1 className="text-2xl font-semibold text-slate-900">
+        <h1 className="text-2xl font-semibold text-stone-900">
           Your decisions
         </h1>
         <button
           type="button"
           onClick={() => navigate("/new")}
-          className="inline-flex items-center rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700"
+          className="inline-flex items-center rounded-lg bg-stone-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-stone-700"
         >
           New decision
         </button>

@@ -25,18 +25,18 @@ function StatusIcon({ status }) {
   if (status === "running") return <Spinner />;
   if (status === "done")
     return (
-      <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 text-xs font-bold text-white">
+      <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-stone-900 text-xs font-bold text-white">
         ✓
       </span>
     );
   if (status === "error")
     return (
-      <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-rose-500 text-xs font-bold text-white">
+      <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-rose-400 text-xs font-bold text-white">
         !
       </span>
     );
   return (
-    <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border-2 border-slate-200 text-xs text-slate-400">
+    <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border-2 border-stone-200 text-xs text-stone-400">
       •
     </span>
   );
@@ -206,9 +206,9 @@ export default function AgentRun() {
 
   if (!decision) {
     return (
-      <div className="rounded-xl border border-slate-200 bg-white p-8 text-center">
-        <p className="text-slate-600">That decision doesn't exist.</p>
-        <Link to="/" className="mt-3 inline-block text-sm font-medium text-slate-900 underline">
+      <div className="rounded-xl border border-stone-200 bg-white p-8 text-center">
+        <p className="text-stone-600">That decision doesn't exist.</p>
+        <Link to="/" className="mt-3 inline-block text-sm font-medium text-stone-900 underline">
           Back to dashboard
         </Link>
       </div>
@@ -219,14 +219,14 @@ export default function AgentRun() {
   const evidence = evidenceByDecision(id);
   if (assumptions.length === 0 || evidence.length === 0) {
     return (
-      <div className="rounded-xl border border-slate-200 bg-white p-8 text-center">
-        <p className="text-slate-600">
+      <div className="rounded-xl border border-stone-200 bg-white p-8 text-center">
+        <p className="text-stone-600">
           This decision needs at least one assumption and one evidence snippet
           before a review can run.
         </p>
         <Link
           to={`/decision/${id}`}
-          className="mt-3 inline-block text-sm font-medium text-slate-900 underline"
+          className="mt-3 inline-block text-sm font-medium text-stone-900 underline"
         >
           Back to decision
         </Link>
@@ -236,11 +236,11 @@ export default function AgentRun() {
 
   return (
     <div className="mx-auto max-w-2xl">
-      <Link to={`/decision/${id}`} className="text-sm text-slate-500 hover:text-slate-700">
+      <Link to={`/decision/${id}`} className="text-sm text-stone-500 hover:text-stone-700">
         ← {decision.title || "Decision"}
       </Link>
-      <h1 className="mt-2 text-2xl font-semibold text-slate-900">Running review</h1>
-      <p className="mt-1 text-sm text-slate-500">
+      <h1 className="mt-2 text-2xl font-semibold text-stone-900">Running review</h1>
+      <p className="mt-1 text-sm text-stone-500">
         Four specialist agents run in sequence. Each card shows the real JSON it
         returned — the typed handoff to the next agent.
       </p>
@@ -248,25 +248,25 @@ export default function AgentRun() {
       <ol className="mt-6 space-y-4">
         {steps.map((step, i) => (
           <li key={step.agent} className="relative">
-            <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
               <div className="flex items-start gap-3">
                 <div className="mt-0.5">
                   <StatusIcon status={step.status} />
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="font-medium text-slate-900">
+                    <span className="font-medium text-stone-900">
                       {i + 1}. {step.name}
                     </span>
                     {step.status === "done" && step.durationMs > 0 && (
-                      <span className="text-xs text-slate-400">
+                      <span className="text-xs text-stone-400">
                         {(step.durationMs / 1000).toFixed(1)}s
                       </span>
                     )}
                   </div>
-                  <p className="text-xs text-slate-500">{step.role}</p>
+                  <p className="text-xs text-stone-500">{step.role}</p>
                   {step.inputSummary && (
-                    <p className="mt-1 text-xs text-slate-400">
+                    <p className="mt-1 text-xs text-stone-400">
                       Input: {step.inputSummary}
                     </p>
                   )}
@@ -292,7 +292,7 @@ export default function AgentRun() {
             </button>
             <Link
               to={`/decision/${id}`}
-              className="rounded-md px-3 py-1 text-xs font-medium text-slate-500 hover:text-slate-700"
+              className="rounded-md px-3 py-1 text-xs font-medium text-stone-500 hover:text-stone-700"
             >
               Back to decision
             </Link>
@@ -304,18 +304,18 @@ export default function AgentRun() {
         <div className="mt-6 flex flex-wrap items-center gap-3">
           <Link
             to={`/decision/${id}/report/${runId}`}
-            className="inline-flex items-center rounded-lg bg-slate-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-slate-700"
+            className="inline-flex items-center rounded-lg bg-stone-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-stone-700"
           >
             View report
           </Link>
           <button
             type="button"
             onClick={copyRunJson}
-            className="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+            className="inline-flex items-center rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-sm font-medium text-stone-700 transition hover:bg-stone-50"
           >
             {copied ? "Copied ✓" : "Copy run JSON"}
           </button>
-          <span className="text-sm text-emerald-600">All four agents finished.</span>
+          <span className="text-sm text-stone-500">All four agents finished.</span>
         </div>
       )}
     </div>

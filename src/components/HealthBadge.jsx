@@ -1,13 +1,12 @@
 import { healthGradeMeta } from "../lib/labels.js";
+import Chip from "./Chip.jsx";
 
-// Rounded pill showing a decision's overall health grade (or "Not yet reviewed").
+// Pill showing a decision's overall health grade (or "Not yet reviewed").
 export default function HealthBadge({ grade, className = "" }) {
   const meta = healthGradeMeta(grade);
   return (
-    <span
-      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset ${meta.chip} ${className}`}
-    >
+    <Chip tone={meta.chip} dot={meta.dot} className={className}>
       {meta.label}
-    </span>
+    </Chip>
   );
 }
