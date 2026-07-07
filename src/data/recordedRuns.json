@@ -47,7 +47,7 @@
         {
           "assumptionId": "sample-3pl-a1",
           "type": "evidenced",
-          "case": "The claim that customers won't notice a difference is already contradicted by pilot-stage data. E1 shows a 3-percentage-point gap in same-day-ship rates versus the in-house baseline during the pilot — before the added complexity of full-scale, multi-SKU volume. Pilots typically run under favorable, closely-monitored conditions with the 3PL's best attention; if a gap exists even here, it is likely to widen at scale when the account is no longer a novelty. Compounding this, E2 shows customer survey mentions of 'fast shipping' already declined from 31% to 24%, which is a direct behavioral signal that customers ARE noticing — the assumption's core premise is being falsified in real time, not just theoretically at risk. The strongest honest case is that this assumption is not merely 'vulnerable' but actively failing its own signpost test before the full decision has even been implemented.",
+          "case": "The claim that customers won't notice a difference is already contradicted by pilot-stage data. E1 shows a 3-percentage-point gap in same-day-ship rates versus the in-house baseline during the pilot, before the added complexity of full-scale, multi-SKU volume. Pilots typically run under favorable, closely-monitored conditions with the 3PL's best attention; if a gap exists even here, it is likely to widen at scale when the account is no longer a novelty. Compounding this, E2 shows customer survey mentions of 'fast shipping' already declined from 31% to 24%, which is a direct behavioral signal that customers ARE noticing, the assumption's core premise is being falsified in real time, not just theoretically at risk. The strongest honest case is that this assumption is not merely 'vulnerable' but actively failing its own signpost test before the full decision has even been implemented.",
           "evidenceIds": [
             "sample-3pl-e1",
             "sample-3pl-e2"
@@ -56,7 +56,7 @@
         {
           "assumptionId": "sample-3pl-a2",
           "type": "evidenced",
-          "case": "The 18% savings figure is a snapshot at current volume and current SKU count, but E4 shows a planned Q3 SKU expansion that triggers the 3PL's next pricing tier — meaning the cost basis underlying the entire financial case for outsourcing is already known to be temporary. This is not a hypothetical risk; it's a scheduled, near-term event that invalidates the headline number used to justify the decision. If the SKU-triggered tier increases costs enough to erode or eliminate the 18% savings, the primary economic rationale for the move collapses, and the company will have already dismantled in-house fulfillment capability and be locked into a contract with a 3PL whose pricing no longer looks favorable. The case for this assumption failing is strong and evidenced, not speculative.",
+          "case": "The 18% savings figure is a snapshot at current volume and current SKU count, but E4 shows a planned Q3 SKU expansion that triggers the 3PL's next pricing tier, meaning the cost basis underlying the entire financial case for outsourcing is already known to be temporary. This is not a hypothetical risk; it's a scheduled, near-term event that invalidates the headline number used to justify the decision. If the SKU-triggered tier increases costs enough to erode or eliminate the 18% savings, the primary economic rationale for the move collapses, and the company will have already dismantled in-house fulfillment capability and be locked into a contract with a 3PL whose pricing no longer looks favorable. The case for this assumption failing is strong and evidenced, not speculative.",
           "evidenceIds": [
             "sample-3pl-e4"
           ]
@@ -64,7 +64,7 @@
         {
           "assumptionId": "sample-3pl-a3",
           "type": "evidenced",
-          "case": "E3 documents a 3PL acquisition accompanied by public reports of onboarding freezes affecting existing clients during the ownership transition. This directly contradicts the assumption that the 3PL will remain stable and able to onboard fully within the timeline dictated by the warehouse lease decision. An acquisition-driven onboarding freeze is exactly the failure mode this assumption depends on NOT happening — and there is documented precedent that it already happened to other clients of this specific vendor. Given the lease deadline is fixed (8 months) and cannot be renegotiated on short notice, any onboarding delay from ownership instability creates a scenario where the company loses in-house capacity before the 3PL is ready to receive volume, with no fallback. This is a serious, evidenced threat to the timeline, not a background risk.",
+          "case": "E3 documents a 3PL acquisition accompanied by public reports of onboarding freezes affecting existing clients during the ownership transition. This directly contradicts the assumption that the 3PL will remain stable and able to onboard fully within the timeline dictated by the warehouse lease decision. An acquisition-driven onboarding freeze is exactly the failure mode this assumption depends on NOT happening, and there is documented precedent that it already happened to other clients of this specific vendor. Given the lease deadline is fixed (8 months) and cannot be renegotiated on short notice, any onboarding delay from ownership instability creates a scenario where the company loses in-house capacity before the 3PL is ready to receive volume, with no fallback. This is a serious, evidenced threat to the timeline, not a background risk.",
           "evidenceIds": [
             "sample-3pl-e3"
           ]
@@ -72,7 +72,7 @@
         {
           "assumptionId": "sample-3pl-a4",
           "type": "evidenced",
-          "case": "E1 shows pilot mispicks were traced to product/catalog data-feed issues rather than 3PL execution failures — meaning the assumption that 'our data is clean enough' has already been tested and found wanting at pilot scale. This is a critical dependency: if the data feed problem persists uncorrected, it will scale with volume, potentially producing far more errors at full deployment than the pilot suggested, and those errors will likely be misattributed to the 3PL's performance (compounding the risk to a1) rather than recognized as an internal data-quality problem. The honest case is that this is not a minor operational footnote — it is a root-cause issue that undermines the reliability of the entire fulfillment pipeline, and there's no evidence in the mappings that remediation work has been scoped, resourced, or completed before scale-up.",
+          "case": "E1 shows pilot mispicks were traced to product/catalog data-feed issues rather than 3PL execution failures, meaning the assumption that 'our data is clean enough' has already been tested and found wanting at pilot scale. This is a critical dependency: if the data feed problem persists uncorrected, it will scale with volume, potentially producing far more errors at full deployment than the pilot suggested, and those errors will likely be misattributed to the 3PL's performance (compounding the risk to a1) rather than recognized as an internal data-quality problem. The honest case is that this is not a minor operational footnote, it is a root-cause issue that undermines the reliability of the entire fulfillment pipeline, and there's no evidence in the mappings that remediation work has been scoped, resourced, or completed before scale-up.",
           "evidenceIds": [
             "sample-3pl-e1"
           ]
@@ -178,9 +178,9 @@
         }
       ],
       "challengeHighlights": [
-        "Both service-quality signals (speed gap, customer perception) moved in the wrong direction during a pilot run under favorable, closely-monitored conditions — the real-scale gap could be worse.",
+        "Both service-quality signals (speed gap, customer perception) moved in the wrong direction during a pilot run under favorable, closely-monitored conditions, the real-scale gap could be worse.",
         "The 18 percent savings claim is already known to expire once the Q3 SKU expansion hits the next pricing tier, meaning the financial case is temporary by design.",
-        "The 3PL's ownership change is not a hypothetical risk — other clients have already reported onboarding freezes, directly threatening the fixed lease-decision timeline with no stated fallback.",
+        "The 3PL's ownership change is not a hypothetical risk, other clients have already reported onboarding freezes, directly threatening the fixed lease-decision timeline with no stated fallback.",
         "Mispicks currently attributed to internal data quality risk being misread as 3PL underperformance if not fixed before scale-up, compounding a1's risk."
       ],
       "actions": [
@@ -251,7 +251,7 @@
         {
           "assumptionId": "sample-cafe-a2",
           "type": "evidenced",
-          "case": "The operational readiness assumption is directly undermined by existing-shop data: six-week hiring cycles and one-month average staff turnover (sample-cafe-e2) show the business is already unable to reliably staff a single location, let alone hire, train, and retain enough additional staff to open a second site without depleting the first. Opening a downtown location this fall would likely require pulling trained staff from the original shop to cover the new site during its ramp-up, degrading service exactly where the business is already at capacity. There is no evidence of expanded supplier capacity, a second-location staffing plan, or a management bench able to run two sites simultaneously — the existing bottleneck evidence suggests the opposite of 'adequate systems,' not merely an absence of proof.",
+          "case": "The operational readiness assumption is directly undermined by existing-shop data: six-week hiring cycles and one-month average staff turnover (sample-cafe-e2) show the business is already unable to reliably staff a single location, let alone hire, train, and retain enough additional staff to open a second site without depleting the first. Opening a downtown location this fall would likely require pulling trained staff from the original shop to cover the new site during its ramp-up, degrading service exactly where the business is already at capacity. There is no evidence of expanded supplier capacity, a second-location staffing plan, or a management bench able to run two sites simultaneously, the existing bottleneck evidence suggests the opposite of 'adequate systems,' not merely an absence of proof.",
           "evidenceIds": [
             "sample-cafe-e2"
           ]
@@ -267,7 +267,7 @@
         {
           "assumptionId": "sample-cafe-a4",
           "type": "untested_risk",
-          "case": "The contractor's own estimate (sample-cafe-e4) leaves only a two-week buffer before the free-rent period expires — a margin thin enough to be erased by a single permitting delay, inspection failure, equipment lead-time slip, or subcontractor scheduling conflict, all of which are common in commercial build-outs and none of which are addressed by the evidence. Contractor completion estimates are also self-reported and typically optimistic; no historical base rate for this contractor's on-time delivery, no contingency plan for a delay, and no analysis of what a delay would cost (paying rent before revenue starts, or losing the incentive entirely) has been presented. The most important untested risk is that a two-week buffer provides no real protection against the ordinary variance in commercial construction timelines, and the decision has no stated fallback if the buffer is consumed.",
+          "case": "The contractor's own estimate (sample-cafe-e4) leaves only a two-week buffer before the free-rent period expires, a margin thin enough to be erased by a single permitting delay, inspection failure, equipment lead-time slip, or subcontractor scheduling conflict, all of which are common in commercial build-outs and none of which are addressed by the evidence. Contractor completion estimates are also self-reported and typically optimistic; no historical base rate for this contractor's on-time delivery, no contingency plan for a delay, and no analysis of what a delay would cost (paying rent before revenue starts, or losing the incentive entirely) has been presented. The most important untested risk is that a two-week buffer provides no real protection against the ordinary variance in commercial construction timelines, and the decision has no stated fallback if the buffer is consumed.",
           "evidenceIds": []
         }
       ]
@@ -391,6 +391,193 @@
           "type": "shaping",
           "assumptionId": "sample-cafe-a4",
           "text": "Owner to obtain a written contingency schedule from the contractor (permit status, inspection dates, equipment lead times) and negotiate a two-week rent-extension option with the landlord as insurance against delay."
+        }
+      ]
+    }
+  },
+  "sample-chat": {
+    "evidence_review": {
+      "mappings": [
+        {
+          "evidenceId": "sample-chat-e1",
+          "assumptionId": "sample-chat-a3",
+          "direction": "supports",
+          "strength": "moderate",
+          "reading": "Marketing pilot achieved 90% daily adoption within two weeks, indicating rapid user uptake possible"
+        },
+        {
+          "evidenceId": "sample-chat-e2",
+          "assumptionId": "sample-chat-a4",
+          "direction": "contradicts",
+          "strength": "strong",
+          "reading": "Ticketing system integration missing; manual workarounds required for chat-to-ticket linking"
+        },
+        {
+          "evidenceId": "sample-chat-e4",
+          "assumptionId": "sample-chat-a5",
+          "direction": "supports",
+          "strength": "moderate",
+          "reading": "Rollout plan tracking for completion one month before contract renewal, providing stabilization buffer"
+        }
+      ]
+    },
+    "challenge": {
+      "challenges": [
+        {
+          "assumptionId": "sample-chat-a1",
+          "type": "untested_risk",
+          "case": "No evidence in this dataset speaks to the new platform's actual reliability track record, no uptime history, SLA terms, incident logs, or comparable-team deployment data are cited. The entire premise rests on the current tool's known unreliability plus an unverified assumption that 'lower-cost' also means 'more reliable,' which does not follow logically (cheaper platforms sometimes cut corners on infrastructure redundancy). The most important untested risk: the team is switching away from a known bad reliability profile toward an unknown one, with no first-month production data, load testing, or vendor-reported incident history to confirm the new platform will actually perform better under this team's real usage patterns and message/attachment volume.",
+          "evidenceIds": []
+        },
+        {
+          "assumptionId": "sample-chat-a2",
+          "type": "untested_risk",
+          "case": "No migration testing, pilot audit, or trial-run evidence has been provided at all. There is no data on whether a test migration was performed, whether historical threads/attachments were validated post-transfer, or whether the source platform's export format is even fully compatible with the destination platform's import capabilities. The most important untested risk: full-fidelity migration of chat history (especially threading, attachments, and search metadata) is a common failure point in platform migrations, and committing to a full-team cutover before contract renewal, under time pressure, increases the likelihood that migration validation gets rushed or skipped, with data loss only discovered after the old platform's contract has lapsed and rollback is no longer possible.",
+          "evidenceIds": []
+        },
+        {
+          "assumptionId": "sample-chat-a3",
+          "type": "untested_risk",
+          "case": "The only evidence offered (sample-chat-e1) is a marketing team pilot showing 90% adoption in two weeks, this is not evidence for the team in question, and marketing workflows are typically less dependent on deep tool integrations, structured escalation processes, or high-volume operational communication than teams in engineering, support, or ops contexts. Generalizing a single department's fast, voluntary pilot adoption to a mandatory, quarter-bound, full-team migration is a significant leap. No evidence exists on adoption curves for teams with heavier workflow dependencies, no evidence on error rates or reversion behavior beyond two weeks, and no satisfaction survey data post-adoption. The most important untested risk: unlike a discrete marketing pilot, this team may have entrenched habits, complex cross-tool workflows, or lower tolerance for disruption, meaning the 90%-in-two-weeks figure could substantially overstate expected adoption speed and understate reversion risk under deadline pressure.",
+          "evidenceIds": []
+        },
+        {
+          "assumptionId": "sample-chat-a4",
+          "type": "evidenced",
+          "case": "Evidence sample-chat-e2 directly contradicts this assumption: the ticketing system integration is confirmed missing, requiring manual workarounds for chat-to-ticket linking. This is not a hypothetical risk but a documented current-state gap in a 'critical tool' integration named explicitly in the assumption's own signpost criteria. Beyond ticketing, there is no evidence confirming successful, reliable integration with project management, CRM, or monitoring tools either, the one integration point that has been checked failed, and the others remain unverified. This suggests the assumption is already falsified for at least one critical system and unproven for the rest, undermining confidence that 'adequate' integration will be achieved anywhere close to migration timing.",
+          "evidenceIds": [
+            "sample-chat-e2"
+          ]
+        },
+        {
+          "assumptionId": "sample-chat-a5",
+          "type": "untested_risk",
+          "case": "The only evidence offered (sample-chat-e4) is a rollout plan tracking toward completion one month before renewal, this is a forward-looking schedule, not a demonstrated outcome, and migration plans are notoriously prone to slippage, especially for a quarter-bound, leadership-driven timeline with no evidence of buffer built in for the failures already surfacing elsewhere (e.g., the missing ticketing integration under sample-chat-a4, and untested data migration under sample-chat-a2). A one-month planned buffer can evaporate quickly if even one of the other load-bearing assumptions breaks, which the evidence base already suggests is happening. The most important untested risk: there is no historical evidence of this team or vendor completing comparable migrations on schedule, so the 'plan tracks to one month early' claim should be treated as an aspirational milestone, not a reliable predictor of actual runway sufficiency.",
+          "evidenceIds": []
+        }
+      ]
+    },
+    "risk_ranking": {
+      "rankings": [
+        {
+          "assumptionId": "sample-chat-a1",
+          "status": "needs_review",
+          "confidence": "low",
+          "rationale": "Load-bearing assumption with zero supporting evidence and comprehensive untested risk: no uptime history, SLA terms, incident logs, or comparable deployment data exist for the new platform. The challenge documents that the entire premise rests on an unverified assumption that lower cost implies higher reliability, a logical fallacy. Switching from a known unreliable baseline to an unknown reliability profile without first-month production data, load testing, or vendor incident history creates unacceptable risk for a critical assumption.",
+          "evidenceIds": []
+        },
+        {
+          "assumptionId": "sample-chat-a2",
+          "status": "needs_review",
+          "confidence": "low",
+          "rationale": "Load-bearing assumption with zero migration validation evidence. No test migration, pilot audit, trial-run data, or export/import compatibility confirmation exists. The challenge correctly identifies that full-fidelity chat history migration (threading, attachments, metadata) is a common failure point, and the pressure to complete before contract renewal increases risk that validation gets rushed or skipped entirely, making post-cutover data loss discovery irreversible.",
+          "evidenceIds": []
+        },
+        {
+          "assumptionId": "sample-chat-a3",
+          "status": "needs_review",
+          "confidence": "medium",
+          "rationale": "Conflicting evidence on load-bearing assumption. Supporting evidence (sample-chat-e1: marketing pilot 90% adoption in two weeks) is moderate in strength but non-representative; marketing workflows typically have lower integration complexity and less operational dependency than engineering/support/ops teams. Challenge correctly notes no error rates beyond two weeks, no satisfaction survey data, and no evidence of reversion behavior under deadline pressure. Generalizing departmental pilot results to mandatory full-team migration underestimates adoption friction for teams with heavier tool dependencies.",
+          "evidenceIds": [
+            "sample-chat-e1"
+          ]
+        },
+        {
+          "assumptionId": "sample-chat-a4",
+          "status": "weakened",
+          "confidence": "high",
+          "rationale": "Strong contradicting evidence (sample-chat-e2) confirms that ticketing system integration, explicitly named as a critical tool in the assumption's own signpost, is missing and requires manual workarounds. Per hard rule, a load-bearing assumption cannot hold when strong contradicting evidence exists. The ticketing integration failure is not hypothetical; it is a documented current-state gap. Beyond ticketing, no evidence confirms successful integration with project management, CRM, or monitoring tools either, leaving the 'adequate integration' claim undermined across the board.",
+          "evidenceIds": [
+            "sample-chat-e2"
+          ]
+        },
+        {
+          "assumptionId": "sample-chat-a5",
+          "status": "needs_review",
+          "confidence": "medium",
+          "rationale": "Conflicting evidence on load-bearing assumption. Supporting evidence (sample-chat-e4: rollout plan tracking one month early) is moderate but forward-looking and unproven, a schedule, not a demonstrated outcome. Migration plans are notoriously prone to slippage. Critically, the one-month planned buffer is vulnerable to being consumed by failures already surfacing in other load-bearing assumptions (missing ticketing integration under sample-chat-a4, untested migration under sample-chat-a2). No historical precedent of this team or vendor completing comparable migrations on schedule exists. Buffer sufficiency cannot be validated until upstream assumption risks are resolved.",
+          "evidenceIds": [
+            "sample-chat-e4"
+          ]
+        }
+      ]
+    },
+    "reporter": {
+      "healthGrade": "watch",
+      "summary": "The decision to migrate the team chat platform before contract renewal is at Watch status, not yet At Risk. The single most important finding: the critical integration assumption is already weakened by confirmed evidence that the new platform's ticketing system connector is missing, forcing manual workarounds on a tool named explicitly as critical. Three other load-bearing assumptions, platform reliability, data migration fidelity, and timeline sufficiency, currently rest on zero or weak validating evidence, meaning much of this migration is proceeding on unverified assumptions under deadline pressure.",
+      "findings": [
+        {
+          "assumptionId": "sample-chat-a1",
+          "status": "needs_review",
+          "rationale": "No evidence exists on the new platform's reliability track record, no uptime history, SLA terms, incident logs, or comparable deployment data. The premise that 'lower-cost' implies 'more reliable' is unverified and does not logically follow.",
+          "receipts": []
+        },
+        {
+          "assumptionId": "sample-chat-a2",
+          "status": "needs_review",
+          "rationale": "Zero migration validation evidence exists: no test migration, pilot audit, or export/import compatibility check has been documented. Full-fidelity history migration is a common failure point, and time pressure raises the risk that validation gets skipped before the old contract lapses.",
+          "receipts": []
+        },
+        {
+          "assumptionId": "sample-chat-a3",
+          "status": "needs_review",
+          "rationale": "Only evidence is a marketing-team pilot, which is not representative of teams with heavier integration dependencies. No data exists beyond two weeks on error rates, reversion behavior, or satisfaction under mandatory (vs. voluntary) rollout conditions.",
+          "receipts": [
+            {
+              "evidenceId": "sample-chat-e1",
+              "quote": "about 90 percent of them using the new app every day"
+            }
+          ]
+        },
+        {
+          "assumptionId": "sample-chat-a4",
+          "status": "weakened",
+          "rationale": "Confirmed current-state gap: ticketing system integration is missing, requiring manual chat-to-ticket linking. This is a documented failure on a named critical tool, and no other critical integrations (PM, CRM, monitoring) have been verified either.",
+          "receipts": [
+            {
+              "evidenceId": "sample-chat-e2",
+              "quote": "does not yet connect to our ticketing system"
+            }
+          ]
+        },
+        {
+          "assumptionId": "sample-chat-a5",
+          "status": "needs_review",
+          "rationale": "The one-month buffer is a forward-looking schedule claim, not a demonstrated outcome, and migration plans are prone to slippage. That buffer is especially vulnerable given failures already surfacing in the integration and data-migration assumptions, which could consume the runway.",
+          "receipts": [
+            {
+              "evidenceId": "sample-chat-e4",
+              "quote": "rollout plan is on track to finish about a month before"
+            }
+          ]
+        }
+      ],
+      "challengeHighlights": [
+        "No first-month production data, load testing, or vendor incident history confirms the new platform will outperform the current one on reliability.",
+        "No test migration or audit has verified that historical threads, attachments, and metadata will survive the transfer.",
+        "Marketing pilot adoption data does not generalize to teams with heavier integration and operational dependencies.",
+        "The one-month stabilization buffer has no historical precedent of this team or vendor completing comparable migrations on schedule, and is already at risk from integration and data-migration failures."
+      ],
+      "actions": [
+        {
+          "type": "hedging",
+          "assumptionId": "sample-chat-a1",
+          "text": "Have IT procurement request SLA terms, uptime history, and incident logs from the vendor for at least three comparable-scale deployments before finalizing the migration date."
+        },
+        {
+          "type": "hedging",
+          "assumptionId": "sample-chat-a2",
+          "text": "Assign a migration engineer to run a full test migration on a sample of historical channels (including attachments and threads) and produce a written completeness audit before scheduling full cutover."
+        },
+        {
+          "type": "shaping",
+          "assumptionId": "sample-chat-a4",
+          "text": "Assign an integration engineer to build or confirm a working ticketing system connector, with a firm completion date set before the migration cutover."
+        },
+        {
+          "type": "hedging",
+          "assumptionId": "sample-chat-a5",
+          "text": "Have the deal owner negotiate a month-to-month extension option with the current chat vendor as a rollback contingency in case stabilization slips past the renewal date."
         }
       ]
     }

@@ -75,8 +75,8 @@
     },
     {
       "id": "sample-chat",
-      "title": "Switch the team to a new chat app",
-      "statement": "Move our whole team off our current chat app onto a new one this quarter.",
+      "title": "Migrate Team Chat Platform This Quarter",
+      "statement": "Migrate the entire team from the current chat application to a new, lower-cost platform before the current contract renews this quarter.",
       "context": "Our current chat tool keeps going down and the new one is cheaper, and leadership wants the switch done before the current contract renews.",
       "owner": "",
       "createdAt": "2026-06-20T09:00:00.000Z",
@@ -84,35 +84,43 @@
       "assumptions": [
         {
           "id": "sample-chat-a1",
-          "text": "The team will actually adopt the new app instead of drifting back to the old tool or email.",
+          "text": "The new chat platform will have reliability that meets or exceeds the team's current needs",
           "loadBearing": true,
           "vulnerable": true,
           "tier": "load_bearing",
-          "signpost": "Message volume on the new app staying low, or people still working in the old tool weeks after the switch."
+          "signpost": "Platform experiences outages, message delivery failures, or sustained uptime below 99% during first month of production use"
         },
         {
           "id": "sample-chat-a2",
-          "text": "The new app connects to the other tools we rely on, like our calendar, file storage, and ticketing.",
+          "text": "All important data and conversation history can be successfully migrated from the current tool without loss",
           "loadBearing": true,
           "vulnerable": true,
           "tier": "load_bearing",
-          "signpost": "A key integration missing or breaking after the switch."
+          "signpost": "Post-migration audit reveals missing conversation threads, corrupted message content, attachment failures, or metadata loss; users report inability to locate previously accessible conversations"
         },
         {
           "id": "sample-chat-a3",
-          "text": "The new app will not end up costing more than the tool we are replacing once everyone is added.",
-          "loadBearing": false,
+          "text": "The team can adopt and productively use the new platform within this quarter",
+          "loadBearing": true,
           "vulnerable": true,
-          "tier": "vulnerable",
-          "signpost": "Per-user pricing tiers pushing the bill above what we pay today."
+          "tier": "load_bearing",
+          "signpost": "After 4+ weeks on new platform, team members revert to old platform for critical communications, error rates increase, communication latency rises, or user satisfaction surveys show sustained dissatisfaction"
         },
         {
           "id": "sample-chat-a4",
-          "text": "We can move everyone over before the current contract renews.",
-          "loadBearing": false,
+          "text": "The new platform integrates adequately with other critical tools the team currently depends on",
+          "loadBearing": true,
           "vulnerable": true,
-          "tier": "vulnerable",
-          "signpost": "The rollout slipping past the renewal date."
+          "tier": "load_bearing",
+          "signpost": "Integrations with critical tools (project management, CRM, ticketing, monitoring) fail to sync data reliably; manual workarounds become necessary; integration latency or data loss between systems is observed"
+        },
+        {
+          "id": "sample-chat-a5",
+          "text": "The contract renewal timeline provides sufficient runway to complete migration and stabilization",
+          "loadBearing": true,
+          "vulnerable": true,
+          "tier": "load_bearing",
+          "signpost": "Migration milestones slip; planned stabilization period compresses before renewal deadline; escalations occur citing time pressure; team discusses rollback contingencies within 4 weeks of renewal"
         }
       ],
       "evidence": [
