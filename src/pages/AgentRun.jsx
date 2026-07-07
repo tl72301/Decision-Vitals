@@ -47,6 +47,10 @@ export default function AgentRun() {
   const decision = getDecision(id);
 
   const startedRef = useRef(false);
+  // Full inputs and outputs for this run, kept for 'Copy run JSON' (used to
+  // capture recordings for Demo Mode).
+  const fullRunRef = useRef({ decisionId: id, runId: null, runNumber: null, agents: {} });
+  const [copied, setCopied] = useState(false);
   const [runId, setRunId] = useState(null);
   const [steps, setSteps] = useState(
     PIPELINE.map((p) => ({ ...p, status: "pending", inputSummary: "", output: null, durationMs: 0 }))
@@ -96,6 +100,8 @@ export default function AgentRun() {
     }));
     const run = createAgentRun({ decisionId: id, steps: working });
     setRunId(run.id);
+    fullRunRef.current.runId = run.id;
+    fullRunRef.current.runNumber = run.runNumber;
 
     const persist = () => {
       setSteps(PIPELINE.map((p, i) => ({ ...p, ...working[i] })));
@@ -149,8 +155,9 @@ export default function AgentRun() {
 
       const t0 = performance.now();
       try {
-        const output = await runAgent(agent, payload);
+        const output = await runAgent(agent, payload, { decisionId: id });
         outputs[agent] = output;
+        fullRunRef.current.agents[agent] = { input: payload, output };
         working[i] = {
           ...working[i],
           status: "done",
@@ -174,6 +181,22 @@ export default function AgentRun() {
     // and set the decision's health grade.
     buildAndSaveReport(id, run, outputs);
     setDone(true);
+  }
+
+  // Item 14: copy the full run — inputs and outputs per agent — to the clipboard.
+  async function copyRunJson() {
+    const text = JSON.stringify(
+      { ...fullRunRef.current, copiedAt: new Date().toISOString() },
+      null,
+      2
+    );
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      window.prompt("Clipboard unavailable — copy manually:", text);
+    }
   }
 
   if (!decision) {
@@ -273,13 +296,20 @@ export default function AgentRun() {
       )}
 
       {done && runId && (
-        <div className="mt-6 flex items-center gap-3">
+        <div className="mt-6 flex flex-wrap items-center gap-3">
           <Link
             to={`/decision/${id}/report/${runId}`}
             className="inline-flex items-center rounded-lg bg-slate-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-slate-700"
           >
             View report
           </Link>
+          <button
+            type="button"
+            onClick={copyRunJson}
+            className="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+          >
+            {copied ? "Copied ✓" : "Copy run JSON"}
+          </button>
           <span className="text-sm text-emerald-600">All four agents finished.</span>
         </div>
       )}
