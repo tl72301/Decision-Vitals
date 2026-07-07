@@ -8,6 +8,7 @@ import {
   createAgentRun,
   updateAgentRun,
 } from "../lib/store.js";
+import { buildAndSaveReport } from "../lib/review.js";
 import Spinner from "../components/Spinner.jsx";
 import JsonView from "../components/JsonView.jsx";
 
@@ -168,6 +169,10 @@ export default function AgentRun() {
         return;
       }
     }
+
+    // All four finished: build the numbered Report, apply assumption statuses,
+    // and set the decision's health grade.
+    buildAndSaveReport(id, run, outputs);
     setDone(true);
   }
 
