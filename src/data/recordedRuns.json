@@ -41,25 +41,33 @@
           "assumptionId": "sample-pricing-a1",
           "type": "evidenced",
           "case": "The assumption that enough customers will accept usage-based terms at renewal to protect NRR is directly contradicted by sample-pricing-e1, where a major customer not only rejected the new model but escalated to committee review — the strongest form of renewal friction possible short of outright churn. If this is representative rather than an outlier, the 'enough customers' threshold may not hold: a single major account escalating suggests procurement teams are treating this as a contract renegotiation event, not a routine renewal, which typically lengthens sales cycles, invites discounting, and creates precedent for other accounts to demand exceptions or grandfathering. There is no evidence presented of a base rate (how many renewals have occurred, what fraction accepted vs. rejected), so the sample may be unrepresentative in either direction — but the one data point available points toward rejection, not acceptance, undercutting the assumption's directional confidence.",
-          "evidenceIds": ["sample-pricing-e1"]
+          "evidenceIds": [
+            "sample-pricing-e1"
+          ]
         },
         {
           "assumptionId": "sample-pricing-a2",
           "type": "evidenced",
           "case": "The assumption that metering infrastructure will be production-ready before Q4 cutover is contradicted by sample-pricing-e3: the billing team's own revised estimate is 9 weeks with new cross-team dependencies, nearly double the 5-week plan the assumption was implicitly built on. Revised estimates that slip this dramatically (80% overrun) after work has begun are a strong signal of underestimated complexity rather than a one-off scheduling hiccup, and the emergence of 'cross-team dependencies' suggests scope was not fully understood at the time the Q4 date was set. This is not a marginal miss — it likely pushes readiness past the Q4 window entirely, meaning the cutover date and the infrastructure assumption may already be incompatible.",
-          "evidenceIds": ["sample-pricing-e3"]
+          "evidenceIds": [
+            "sample-pricing-e3"
+          ]
         },
         {
           "assumptionId": "sample-pricing-a3",
           "type": "evidenced",
           "case": "The only evidence offered for this assumption, sample-pricing-e4, is far weaker than its 'supports' label implies and can be read as undermining the assumption rather than confirming it. A 29% ask-through rate on usage pricing in a late-stage pipeline means over 70% of deals show no signal of interest in the new model at all, and only 2 of 7 AEs (29%) believe it drove expansion — a minority view from a small, likely non-random sample. This is consistent with the assumption's own stated disconfirming signpost ('AEs reporting no expansion effect'), which is already partially triggered by 5 of 7 AEs not reporting an expansion effect. Treating this data as support rather than a warning sign risks confirmation bias; the more honest reading is that deal expansion from usage pricing is unproven and possibly limited to a narrow subset of deals.",
-          "evidenceIds": ["sample-pricing-e4"]
+          "evidenceIds": [
+            "sample-pricing-e4"
+          ]
         },
         {
           "assumptionId": "sample-pricing-a4",
           "type": "evidenced",
           "case": "The assumption that the market-wide shift to usage-based pricing will continue is directly contradicted by sample-pricing-e2: a competitor has already reversed course, reintroducing a seat-based floor after experiencing mid-market churn attributed to usage pricing. This is a leading indicator that the category-wide trend may not be monotonic or durable — if usage-based pricing causes churn in the segment most sensitive to bill volatility (mid-market), the same dynamic could apply to this company's own mid-market base, and other competitors may follow suit in walking back usage pricing. The decision context cites 'two competitors moved to usage-based this year' as supporting rationale, but if one of those two is the one now reversing, the competitive momentum argument is weaker than presented and may be actively eroding rather than strengthening.",
-          "evidenceIds": ["sample-pricing-e2"]
+          "evidenceIds": [
+            "sample-pricing-e2"
+          ]
         }
       ]
     },
@@ -70,28 +78,36 @@
           "status": "weakened",
           "confidence": "low",
           "rationale": "Strong contradicting evidence (sample-pricing-e1) documents a major customer explicitly rejecting usage-based terms at renewal and escalating to committee review. This is the strongest form of renewal friction and directly contradicts the assumption's 'enough customers will accept' threshold. However, a single data point lacks base-rate context (total renewals, fraction accepted vs. rejected), so the contradiction cannot be deemed conclusive yet. Nonetheless, the direction of available evidence points toward rejection, not acceptance, and the hard rule prohibits 'holding' status given a load_bearing assumption with strong contradicting evidence.",
-          "evidenceIds": ["sample-pricing-e1"]
+          "evidenceIds": [
+            "sample-pricing-e1"
+          ]
         },
         {
           "assumptionId": "sample-pricing-a2",
           "status": "invalidated",
           "confidence": "high",
           "rationale": "Strong contradicting evidence (sample-pricing-e3) from the billing team's own revised estimate (9 weeks vs. 5-week plan) represents an 80% overrun and emergence of cross-team dependencies not accounted for in the original assumption. This magnitude of slip after work has begun signals underestimated complexity rather than a marginal scheduling adjustment, and likely pushes infrastructure readiness past the Q4 cutover window entirely. The estimate comes from an authoritative source (billing team) and contradicts the load_bearing assumption directly and conclusively.",
-          "evidenceIds": ["sample-pricing-e3"]
+          "evidenceIds": [
+            "sample-pricing-e3"
+          ]
         },
         {
           "assumptionId": "sample-pricing-a3",
           "status": "weakened",
           "confidence": "medium",
           "rationale": "Evidence (sample-pricing-e4) labeled as supporting is substantially weaker than claimed. A 29% ask-through rate means 71% of late-stage deals show no signal of interest in usage pricing, and only 2 of 7 AEs (29%) report expansion effect — a minority view. This aligns precisely with the assumption's own disconfirming signpost ('AEs reporting no expansion effect'), which is already partially triggered. The data does not substantiate the expansion premise and instead reveals the early warning sign embedded in the assumption's own failure condition.",
-          "evidenceIds": ["sample-pricing-e4"]
+          "evidenceIds": [
+            "sample-pricing-e4"
+          ]
         },
         {
           "assumptionId": "sample-pricing-a4",
           "status": "weakened",
           "confidence": "medium",
           "rationale": "Strong contradicting evidence (sample-pricing-e2) shows a competitor has reversed course on usage-based pricing due to mid-market churn, reintroducing a seat-based floor. This is a leading indicator that the market shift may not be durable or monotonic. If usage pricing drives churn in the mid-market segment, the same dynamic threatens this company's own mid-market base, and competitor follow-through on reversals could accelerate. While the broader category trend is not disproven by a single competitor action, the momentum assumption is eroding rather than strengthening.",
-          "evidenceIds": ["sample-pricing-e2"]
+          "evidenceIds": [
+            "sample-pricing-e2"
+          ]
         }
       ]
     },
@@ -170,6 +186,211 @@
           "type": "shaping",
           "assumptionId": "sample-pricing-a3",
           "text": "Have sales ops survey all AEs on the full late-stage pipeline (not just the 7-deal sample) to confirm or disconfirm the expansion effect before using it to justify the pricing change."
+        }
+      ]
+    }
+  },
+  "sample-3pl": {
+    "evidence_review": {
+      "mappings": [
+        {
+          "evidenceId": "sample-3pl-e1",
+          "assumptionId": "sample-3pl-a1",
+          "direction": "contradicts",
+          "strength": "moderate",
+          "reading": "3-percent gap in same-day rates during pilot shows shipping speed divergence from in-house baseline."
+        },
+        {
+          "evidenceId": "sample-3pl-e1",
+          "assumptionId": "sample-3pl-a4",
+          "direction": "contradicts",
+          "strength": "moderate",
+          "reading": "Pilot mispicks traced to product data feed, indicating data quality gaps before scale."
+        },
+        {
+          "evidenceId": "sample-3pl-e2",
+          "assumptionId": "sample-3pl-a1",
+          "direction": "contradicts",
+          "strength": "moderate",
+          "reading": "Customer survey shows fast-shipping mentions declined from 31% to 24%, suggesting perceptible service difference."
+        },
+        {
+          "evidenceId": "sample-3pl-e3",
+          "assumptionId": "sample-3pl-a3",
+          "direction": "contradicts",
+          "strength": "strong",
+          "reading": "3PL acquisition with public reports of onboarding freezes from existing clients during transition."
+        },
+        {
+          "evidenceId": "sample-3pl-e4",
+          "assumptionId": "sample-3pl-a2",
+          "direction": "contradicts",
+          "strength": "strong",
+          "reading": "Planned Q3 SKU expansion triggers next 3PL pricing tier, invalidating current 18-percent savings assumption."
+        }
+      ]
+    },
+    "challenge": {
+      "challenges": [
+        {
+          "assumptionId": "sample-3pl-a1",
+          "type": "evidenced",
+          "case": "The claim that customers won't notice a difference is already contradicted by pilot-stage data. E1 shows a 3-percentage-point gap in same-day-ship rates versus the in-house baseline during the pilot — before the added complexity of full-scale, multi-SKU volume. Pilots typically run under favorable, closely-monitored conditions with the 3PL's best attention; if a gap exists even here, it is likely to widen at scale when the account is no longer a novelty. Compounding this, E2 shows customer survey mentions of 'fast shipping' already declined from 31% to 24%, which is a direct behavioral signal that customers ARE noticing — the assumption's core premise is being falsified in real time, not just theoretically at risk. The strongest honest case is that this assumption is not merely 'vulnerable' but actively failing its own signpost test before the full decision has even been implemented.",
+          "evidenceIds": [
+            "sample-3pl-e1",
+            "sample-3pl-e2"
+          ]
+        },
+        {
+          "assumptionId": "sample-3pl-a2",
+          "type": "evidenced",
+          "case": "The 18% savings figure is a snapshot at current volume and current SKU count, but E4 shows a planned Q3 SKU expansion that triggers the 3PL's next pricing tier — meaning the cost basis underlying the entire financial case for outsourcing is already known to be temporary. This is not a hypothetical risk; it's a scheduled, near-term event that invalidates the headline number used to justify the decision. If the SKU-triggered tier increases costs enough to erode or eliminate the 18% savings, the primary economic rationale for the move collapses, and the company will have already dismantled in-house fulfillment capability and be locked into a contract with a 3PL whose pricing no longer looks favorable. The case for this assumption failing is strong and evidenced, not speculative.",
+          "evidenceIds": [
+            "sample-3pl-e4"
+          ]
+        },
+        {
+          "assumptionId": "sample-3pl-a3",
+          "type": "evidenced",
+          "case": "E3 documents a 3PL acquisition accompanied by public reports of onboarding freezes affecting existing clients during the ownership transition. This directly contradicts the assumption that the 3PL will remain stable and able to onboard fully within the timeline dictated by the warehouse lease decision. An acquisition-driven onboarding freeze is exactly the failure mode this assumption depends on NOT happening — and there is documented precedent that it already happened to other clients of this specific vendor. Given the lease deadline is fixed (8 months) and cannot be renegotiated on short notice, any onboarding delay from ownership instability creates a scenario where the company loses in-house capacity before the 3PL is ready to receive volume, with no fallback. This is a serious, evidenced threat to the timeline, not a background risk.",
+          "evidenceIds": [
+            "sample-3pl-e3"
+          ]
+        },
+        {
+          "assumptionId": "sample-3pl-a4",
+          "type": "evidenced",
+          "case": "E1 shows pilot mispicks were traced to product/catalog data-feed issues rather than 3PL execution failures — meaning the assumption that 'our data is clean enough' has already been tested and found wanting at pilot scale. This is a critical dependency: if the data feed problem persists uncorrected, it will scale with volume, potentially producing far more errors at full deployment than the pilot suggested, and those errors will likely be misattributed to the 3PL's performance (compounding the risk to a1) rather than recognized as an internal data-quality problem. The honest case is that this is not a minor operational footnote — it is a root-cause issue that undermines the reliability of the entire fulfillment pipeline, and there's no evidence in the mappings that remediation work has been scoped, resourced, or completed before scale-up.",
+          "evidenceIds": [
+            "sample-3pl-e1"
+          ]
+        }
+      ]
+    },
+    "risk_ranking": {
+      "rankings": [
+        {
+          "assumptionId": "sample-3pl-a1",
+          "status": "invalidated",
+          "confidence": "high",
+          "rationale": "Pilot-stage data directly contradicts the core premise that customers won't notice a service difference. E1 documents a 3-percentage-point gap in same-day-ship rates versus in-house baseline. E2 provides behavioral confirmation: customer survey mentions of fast shipping declined from 31% to 24%, indicating customers are already perceiving degradation. Both conditions of the signpost (rate divergence and complaint rise) are being triggered under favorable pilot conditions, indicating the gap will likely widen at full scale. Load-bearing assumption with multiple contradicting evidence sources.",
+          "evidenceIds": [
+            "sample-3pl-e1",
+            "sample-3pl-e2"
+          ]
+        },
+        {
+          "assumptionId": "sample-3pl-a2",
+          "status": "invalidated",
+          "confidence": "high",
+          "rationale": "The 18% savings figure is not resilient to known, near-term constraints. E4 documents that a planned Q3 SKU expansion will trigger the 3PL's next pricing tier, directly invalidating the cost baseline underlying the entire financial case for outsourcing. This is a scheduled event, not speculative risk. Load-bearing assumption with strong contradicting evidence that cannot be holding.",
+          "evidenceIds": [
+            "sample-3pl-e4"
+          ]
+        },
+        {
+          "assumptionId": "sample-3pl-a3",
+          "status": "weakened",
+          "confidence": "high",
+          "rationale": "Recent 3PL acquisition has created material onboarding risk. E3 documents public reports of onboarding freezes from existing clients during the ownership transition at this specific vendor. Against a fixed warehouse lease decision deadline that cannot flex, acquisition-driven delays represent a credible threat to the onboarding timeline. The 3PL's stability assumption is directly undermined by the acquisition itself.",
+          "evidenceIds": [
+            "sample-3pl-e3"
+          ]
+        },
+        {
+          "assumptionId": "sample-3pl-a4",
+          "status": "weakened",
+          "confidence": "medium",
+          "rationale": "Pilot testing has exposed data-quality gaps that undermine the assumption. E1 shows pilot mispicks were root-caused to product data-feed issues rather than 3PL execution failures. No evidence in the mappings indicates these data problems have been remediated before full-scale deployment. A root-cause defect in the data feed will scale with volume and create fulfillment errors across the pipeline.",
+          "evidenceIds": [
+            "sample-3pl-e1"
+          ]
+        }
+      ]
+    },
+    "reporter": {
+      "healthGrade": "at_risk",
+      "summary": "The decision to outsource fulfillment to a 3PL by Q2 is at risk: both load-bearing assumptions have been invalidated by evidence gathered before full rollout. Pilot data already shows the 3PL shipping slower than in-house and customers noticing the difference, while a scheduled Q3 SKU expansion is set to trigger a pricing-tier change that erodes the 18 percent savings case for outsourcing in the first place.",
+      "findings": [
+        {
+          "assumptionId": "sample-3pl-a1",
+          "status": "invalidated",
+          "rationale": "Pilot-stage results already show a same-day-ship gap versus the in-house baseline, and customer survey data confirms shoppers are noticing reduced shipping speed, contradicting the core premise that the difference would be imperceptible.",
+          "receipts": [
+            {
+              "evidenceId": "sample-3pl-e1",
+              "quote": "94 percent of orders shipped same-day vs our 97 percent in-house"
+            },
+            {
+              "evidenceId": "sample-3pl-e2",
+              "quote": "dropped from 31 percent to 24 percent"
+            }
+          ]
+        },
+        {
+          "assumptionId": "sample-3pl-a2",
+          "status": "invalidated",
+          "rationale": "The 18 percent savings figure assumes current SKU count, but a planned Q3 product expansion is confirmed to trigger the 3PL's next pricing tier, undermining the financial rationale for the move.",
+          "receipts": [
+            {
+              "evidenceId": "sample-3pl-e4",
+              "quote": "adds 40 SKUs, which triggers their next pricing tier"
+            }
+          ]
+        },
+        {
+          "assumptionId": "sample-3pl-a3",
+          "status": "weakened",
+          "rationale": "The 3PL's recent acquisition has produced documented onboarding freezes for other clients, creating real risk of a timeline collision with the fixed 8-month warehouse lease decision.",
+          "receipts": [
+            {
+              "evidenceId": "sample-3pl-e3",
+              "quote": "announced acquisition by a larger logistics group"
+            },
+            {
+              "evidenceId": "sample-3pl-e3",
+              "quote": "publicly flagged onboarding freezes during the transition"
+            }
+          ]
+        },
+        {
+          "assumptionId": "sample-3pl-a4",
+          "status": "weakened",
+          "rationale": "Pilot mispicks were traced to internal data-feed defects rather than 3PL execution errors, indicating the product data is not yet clean enough to safely drive third-party pick-and-pack at scale.",
+          "receipts": [
+            {
+              "evidenceId": "sample-3pl-e1",
+              "quote": "traced to our product data feed"
+            }
+          ]
+        }
+      ],
+      "challengeHighlights": [
+        "Both service-quality signals (speed gap, customer perception) moved in the wrong direction during a pilot run under favorable, closely-monitored conditions — the real-scale gap could be worse.",
+        "The 18 percent savings claim is already known to expire once the Q3 SKU expansion hits the next pricing tier, meaning the financial case is temporary by design.",
+        "The 3PL's ownership change is not a hypothetical risk — other clients have already reported onboarding freezes, directly threatening the fixed lease-decision timeline with no stated fallback.",
+        "Mispicks currently attributed to internal data quality risk being misread as 3PL underperformance if not fixed before scale-up, compounding a1's risk."
+      ],
+      "actions": [
+        {
+          "type": "hedging",
+          "assumptionId": "sample-3pl-a1",
+          "text": "Assign the fulfillment ops lead to define a walk-away threshold for same-day-ship rate and shipping-complaint volume, and monitor against it before expanding beyond the pilot region."
+        },
+        {
+          "type": "shaping",
+          "assumptionId": "sample-3pl-a2",
+          "text": "Have finance and procurement renegotiate or lock in the current pricing tier with the 3PL ahead of the Q3 SKU expansion to preserve the 18 percent savings case."
+        },
+        {
+          "type": "hedging",
+          "assumptionId": "sample-3pl-a3",
+          "text": "Have legal and ops draft a warehouse lease extension option or interim in-house capacity plan in case the 3PL's acquisition-driven transition delays onboarding past the decision deadline."
+        },
+        {
+          "type": "shaping",
+          "assumptionId": "sample-3pl-a4",
+          "text": "Assign the catalog/data team to audit and remediate the product data feed responsible for pilot mispicks before any volume scale-up to the 3PL."
         }
       ]
     }
