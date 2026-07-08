@@ -2,16 +2,23 @@
 
 Vital signs for the decisions you've already made.
 
-Decision Vitals is a lightweight, multi-agent implementation of
-Assumption-Based Planning (a RAND methodology). You register a business
-decision, the system extracts the assumptions underneath it, you paste in
-evidence as it accumulates, and a pipeline of specialist agents reviews the
-assumptions and produces a versioned Decision Health Report: a grade,
-per-assumption verdicts with quoted evidence receipts, the strongest
-disconfirming case, and concrete shaping and hedging actions.
+**Live demo:** https://decision-vitals.vercel.app (Demo mode replays real
+recorded agent runs; no API key needed)
 
-See `PLAN.md` for the full product spec and `/about` on the deployed site for
-the case study.
+Decision Vitals watches the assumptions a business decision rests on and tells
+you when the evidence starts to turn against one. You register a decision and
+AI agents pull out the assumptions underneath it, marking which are
+**critical** (the decision could break if they're wrong) and which are
+**supporting**, each with a **warning signal** to watch for. You paste in
+evidence as it accumulates: meeting notes, tickets, customer feedback, market
+updates. When you review the decision, four specialist agents map the evidence
+to each assumption, argue against every one of them, grade where each stands,
+and write a Decision Health Report with an overall grade, a verdict per
+assumption backed by quoted evidence, and concrete next steps. Reviews are
+numbered, so a decision builds a health history.
+
+Inspired by RAND's Assumption-Based Planning; see `/about` on the site for the
+full case study.
 
 ## Architecture
 
@@ -24,9 +31,10 @@ the case study.
   on Haiku. Definitions live in `agents.json`.
 - **Orchestration:** the app drives a deterministic sequential pipeline with
   typed JSON contracts. Each agent's output schema is the next agent's input.
-  Deterministic rules override model judgment where it matters: a
-  load-bearing assumption with strong contradicting evidence can never be
-  "holding", and the health grade derives mechanically from statuses.
+  Deterministic rules override model judgment where it matters: a critical
+  assumption with strong contradicting evidence can never be graded as still
+  holding, and the overall health grade is computed from the per-assumption
+  verdicts rather than left to the model.
 - **Serverless routes (Vercel, under `/api`):**
   - `api/setup.js`: idempotently creates or updates the six agents from
     `agents.json` (matched by name) and returns their IDs.
@@ -34,6 +42,7 @@ the case study.
     Managed Agents session, polls until idle, parses the JSON reply (one
     retry with a "JSON only" nudge), and returns it.
   - `api/live.js`: verifies the Live Mode passphrase.
+  - `api/og.js`: renders the Open Graph card for link previews (Edge runtime).
 - **Modes:** the app defaults to Demo Mode, which replays recorded real agent
   runs from `src/data/recordedRuns.json` with staged delays and zero API
   calls, under a visible label. Live Mode runs real sessions and is gated by
@@ -41,16 +50,15 @@ the case study.
 
 ### Agent pipeline
 
-Registration (Phase A): Intake extracts a title, a normalized statement, and
-3 to 5 candidate assumptions; Classifier tiers each assumption (load-bearing,
-vulnerable, lower-risk) and writes a signpost.
+Registration: Intake extracts a title, a normalized statement, and 3 to 5
+candidate assumptions; Classifier marks each critical or supporting and writes
+its warning signal.
 
-Review (Phase B): Evidence Review maps snippets to assumptions with direction
-and strength; Challenge argues the strongest honest case against every
-assumption; Risk Ranking assigns statuses under the hard rules; Reporter
-writes the health report. Every step's real JSON input and output is visible
-in the Agent Run view, and every run is traceable as a session in the Claude
-Console.
+Review: Evidence Review maps evidence to assumptions with direction and
+strength; Challenge argues the strongest honest case against every assumption;
+Risk Ranking grades each one under the review rules; Reporter writes the
+health report. Every step's real JSON input and output is visible in the
+review view, and every run is traceable as a session in the Claude Console.
 
 ## Routes
 
@@ -59,7 +67,7 @@ Console.
 | `/`                           | Dashboard              |
 | `/new`                        | New Decision           |
 | `/decision/:id`               | Decision Detail        |
-| `/decision/:id/run`           | Agent Run view         |
+| `/decision/:id/run`           | Review pipeline        |
 | `/decision/:id/report/:runId` | Decision Health Report |
 | `/about`                      | Case study             |
 
@@ -78,7 +86,7 @@ Console.
 
 ## Development
 
-Everything is built through Claude Code on the web and deployed by pushing to
+Built entirely through Claude Code on the web and deployed by pushing to
 `main` (Vercel auto-deploys). Standard scripts exist for verification:
 
 ```bash
@@ -89,8 +97,9 @@ npm run dev      # local dev server (requires vercel dev for the /api routes)
 
 ## Deliberate scope limits
 
-No auth, no database, no file parsing, no integrations, no streaming, no
-agent memory across decisions, and no editing of evidence once a review has
-used it (immutable evidence keeps receipts honest). Platform-level
-agent-to-agent coordination is a research preview and was skipped on
-purpose; app-driven sequencing is simpler and easier to reason about.
+No auth, no database, no file parsing, no integrations (yet), no streaming,
+no agent memory across decisions, and no editing of evidence once a review
+has used it (an unchanging evidence trail keeps the receipts honest).
+Platform-level agent-to-agent coordination is a research preview and was
+skipped on purpose; app-driven sequencing is simpler and easier to reason
+about.
