@@ -85,6 +85,12 @@ export default function About() {
         app-driven sequence is simpler to reason about and is the obvious place
         to go next.
       </P>
+      <P>
+        Decision Vitals is also an MCP server: connect it to Claude and an
+        agent can list your decisions, inspect their assumptions, and file new
+        evidence straight from a conversation, where it shows up in the app
+        ready for the next review.
+      </P>
 
       <SectionTitle>Product decisions</SectionTitle>
       <P>
