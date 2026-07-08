@@ -102,6 +102,7 @@ export const SOURCE_TYPE = {
   support_ticket: "Support ticket",
   market_update: "Market update",
   status_update: "Status update",
+  email: "Email",
 };
 
 export function sourceTypeLabel(type) {
