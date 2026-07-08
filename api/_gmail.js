@@ -65,6 +65,18 @@ function extractPlainText(payload) {
   return "";
 }
 
+// Remove bare http(s)/www URLs and the empty brackets, parens, or angle
+// brackets that once wrapped them, so link-heavy notification emails read as
+// text. Prose is kept; only the URLs and their now-empty wrappers are dropped.
+function stripUrls(text) {
+  return text
+    .replace(/<https?:\/\/[^>]*>/gi, " ") // <https://...>
+    .replace(/\(\s*(?:https?:\/\/|www\.)\S*\s*\)/gi, " ") // (https://...)
+    .replace(/\[\s*(?:https?:\/\/|www\.)\S*\s*\]/gi, " ") // [https://...]
+    .replace(/\b(?:https?:\/\/|www\.)\S+/gi, " ") // bare URLs
+    .replace(/[ \t]*[([<]\s*[)\]>]/g, " "); // leftover empty wrappers
+}
+
 const header = (message, name) =>
   message.payload?.headers?.find(
     (h) => h.name?.toLowerCase() === name.toLowerCase()
@@ -89,11 +101,12 @@ export async function getMessage(accessToken, id) {
     : parsed.toISOString().slice(0, 10);
 
   // Body: prefer the decoded text/plain part, fall back to Gmail's snippet.
-  // Cut quoted reply chains and collapse whitespace so the evidence reads clean.
+  // Cut quoted reply chains, strip tracking URLs, and collapse whitespace so the
+  // evidence reads as prose instead of a wall of links.
   let body = extractPlainText(message.payload) || message.snippet || "";
   const replyMarker = body.search(/\r?\nOn .* wrote:/);
   if (replyMarker > 0) body = body.slice(0, replyMarker);
-  body = body.replace(/\s+/g, " ").trim().slice(0, 1200);
+  body = stripUrls(body).replace(/\s+/g, " ").trim().slice(0, 1200);
 
   return { id, subject, from, date, body };
 }
