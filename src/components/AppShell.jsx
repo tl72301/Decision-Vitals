@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { isDemo, setMode, subscribeMode } from "../lib/mode.js";
 import { verifyLivePassphrase } from "../lib/api.js";
+import { startMcpSync } from "../lib/mcpSync.js";
 
 function ModeToggle() {
   const [, setVersion] = useState(0);
@@ -47,6 +48,7 @@ function ModeToggle() {
 export default function AppShell({ children }) {
   const [, setVersion] = useState(0);
   useEffect(() => subscribeMode(() => setVersion((v) => v + 1)), []);
+  useEffect(() => startMcpSync(), []); // Live Mode only; no-op in Demo Mode
 
   return (
     <div className="min-h-screen bg-stone-50 text-stone-900 antialiased">

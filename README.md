@@ -60,6 +60,31 @@ Risk Ranking grades each one under the review rules; Reporter writes the
 health report. Every step's real JSON input and output is visible in the
 review view, and every run is traceable as a session in the Claude Console.
 
+## MCP server
+
+Decision Vitals is also an MCP server, so Claude (or any MCP client) can work
+with your decisions from a conversation: list them, inspect their assumptions,
+and file new evidence ("just got off a call with Meridian, log this against
+the pricing decision"). Evidence filed by an agent appears in the app within
+about 20 seconds while it is open in Live Mode, ready for a re-review.
+
+Tools: `list_decisions`, `get_decision`, `add_evidence`.
+
+How it works: decisions live in the browser's localStorage, so the app (Live
+Mode only) syncs a snapshot to a small Redis store via `/api/sync` and pulls
+back any evidence agents filed. `api/mcp.js` serves the MCP Streamable HTTP
+endpoint (stateless, JSON responses) against that store, protected by the same
+passphrase as Live Mode.
+
+Setup:
+
+1. In Vercel, add the **Upstash for Redis** marketplace integration to the
+   project (free tier is fine); the `KV_REST_API_*` env vars are injected
+   automatically. Redeploy.
+2. Open the app in Live Mode once so it syncs your decisions.
+3. In Claude: Settings, Connectors, Add custom connector, with URL
+   `https://<your-site>/api/mcp?key=<LIVE_MODE_PASSPHRASE>`.
+
 ## Routes
 
 | Path                          | Screen                 |
