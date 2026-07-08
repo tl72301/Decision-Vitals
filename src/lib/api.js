@@ -60,3 +60,23 @@ export async function verifyLivePassphrase(passphrase) {
     return { ok: false, error: `Verification failed (${res.status}).` };
   }
 }
+
+/**
+ * Owner-pull: fetch labeled emails from Gmail (server-side) and return them as
+ * evidence-ready items. Live Mode only. Returns { ok, configured, items, ... }.
+ */
+export async function pullGmail() {
+  const res = await fetch("/api/gmail-pull", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-live-passphrase": getPassphrase(),
+    },
+    body: "{}",
+  });
+  try {
+    return await res.json();
+  } catch {
+    return { ok: false, error: `Gmail pull failed (${res.status}).` };
+  }
+}

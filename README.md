@@ -85,6 +85,30 @@ Setup:
 3. In Claude: Settings, Connectors, Add custom connector, with URL
    `https://<your-site>/api/mcp?key=<LIVE_MODE_PASSPHRASE>`.
 
+## Pull evidence from Gmail
+
+A decision's evidence often arrives as email. Label those emails
+`decision-evidence` in Gmail, and the **Pull from Gmail** button on a decision
+(Live Mode) files them as evidence, ready for a re-review. It connects once to
+the owner's own mailbox with a read-only refresh token, reads only labeled
+messages, trims quoted reply chains, and pulls each email at most once (already
+seen message IDs are remembered in Redis).
+
+Setup:
+
+1. In the **Google Cloud Console**, create an OAuth **Web application** client.
+   Add the authorized redirect URI `https://<your-site>/api/gmail-auth`. Put
+   its ID and secret in Vercel as `GOOGLE_CLIENT_ID` and
+   `GOOGLE_CLIENT_SECRET`, then redeploy.
+2. Visit `https://<your-site>/api/gmail-auth?key=<LIVE_MODE_PASSPHRASE>` once,
+   consent with your own Google account, and copy the printed refresh token
+   into Vercel as `GOOGLE_REFRESH_TOKEN`. Redeploy.
+3. Label the emails you want ingested `decision-evidence` (override with
+   `GMAIL_LABEL`), open a decision in Live Mode, and click **Pull from Gmail**.
+
+Requires the same Upstash Redis store as the MCP server (to remember which
+emails were already pulled).
+
 ## Routes
 
 | Path                          | Screen                 |
@@ -105,6 +129,9 @@ Setup:
      reaches the browser.
    - `LIVE_MODE_PASSPHRASE`: any secret phrase. Required to unlock Live Mode;
      without it set, Live Mode is not gated.
+   - Optional: `KV_REST_API_URL` / `KV_REST_API_TOKEN` (Upstash Redis) to
+     enable the MCP server and Gmail pull; `GOOGLE_CLIENT_ID` /
+     `GOOGLE_CLIENT_SECRET` / `GOOGLE_REFRESH_TOKEN` for Gmail pull.
 3. Visit `/api/setup` once. It registers the six agents and returns their
    IDs; the agents appear in the Claude Console. Repeat calls are no-ops.
 4. To edit a prompt: change `agents.json`, push, and hit `/api/setup` again.

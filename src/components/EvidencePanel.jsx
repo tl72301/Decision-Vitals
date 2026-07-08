@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { createEvidence, evidenceByDecision, deleteEvidence } from "../lib/store.js";
 import { SOURCE_TYPE, sourceTypeLabel, formatDate } from "../lib/labels.js";
+import { isDemo } from "../lib/mode.js";
+import { pullGmail } from "../lib/api.js";
 import Chip from "./Chip.jsx";
+import Spinner from "./Spinner.jsx";
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -12,6 +15,8 @@ export default function EvidencePanel({ decisionId, locked }) {
   const [text, setText] = useState("");
   const [sourceType, setSourceType] = useState("meeting_notes");
   const [date, setDate] = useState(today());
+  const [pulling, setPulling] = useState(false);
+  const [pullNotice, setPullNotice] = useState("");
 
   const evidence = evidenceByDecision(decisionId);
 
@@ -22,11 +27,56 @@ export default function EvidencePanel({ decisionId, locked }) {
     setText("");
   }
 
+  async function pullFromGmail() {
+    setPulling(true);
+    setPullNotice("");
+    try {
+      const res = await pullGmail();
+      if (!res.ok) {
+        setPullNotice(res.error || "Couldn't pull from Gmail.");
+      } else {
+        for (const item of res.items ?? []) {
+          createEvidence({
+            decisionId,
+            text: item.text,
+            sourceType: "email",
+            date: item.date,
+          });
+        }
+        const n = res.items?.length ?? 0;
+        setPullNotice(
+          n === 0
+            ? "No new labeled emails to pull."
+            : `Pulled ${n} email${n === 1 ? "" : "s"} into this decision.`
+        );
+      }
+    } catch (err) {
+      setPullNotice(err.message || "Couldn't pull from Gmail.");
+    } finally {
+      setPulling(false);
+    }
+  }
+
   const inputCls =
     "w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm outline-none focus:border-stone-400 focus:ring-2 focus:ring-stone-200";
 
   return (
     <div>
+      {!isDemo() && (
+        <div className="mb-3 flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            onClick={pullFromGmail}
+            disabled={pulling}
+            className="inline-flex items-center gap-2 rounded-lg border border-stone-300 bg-white px-3 py-1.5 text-xs font-medium text-stone-700 transition hover:bg-stone-50 disabled:opacity-50"
+          >
+            {pulling && <Spinner />}
+            {pulling ? "Pulling…" : "Pull from Gmail"}
+          </button>
+          {pullNotice && <span className="text-xs text-stone-500">{pullNotice}</span>}
+        </div>
+      )}
+
       <form onSubmit={add} className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
         <textarea
           value={text}
