@@ -88,12 +88,12 @@ function HowItWorks() {
       {HOW_IT_WORKS.map((step) => (
         <div
           key={step.n}
-          className="rounded-xl border border-stone-200 bg-white p-4 text-left"
+          className="rounded-xl border border-stone-200 bg-white p-5 text-left shadow-sm"
         >
           <div className="flex h-6 w-6 items-center justify-center rounded-full bg-stone-900 text-xs font-semibold text-white">
             {step.n}
           </div>
-          <div className="mt-2 text-sm font-semibold text-stone-800">
+          <div className="mt-3 text-sm font-semibold text-stone-800">
             {step.title}
           </div>
           <p className="mt-1 text-xs leading-relaxed text-stone-500">
@@ -105,44 +105,45 @@ function HowItWorks() {
   );
 }
 
-function EmptyState({ onLoadSamples, notice }) {
+// The centered anchor of the home screen. Present whether or not any decisions
+// exist, so the page always reads as a considered landing rather than a bare
+// list. CTAs live here; the decisions grid (or the how-it-works primer) follows.
+function Hero({ hasDecisions, onLoadSamples }) {
   return (
-    <div className="rounded-2xl border border-dashed border-stone-300 bg-white p-8 sm:p-10">
-      <div className="text-center">
-        <h2 className="text-lg font-semibold text-stone-900">
-          Watch the assumptions behind your decisions
-        </h2>
-        <p className="mx-auto mt-2 max-w-lg text-sm text-stone-500">
-          Every decision rests on a few assumptions about customers, capacity,
-          timing, or the market. Decision Vitals surfaces them and tells you
-          when the evidence starts to turn against one.
-        </p>
-      </div>
-
-      <div className="mt-8">
-        <HowItWorks />
-      </div>
-
-      <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+    <section className="mx-auto max-w-2xl text-center">
+      <p className="text-xs font-medium uppercase tracking-[0.2em] text-stone-400">
+        Decision monitoring
+      </p>
+      <h1 className="mt-3 text-3xl font-semibold tracking-tight text-stone-900 sm:text-4xl">
+        Watch the assumptions behind your decisions
+      </h1>
+      <p className="mx-auto mt-4 max-w-xl text-[15px] leading-relaxed text-stone-500">
+        Every decision rests on a few assumptions about customers, capacity,
+        timing, or the market. Decision Vitals surfaces them and tells you when
+        the evidence starts to turn against one.
+      </p>
+      <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
         <Link
           to="/new"
-          className="inline-flex items-center rounded-lg bg-stone-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-stone-700"
+          className="inline-flex items-center rounded-lg bg-stone-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-stone-700"
         >
           New decision
         </Link>
         <button
           type="button"
           onClick={onLoadSamples}
-          className="inline-flex items-center rounded-lg border border-stone-300 bg-white px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-50"
+          className="inline-flex items-center rounded-lg border border-stone-300 bg-white px-5 py-2.5 text-sm font-medium text-stone-700 transition hover:bg-stone-50"
         >
-          Load sample decisions
+          {hasDecisions ? "Load more samples" : "Load sample decisions"}
         </button>
       </div>
-      <p className="mt-3 text-center text-xs text-stone-400">
-        New here? Loading the samples is the fastest way to see a finished review.
-      </p>
-      {notice && <p className="mt-2 text-center text-xs text-stone-500">{notice}</p>}
-    </div>
+      {!hasDecisions && (
+        <p className="mt-3 text-xs text-stone-400">
+          New here? Loading the samples is the fastest way to see a finished
+          review.
+        </p>
+      )}
+    </section>
   );
 }
 
@@ -151,6 +152,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const decisions = listDecisions();
   const [notice, setNotice] = useState("");
+  const hasDecisions = decisions.length > 0;
 
   function handleLoadSamples() {
     const n = loadSamples();
@@ -161,32 +163,49 @@ export default function Dashboard() {
     );
   }
 
+  const sorted = decisions
+    .slice()
+    .sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between gap-4">
-        <h1 className="text-2xl font-semibold text-stone-900">
-          Your decisions
-        </h1>
-        <button
-          type="button"
-          onClick={() => navigate("/new")}
-          className="inline-flex items-center rounded-lg bg-stone-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-stone-700"
-        >
-          New decision
-        </button>
+      <div className="py-4 sm:py-8">
+        <Hero hasDecisions={hasDecisions} onLoadSamples={handleLoadSamples} />
+        {notice && (
+          <p className="mt-4 text-center text-xs text-stone-500">{notice}</p>
+        )}
       </div>
 
-      {decisions.length === 0 ? (
-        <EmptyState onLoadSamples={handleLoadSamples} notice={notice} />
-      ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {decisions
-            .slice()
-            .sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)))
-            .map((d) => (
+      {hasDecisions ? (
+        <section className="mt-6 border-t border-stone-200 pt-8">
+          <div className="mb-4 flex items-baseline justify-between gap-4">
+            <h2 className="text-lg font-semibold text-stone-900">
+              Your decisions
+              <span className="ml-2 text-sm font-normal text-stone-400">
+                {decisions.length}
+              </span>
+            </h2>
+            <button
+              type="button"
+              onClick={() => navigate("/new")}
+              className="text-sm font-medium text-stone-500 transition hover:text-stone-800"
+            >
+              + New decision
+            </button>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {sorted.map((d) => (
               <DecisionCard key={d.id} decision={d} />
             ))}
-        </div>
+          </div>
+        </section>
+      ) : (
+        <section className="mt-6 border-t border-stone-200 pt-8">
+          <p className="mb-4 text-center text-xs font-medium uppercase tracking-[0.2em] text-stone-400">
+            How it works
+          </p>
+          <HowItWorks />
+        </section>
       )}
     </div>
   );
