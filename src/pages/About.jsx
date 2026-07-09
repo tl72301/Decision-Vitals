@@ -22,31 +22,6 @@ const Section = ({ title, children }) => (
   </section>
 );
 
-// Quick facts under the hero, so the page reads as a case study at a glance.
-const FACTS = [
-  ["Role", "Product, design & build (solo)"],
-  ["Type", "Multi-agent decision monitor"],
-  ["Stack", "React · Vite · Tailwind · Vercel"],
-  ["Agents", "6 on Claude Managed Agents"],
-];
-
-function MetaStrip() {
-  return (
-    <dl className="mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-stone-200 bg-stone-200 sm:grid-cols-4">
-      {FACTS.map(([label, value]) => (
-        <div key={label} className="bg-white p-4">
-          <dt className="text-[11px] font-medium uppercase tracking-wide text-stone-400">
-            {label}
-          </dt>
-          <dd className="mt-1 text-[13px] font-medium leading-snug text-stone-700">
-            {value}
-          </dd>
-        </div>
-      ))}
-    </dl>
-  );
-}
-
 // The agent pipeline as a small visual: two setup agents, then four review
 // agents, in the order they actually run.
 const PIPELINE = [
@@ -94,36 +69,6 @@ function Pipeline() {
   );
 }
 
-const WHY_SIX = [
-  [
-    "Different jobs, different shapes",
-    "Cleaning a decision, pulling out its assumptions, arguing against them, scoring them, and writing the report are genuinely different tasks with different outputs. One prompt doing all of them does each one worse; separate agents each get a single job and a single thing to tune.",
-  ],
-  [
-    "An independent critic",
-    "The Challenge agent's only role is to argue against every assumption, and it has no say in the final grade. That independence is the whole point: if the step that reads the evidence also grades the decision, it talks itself into the answer it already leaned toward. A critic that never sees the verdict can't protect it.",
-  ],
-  [
-    "A receipt for every verdict",
-    "Each agent hands a structured result to the next, so every grade traces back through the exact evidence and the exact challenge behind it. A single big prompt gives you an answer; the pipeline gives you a paper trail you can open step by step.",
-  ],
-];
-
-function WhySixAgents() {
-  return (
-    <div className="mt-5 space-y-4">
-      {WHY_SIX.map(([title, body]) => (
-        <div key={title} className="border-l-2 border-stone-200 pl-4">
-          <h3 className="text-sm font-semibold text-stone-900">{title}</h3>
-          <p className="mt-1 max-w-prose text-[14px] leading-relaxed text-stone-600">
-            {body}
-          </p>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 const PRODUCT_DECISIONS = [
   [
     "Paste-only evidence",
@@ -165,10 +110,7 @@ export default function About() {
   return (
     <div className="mx-auto max-w-3xl">
       {/* Hero */}
-      <p className="text-xs font-medium uppercase tracking-[0.2em] text-stone-400">
-        Case study
-      </p>
-      <h1 className="mt-2 text-3xl font-semibold tracking-tight text-stone-900 sm:text-4xl">
+      <h1 className="text-3xl font-semibold tracking-tight text-stone-900 sm:text-4xl">
         Decision Vitals
       </h1>
       <p className="mt-4 max-w-prose text-base leading-relaxed text-stone-600">
@@ -176,7 +118,6 @@ export default function About() {
         watches the assumptions a business decision rests on and tells you when
         the evidence starts to turn against one.
       </p>
-      <MetaStrip />
 
       <Section title="The problem">
         <P>
@@ -245,14 +186,6 @@ export default function About() {
           evidence straight from a conversation, where it shows up in the app
           ready for the next review.
         </P>
-      </Section>
-
-      <Section title="Why six agents">
-        <P>
-          Six agents sounds like a lot for a tool this size. It isn't for show,
-          the split does three real jobs:
-        </P>
-        <WhySixAgents />
       </Section>
 
       <Section title="Product decisions">
