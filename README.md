@@ -60,6 +60,28 @@ Risk Ranking grades each one under the review rules; Reporter writes the
 health report. Every step's real JSON input and output is visible in the
 review view, and every run is traceable as a session in the Claude Console.
 
+### Why six agents
+
+Not agent theater, the split earns its keep three ways:
+
+- **Separation of concerns.** Normalizing a decision, extracting assumptions,
+  associating evidence, adversarial critique, scoring, and long-form writing
+  are distinct tasks with distinct output schemas and failure modes. Each agent
+  has one job, one contract, and one prompt to version in isolation; folding
+  them into a single call measurably degrades each.
+- **Adversarial independence.** The Challenge agent's only job is to argue
+  against every assumption, and it has no input into the final grade. That
+  structural separation is the correctness argument: a single context that both
+  reads the evidence and grades the decision rationalizes toward its earlier
+  reads. An independent critic can't protect a verdict it never sees.
+- **Auditability.** Typed handoffs make every verdict traceable back through
+  the exact evidence associations and challenges that produced it. A monolithic
+  prompt yields an answer; the pipeline yields a receipt, visible step by step
+  in the review view and as sessions in the Claude Console.
+
+Model split follows task difficulty: the two most open-ended roles (Challenge,
+Reporter) run a Sonnet-class model; the four schema-bound steps run Haiku.
+
 ## MCP server
 
 Decision Vitals is also an MCP server, so Claude (or any MCP client) can work
@@ -149,9 +171,10 @@ npm run dev      # local dev server (requires vercel dev for the /api routes)
 
 ## Deliberate scope limits
 
-No auth, no database, no file parsing, no integrations (yet), no streaming,
-no agent memory across decisions, and no editing of evidence once a review
-has used it (an unchanging evidence trail keeps the receipts honest).
+No auth, no database, no file parsing, no streaming, no agent memory across
+decisions, and no editing of evidence once a review has used it (an unchanging
+evidence trail keeps the receipts honest). The one integration is the
+owner-only, read-only Gmail pull described above.
 Platform-level agent-to-agent coordination is a research preview and was
 skipped on purpose; app-driven sequencing is simpler and easier to reason
 about.
