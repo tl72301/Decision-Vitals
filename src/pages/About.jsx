@@ -53,7 +53,7 @@ const PIPELINE = [
   {
     phase: "On register",
     note: "extract & label assumptions",
-    agents: ["Intake", "Assumption Mapper"],
+    agents: ["Intake", "Assumption Classifier"],
   },
   {
     phase: "On review",
@@ -88,6 +88,36 @@ function Pipeline() {
               </span>
             ))}
           </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+const WHY_SIX = [
+  [
+    "Different jobs, different shapes",
+    "Cleaning a decision, pulling out its assumptions, arguing against them, scoring them, and writing the report are genuinely different tasks with different outputs. One prompt doing all of them does each one worse; separate agents each get a single job and a single thing to tune.",
+  ],
+  [
+    "An independent critic",
+    "The Challenge agent's only role is to argue against every assumption, and it has no say in the final grade. That independence is the whole point: if the step that reads the evidence also grades the decision, it talks itself into the answer it already leaned toward. A critic that never sees the verdict can't protect it.",
+  ],
+  [
+    "A receipt for every verdict",
+    "Each agent hands a structured result to the next, so every grade traces back through the exact evidence and the exact challenge behind it. A single big prompt gives you an answer; the pipeline gives you a paper trail you can open step by step.",
+  ],
+];
+
+function WhySixAgents() {
+  return (
+    <div className="mt-5 space-y-4">
+      {WHY_SIX.map(([title, body]) => (
+        <div key={title} className="border-l-2 border-stone-200 pl-4">
+          <h3 className="text-sm font-semibold text-stone-900">{title}</h3>
+          <p className="mt-1 max-w-prose text-[14px] leading-relaxed text-stone-600">
+            {body}
+          </p>
         </div>
       ))}
     </div>
@@ -193,10 +223,11 @@ export default function About() {
           Six specialist agents run on Claude Managed Agents, each its own named,
           versioned configuration: two extract and label the assumptions when you
           register a decision, and four (Evidence Review, Challenge, Risk Ranking,
-          and Reporter) run the review. The heavier-judgment roles run on a
-          larger model; the structured extraction runs on a faster one. The app
-          runs them in a fixed sequence with a typed handoff between each step,
-          and every run is traceable back to its session on the platform.
+          and Reporter) run the review. The two most open-ended roles, arguing
+          against the plan and writing the report, run on a larger model; the four
+          structured steps run on a faster one. The app runs them in a fixed
+          sequence with a typed handoff between each step, and every run is
+          traceable back to its session on the platform.
         </P>
         <Pipeline />
         <P>
@@ -214,6 +245,14 @@ export default function About() {
           evidence straight from a conversation, where it shows up in the app
           ready for the next review.
         </P>
+      </Section>
+
+      <Section title="Why six agents">
+        <P>
+          Six agents sounds like a lot for a tool this size. It isn't for show,
+          the split does three real jobs:
+        </P>
+        <WhySixAgents />
       </Section>
 
       <Section title="Product decisions">
