@@ -27,12 +27,12 @@ const Section = ({ title, children }) => (
 const PIPELINE = [
   {
     phase: "On register",
-    note: "extract & label assumptions",
+    note: "identify & classify assumptions",
     agents: ["Intake", "Assumption Classifier"],
   },
   {
     phase: "On review",
-    note: "map, challenge, grade, report",
+    note: "examine, challenge, assess, report",
     agents: ["Evidence Review", "Challenge", "Risk Ranking", "Reporter"],
   },
 ];
@@ -84,7 +84,7 @@ const PRODUCT_DECISIONS = [
   ],
   [
     "Demo mode",
-    "The public site replays real recorded agent runs, labeled as such, so anyone can try it with no cost; live runs are passphrase-protected.",
+    "The public site replays real recorded reviews, labeled as such, so anyone can try it at no cost; live reviews are passphrase-protected.",
   ],
 ];
 
@@ -121,11 +121,11 @@ export default function About() {
 
       <Section title="The problem">
         <P>
-          Decisions get made once and reviewed never. The assumptions underneath
-          them, about customers, capacity, timing, and the market, quietly go out
-          of date, and nobody notices until the damage shows up in the numbers.
-          Most teams monitor their decisions by gut feel: the review happens after
-          the failure, not before it.
+          Most decisions get made once and are rarely revisited. The assumptions
+          underneath them, about customers, capacity, timing, and the market,
+          quietly go out of date, and nobody notices until the damage shows up in
+          the numbers. Most teams monitor their decisions by gut feel: the review
+          happens after the failure, not before it.
         </P>
       </Section>
 
@@ -146,45 +146,41 @@ export default function About() {
 
       <Section title="What it does">
         <P>
-          You register a decision and Decision Vitals pulls out the assumptions
+          You register a decision and Decision Vitals identifies the assumptions
           underneath it, marks which are critical, and gives each a warning signal
           to watch. You paste in evidence as it accumulates: meeting notes,
           tickets, customer feedback, market updates. When you review the
-          decision, four specialist agents map the evidence to each assumption,
-          argue against every one of them, grade where each stands, and write a
-          Decision Health Report: an overall grade, a verdict for each assumption
-          with the quoted evidence behind it, the strongest case against, and
-          concrete next steps. Reviews are numbered, so a decision builds up a
-          health history instead of a single one-time verdict.
+          decision, specialized AI agents examine the evidence from different
+          perspectives and combine their findings into a Decision Health Report:
+          an overall grade, an assessment of each assumption with its supporting
+          evidence, the strongest case against it, and recommended next steps.
+          Reviews are numbered and dated, so a decision builds up a health
+          history instead of a single one-time assessment.
         </P>
       </Section>
 
-      <Section title="How it's built">
+      <Section title="How reviews work">
         <P>
-          Six specialist agents run on Claude Managed Agents, each its own named,
-          versioned configuration: two extract and label the assumptions when you
-          register a decision, and four (Evidence Review, Challenge, Risk Ranking,
-          and Reporter) run the review. The two most open-ended roles, arguing
-          against the plan and writing the report, run on a larger model; the four
-          structured steps run on a faster one. The app runs them in a fixed
-          sequence with a typed handoff between each step, and every run is
-          traceable back to its session on the platform.
+          Each review is carried out by six specialized AI agents, each with a
+          single job: two identify and classify the assumptions when you register
+          a decision, and four run the review. Different agents examine the
+          evidence, make the case against each assumption, assess where each one
+          stands, and write the report. Splitting the work this way keeps every
+          step focused, and it means no single perspective dominates: the agent
+          arguing against an assumption has no say in the final grade.
         </P>
         <Pipeline />
         <P>
-          A few rules sit on top of the model's judgment so the results stay
-          consistent: a critical assumption with strong evidence against it can
-          never be marked as still holding, and the overall health grade is
-          computed from the individual verdicts rather than left to the model.
-          Multi-agent coordination on the platform was left out on purpose, an
-          app-driven sequence is simpler to reason about and is the obvious place
-          to go next.
+          Every step's findings stay attached to the result, so each conclusion
+          can be traced back to the evidence and reasoning behind it. A few fixed
+          rules keep the results consistent: a critical assumption with strong
+          evidence against it can never be marked as still holding, and the
+          overall health grade is computed from the individual assessments.
         </P>
         <P>
-          Decision Vitals is also an MCP server: connect it to Claude and an
-          agent can list your decisions, inspect their assumptions, and file new
-          evidence straight from a conversation, where it shows up in the app
-          ready for the next review.
+          Decision Vitals also connects to Claude directly: from a conversation,
+          Claude can list your decisions, inspect their assumptions, and file new
+          evidence, which shows up in the app ready for the next review.
         </P>
       </Section>
 

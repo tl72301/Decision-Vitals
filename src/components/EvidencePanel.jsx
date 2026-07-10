@@ -122,7 +122,7 @@ export default function EvidencePanel({ decisionId, locked }) {
       <ul className="mt-4 space-y-3">
         {evidence.length === 0 && (
           <li className="rounded-lg border border-dashed border-stone-300 p-4 text-center text-sm text-stone-400">
-            No evidence yet. Add at least one snippet to run a review.
+            No evidence yet. Add at least one snippet to review this decision.
           </li>
         )}
         {evidence.map((ev) => (

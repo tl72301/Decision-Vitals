@@ -68,7 +68,7 @@ const HOW_IT_WORKS = [
   {
     n: "1",
     title: "Register a decision",
-    body: "Two agents read it and pull out the handful of assumptions it depends on, flagging which are critical (the decision could break if they're wrong).",
+    body: "Describe a decision you've made. Decision Vitals identifies the key assumptions it depends on and flags which ones are critical.",
   },
   {
     n: "2",
@@ -77,8 +77,8 @@ const HOW_IT_WORKS = [
   },
   {
     n: "3",
-    title: "Run a review",
-    body: "Four agents map the evidence to each assumption, argue against it, and grade the decision's health, with a receipt behind every verdict.",
+    title: "Review the decision",
+    body: "Specialized AI agents examine the evidence from different perspectives and combine their findings into one clear decision-health assessment, with the supporting evidence behind each conclusion.",
   },
 ];
 

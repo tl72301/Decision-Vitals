@@ -15,9 +15,9 @@ import JsonView from "../components/JsonView.jsx";
 
 // The Phase-B pipeline, in order. Each step's output is the next step's input.
 const PIPELINE = [
-  { agent: "evidence_review", name: "Evidence Review", role: "Maps each snippet to the assumptions it bears on" },
-  { agent: "challenge", name: "Challenge", role: "Argues the strongest honest case against every assumption" },
-  { agent: "risk_ranking", name: "Risk Ranking", role: "Assigns each assumption a status, applying the review rules" },
+  { agent: "evidence_review", name: "Evidence Review", role: "Matches each piece of evidence to the assumptions it bears on" },
+  { agent: "challenge", name: "Challenge", role: "Makes the strongest honest case against every assumption" },
+  { agent: "risk_ranking", name: "Risk Ranking", role: "Assesses where each assumption stands" },
   { agent: "reporter", name: "Reporter", role: "Writes the Decision Health Report" },
 ];
 
@@ -221,8 +221,8 @@ export default function AgentRun() {
     return (
       <div className="rounded-xl border border-stone-200 bg-white p-8 text-center">
         <p className="text-stone-600">
-          This decision needs at least one assumption and one evidence snippet
-          before a review can run.
+          This decision needs at least one assumption and one piece of evidence
+          before it can be reviewed.
         </p>
         <Link
           to={`/decision/${id}`}
@@ -241,8 +241,9 @@ export default function AgentRun() {
       </Link>
       <h1 className="mt-2 text-2xl font-semibold text-stone-900">Running review</h1>
       <p className="mt-1 text-sm text-stone-500">
-        Four specialist agents run in sequence. Each card shows the real JSON it
-        returned: the typed handoff to the next agent.
+        Specialized AI agents examine the evidence from different perspectives.
+        Each step shows its full findings, so you can see exactly how the
+        assessment was reached.
       </p>
 
       <ol className="mt-6 space-y-4">
@@ -280,7 +281,7 @@ export default function AgentRun() {
 
       {error && (
         <div className="mt-6 rounded-lg bg-rose-50 p-4 text-sm text-rose-700 ring-1 ring-inset ring-rose-200">
-          <p className="font-medium">The pipeline stopped</p>
+          <p className="font-medium">The review stopped</p>
           <p className="mt-1 text-rose-600">{error}</p>
           <div className="mt-3 flex gap-2">
             <button
@@ -315,7 +316,7 @@ export default function AgentRun() {
           >
             {copied ? "Copied ✓" : "Copy run JSON"}
           </button>
-          <span className="text-sm text-stone-500">All four agents finished.</span>
+          <span className="text-sm text-stone-500">Review complete.</span>
         </div>
       )}
     </div>

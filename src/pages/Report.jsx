@@ -148,15 +148,15 @@ export default function Report() {
       {/* Findings */}
       <section className="mt-8">
         <h2 className="text-lg font-semibold text-stone-900">
-          Assumption findings
+          Where each assumption stands
         </h2>
         <p className="mt-1 text-sm text-stone-500">
-          Every verdict cites the evidence that drove it.
+          Each assessment includes the evidence behind it.
         </p>
         <div className="mt-4 space-y-3">
           {report.findings.length === 0 ? (
             <p className="rounded-lg border border-dashed border-stone-300 p-4 text-center text-sm text-stone-400">
-              The reporter returned no per-assumption findings.
+              This review produced no per-assumption findings.
             </p>
           ) : (
             report.findings.map((f, i) => (
@@ -170,10 +170,11 @@ export default function Report() {
       {report.challengeHighlights.length > 0 && (
         <section className="mt-8">
           <h2 className="text-lg font-semibold text-stone-900">
-            Challenge findings
+            The case against
           </h2>
           <p className="mt-1 text-sm text-stone-500">
-            The strongest case against each assumption, even the healthy ones.
+            The strongest challenge to each assumption, including the ones that
+            still hold.
           </p>
           <ul className="mt-4 space-y-2">
             {report.challengeHighlights.map((h, i) => (
