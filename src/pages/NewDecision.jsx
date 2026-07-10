@@ -7,8 +7,8 @@ import Spinner from "../components/Spinner.jsx";
 
 // The two Phase-A steps shown in the progress panel while agents run.
 const STEP_DEFS = [
-  { key: "intake", label: "Decision Intake", role: "Cleans the decision and drafts candidate assumptions" },
-  { key: "classifier", label: "Assumption Classifier", role: "Labels each assumption critical or supporting and adds a warning signal" },
+  { key: "intake", label: "Read the decision", role: "Drafts the assumptions the decision depends on" },
+  { key: "classifier", label: "Classify each assumption", role: "Marks each one critical or supporting and adds a warning signal to watch" },
 ];
 
 function StepRow({ def, state }) {
@@ -123,7 +123,7 @@ export default function NewDecision() {
         intake: s.intake === "running" ? "error" : s.intake,
         classifier: s.classifier === "running" ? "error" : s.classifier,
       }));
-      setError(err.message || "Something went wrong while extracting assumptions.");
+      setError(err.message || "Something went wrong while identifying assumptions.");
       setRunning(false);
     }
   }
@@ -135,17 +135,16 @@ export default function NewDecision() {
     <div className="mx-auto max-w-2xl">
       <h1 className="text-2xl font-semibold text-stone-900">New decision</h1>
       <p className="mt-1 text-sm text-stone-500">
-        Describe a decision you've already made. When you submit, two agents
-        read it and pull out the 3 to 5 assumptions it depends on, labeling
-        which are critical (the decision could break if they're wrong). You add
-        evidence and review the decision on the next screen.
+        Describe a decision you've already made. Decision Vitals identifies the
+        3 to 5 assumptions it depends on and marks which ones are critical. You
+        add evidence and review the decision on the next screen.
       </p>
 
       {demo && (
         <div className="mt-4 rounded-lg border-l-2 border-stone-400 bg-stone-100/60 px-4 py-3 text-sm text-stone-600">
-          Demo Mode replays recorded agent runs on the sample decisions, so it
-          can't extract assumptions from a new decision. Switch to Live Mode
-          (header toggle) to register your own.
+          Demo Mode replays recorded reviews of the sample decisions, so it
+          can't analyze a new decision. Switch to Live Mode (header toggle) to
+          register your own.
         </div>
       )}
 
@@ -214,7 +213,7 @@ export default function NewDecision() {
             className="inline-flex items-center gap-2 rounded-lg bg-stone-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-stone-700 disabled:cursor-not-allowed disabled:opacity-40"
           >
             {running && <Spinner className="border-stone-500 border-t-white" />}
-            {running ? "Extracting assumptions…" : "Extract assumptions"}
+            {running ? "Identifying assumptions…" : "Identify assumptions"}
           </button>
           <button
             type="button"
@@ -230,7 +229,7 @@ export default function NewDecision() {
       {(running || error) && (
         <div className="mt-6 rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
           <div className="text-sm font-medium text-stone-700">
-            Running the assumption pipeline
+            Identifying the assumptions behind this decision
           </div>
           <ol className="mt-3 space-y-3">
             {STEP_DEFS.map((def) => (
@@ -239,7 +238,7 @@ export default function NewDecision() {
           </ol>
           {error && (
             <div className="mt-4 rounded-lg bg-rose-50 p-3 text-sm text-rose-700 ring-1 ring-inset ring-rose-200">
-              <p className="font-medium">Couldn't extract assumptions</p>
+              <p className="font-medium">Couldn't identify assumptions</p>
               <p className="mt-1 text-rose-600">{error}</p>
               <button
                 type="button"

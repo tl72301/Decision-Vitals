@@ -15,7 +15,7 @@ function ModeToggle() {
       return;
     }
     const passphrase = window.prompt(
-      "Live Mode runs real agent sessions (and spends real credits).\nEnter the Live Mode passphrase:"
+      "Live Mode runs real AI reviews (and spends real credits).\nEnter the Live Mode passphrase:"
     );
     if (passphrase === null) return; // cancelled
     const result = await verifyLivePassphrase(passphrase);
@@ -75,7 +75,7 @@ export default function AppShell({ children }) {
       </header>
       {isDemo() && (
         <div className="border-b border-stone-200 bg-stone-100/80 px-4 py-1.5 text-center text-xs text-stone-500">
-          Demo mode: replaying recorded agent runs
+          Demo mode: replaying recorded reviews
         </div>
       )}
       <main className="mx-auto max-w-5xl px-4 py-6 sm:py-8">{children}</main>
@@ -91,7 +91,7 @@ export default function AppShell({ children }) {
         </a>{" "}
         (RAND) ·{" "}
         <Link to="/about" className="underline decoration-stone-300 underline-offset-2 hover:text-stone-600">
-          Case study
+          About Decision Vitals
         </Link>
       </footer>
     </div>
