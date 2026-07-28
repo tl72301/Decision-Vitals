@@ -35,10 +35,11 @@ function ModeToggle() {
           ? "Switch to Live Mode (passphrase required)"
           : "Switch back to Demo Mode"
       }
-      className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-xs font-medium text-stone-600 ring-1 ring-inset ring-stone-300 transition hover:bg-stone-50"
+      className="inline-flex min-h-9 items-center gap-2 whitespace-nowrap rounded border border-line px-3 py-1.5 text-xs font-medium text-fg-2 transition-colors hover:border-line-2 hover:text-fg-1"
     >
       <span
-        className={`h-1.5 w-1.5 rounded-full ${demo ? "bg-stone-400" : "bg-emerald-500"}`}
+        aria-hidden="true"
+        className={`h-1.5 w-1.5 rounded-full ${demo ? "bg-fg-3" : "bg-ok"}`}
       />
       {demo ? "Demo mode" : "Live mode"}
     </button>
@@ -51,48 +52,59 @@ export default function AppShell({ children }) {
   useEffect(() => startMcpSync(), []); // Live Mode only; no-op in Demo Mode
 
   return (
-    <div className="min-h-screen bg-stone-50 text-stone-900 antialiased">
-      <header className="sticky top-0 z-10 border-b border-stone-200/80 bg-white/85 backdrop-blur">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-          <Link to="/" className="flex flex-col leading-tight">
-            <span className="text-lg font-semibold tracking-tight">
+    <div className="min-h-screen">
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded focus:bg-brass focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-ink-950"
+      >
+        Skip to content
+      </a>
+      <header className="sticky top-0 z-10 border-b border-line bg-ink-950/95 backdrop-blur-sm">
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3">
+          <Link to="/" className="flex items-center gap-2.5">
+            <span aria-hidden="true" className="block h-2.5 w-2.5 rotate-45 bg-brass" />
+            <span className="text-base font-semibold tracking-tight text-fg-1">
               Decision Vitals
             </span>
-            <span className="text-xs text-stone-500">
-              Vital signs for the decisions you've already made
-            </span>
           </Link>
-          <div className="flex items-center gap-4">
+          <nav aria-label="Primary" className="flex items-center gap-4">
             <Link
               to="/about"
-              className="text-xs font-medium text-stone-500 hover:text-stone-800"
+              className="text-sm font-medium text-fg-2 transition-colors hover:text-fg-1"
             >
               About
             </Link>
             <ModeToggle />
-          </div>
+          </nav>
         </div>
       </header>
       {isDemo() && (
-        <div className="border-b border-stone-200 bg-stone-100/80 px-4 py-1.5 text-center text-xs text-stone-500">
-          Demo mode: replaying recorded reviews
-        </div>
+        <p className="border-b border-line bg-ink-900 px-4 py-1.5 text-center font-mono text-xs text-fg-3">
+          Demo · replaying recorded reviews
+        </p>
       )}
-      <main className="mx-auto max-w-5xl px-4 py-6 sm:py-8">{children}</main>
-      <footer className="mx-auto max-w-5xl px-4 pb-8 pt-4 text-xs text-stone-400">
-        Inspired by{" "}
-        <a
-          href="https://www.rand.org/pubs/monograph_reports/MR114.html"
-          target="_blank"
-          rel="noreferrer"
-          className="underline decoration-stone-300 underline-offset-2 hover:text-stone-600"
-        >
-          Assumption-Based Planning
-        </a>{" "}
-        (RAND) ·{" "}
-        <Link to="/about" className="underline decoration-stone-300 underline-offset-2 hover:text-stone-600">
-          About Decision Vitals
-        </Link>
+      <main id="main" className="mx-auto w-full max-w-5xl px-4 py-8">
+        {children}
+      </main>
+      <footer className="mx-auto mt-8 w-full max-w-5xl px-4 pb-10">
+        <div className="border-t border-line pt-5 text-xs text-fg-3">
+          Method:{" "}
+          <a
+            href="https://www.rand.org/pubs/monograph_reports/MR114.html"
+            target="_blank"
+            rel="noreferrer"
+            className="underline decoration-line-2 underline-offset-2 transition-colors hover:text-fg-1"
+          >
+            Assumption-Based Planning
+          </a>{" "}
+          (RAND) ·{" "}
+          <Link
+            to="/about"
+            className="underline decoration-line-2 underline-offset-2 transition-colors hover:text-fg-1"
+          >
+            About Decision Vitals
+          </Link>
+        </div>
       </footer>
     </div>
   );

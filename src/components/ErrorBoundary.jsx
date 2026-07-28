@@ -12,26 +12,30 @@ export default class ErrorBoundary extends Component {
   render() {
     if (!this.state.error) return this.props.children;
     return (
-      <div className="mx-auto mt-16 max-w-md rounded-xl border border-rose-200 bg-rose-50 p-6 text-center">
-        <h2 className="text-lg font-semibold text-rose-800">
-          Something went wrong
-        </h2>
-        <p className="mt-2 text-sm text-rose-700">
+      <div
+        role="alert"
+        className="mx-auto mt-16 max-w-md rounded-md border border-bad/40 bg-ink-800 p-6"
+      >
+        <h2 className="text-lg font-semibold text-fg-1">Something went wrong</h2>
+        <p className="mt-2 font-mono text-xs leading-relaxed text-fg-2">
           {String(this.state.error?.message || this.state.error)}
         </p>
-        <div className="mt-4 flex justify-center gap-3">
+        <p className="mt-2 text-sm text-fg-2">
+          Your decisions and evidence are stored locally and survive a reload.
+        </p>
+        <div className="mt-4 flex gap-3">
           <button
             type="button"
             onClick={() => window.location.reload()}
-            className="rounded-lg bg-rose-700 px-4 py-2 text-sm font-medium text-white hover:bg-rose-600"
+            className="inline-flex min-h-10 items-center rounded bg-brass px-4 py-2 text-sm font-semibold text-ink-950 transition-colors hover:bg-brass-2"
           >
-            Reload
+            Reload page
           </button>
           <a
             href="/"
-            className="rounded-lg border border-rose-300 bg-white px-4 py-2 text-sm font-medium text-rose-700 hover:bg-rose-50"
+            className="inline-flex min-h-10 items-center rounded border border-line-2 px-4 py-2 text-sm font-medium text-fg-1 transition-colors hover:bg-ink-700"
           >
-            Go to dashboard
+            Back to decisions
           </a>
         </div>
       </div>

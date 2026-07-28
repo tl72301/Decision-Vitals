@@ -1,33 +1,33 @@
 // src/lib/labels.js
 //
-// Human labels and Tailwind chip styles for the enums in the data model.
-// Design language: near-monochrome. Chips are neutral (white/stone) and a small
-// colored dot carries the semantic meaning, so the UI stays muted while status
-// remains scannable. Tiers are colorless: load-bearing is the one filled chip.
+// Human labels and chip styles for the enums in the data model.
+// Night-ledger rules: chips are flat rectangular tags on the dark field, a
+// small colored dot or fill carries the semantic meaning, and every status
+// always pairs color with a text label.
 
 /** Overall decision health grade. `null` means no review has run yet. */
 export const HEALTH_GRADE = {
   healthy: {
     label: "Healthy",
-    chip: "bg-white text-stone-700 ring-stone-200",
-    dot: "bg-emerald-500",
+    chip: "bg-transparent text-fg-1 ring-line",
+    dot: "bg-ok",
   },
   watch: {
     label: "Watch",
-    chip: "bg-white text-stone-700 ring-stone-200",
-    dot: "bg-amber-500",
+    chip: "bg-transparent text-fg-1 ring-line",
+    dot: "bg-warn",
   },
   at_risk: {
     label: "At Risk",
-    chip: "bg-white text-stone-700 ring-stone-200",
-    dot: "bg-rose-500",
+    chip: "bg-transparent text-fg-1 ring-line",
+    dot: "bg-bad",
   },
 };
 
 export const HEALTH_GRADE_UNREVIEWED = {
   label: "Not yet reviewed",
-  chip: "bg-white text-stone-400 ring-stone-200",
-  dot: "bg-stone-300",
+  chip: "bg-transparent text-fg-3 ring-line",
+  dot: "bg-line-2",
 };
 
 export function healthGradeMeta(grade) {
@@ -35,25 +35,25 @@ export function healthGradeMeta(grade) {
 }
 
 /**
- * How important an assumption is to the decision. Colorless by design: a
- * Critical assumption is the single filled (near-black) chip, the others are
- * outlined neutrals of decreasing weight. (Internal keys stay load_bearing /
- * vulnerable / lower_risk; only the labels are business-facing.)
+ * How important an assumption is to the decision. Critical is the single
+ * filled brass tag; the others are outlined neutrals of decreasing weight.
+ * (Internal keys stay load_bearing / vulnerable / lower_risk; only the labels
+ * are business-facing.)
  */
 export const TIER = {
   load_bearing: {
     label: "Critical",
-    chip: "bg-stone-900 text-white ring-stone-900",
+    chip: "bg-brass text-ink-950 ring-brass",
     help: "This one could seriously weaken or break the decision if it turns out to be wrong.",
   },
   vulnerable: {
     label: "Supporting",
-    chip: "bg-white text-stone-700 ring-stone-300",
+    chip: "bg-transparent text-fg-2 ring-line-2",
     help: "Still matters, but the decision can probably survive even if it changes.",
   },
   lower_risk: {
     label: "Minor",
-    chip: "bg-white text-stone-500 ring-stone-200",
+    chip: "bg-transparent text-fg-3 ring-line",
     help: "Not likely to break the decision, and not especially likely to change.",
   },
 };
@@ -62,32 +62,32 @@ export function tierMeta(tier) {
   return TIER[tier] ?? TIER.lower_risk;
 }
 
-/** Per-assumption status. Neutral chip + colored dot. */
+/** Per-assumption status. Flat tag + colored dot. */
 export const STATUS = {
   untested: {
     label: "Not checked yet",
-    chip: "bg-white text-stone-500 ring-stone-200",
-    dot: "bg-stone-300",
+    chip: "bg-transparent text-fg-3 ring-line",
+    dot: "bg-line-2",
   },
   holding: {
     label: "Holding",
-    chip: "bg-white text-stone-700 ring-stone-200",
-    dot: "bg-emerald-500",
+    chip: "bg-transparent text-fg-1 ring-line",
+    dot: "bg-ok",
   },
   weakened: {
     label: "Weakened",
-    chip: "bg-white text-stone-700 ring-stone-200",
-    dot: "bg-amber-500",
+    chip: "bg-transparent text-fg-1 ring-line",
+    dot: "bg-warn",
   },
   invalidated: {
     label: "Invalidated",
-    chip: "bg-white text-stone-700 ring-stone-200",
-    dot: "bg-rose-500",
+    chip: "bg-transparent text-fg-1 ring-line",
+    dot: "bg-bad",
   },
   needs_review: {
     label: "Needs review",
-    chip: "bg-white text-stone-700 ring-stone-200",
-    dot: "bg-violet-400",
+    chip: "bg-transparent text-fg-1 ring-line",
+    dot: "bg-review",
   },
 };
 

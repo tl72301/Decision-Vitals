@@ -16,27 +16,39 @@ import {
 } from "../lib/labels.js";
 import Chip from "../components/Chip.jsx";
 
+// Grade rings for the report header: stronger than the small chips because the
+// grade is the report's one headline conclusion.
+const GRADE_RING = {
+  healthy: "ring-ok/60",
+  watch: "ring-warn/60",
+  at_risk: "ring-bad/60",
+};
+
 function NotFound({ id }) {
   return (
-    <div className="rounded-xl border border-stone-200 bg-white p-8 text-center">
-      <p className="text-stone-600">That report doesn't exist.</p>
+    <div className="mx-auto mt-16 max-w-md text-center">
+      <p className="text-fg-2">That report doesn't exist.</p>
       <Link
         to={id ? `/decision/${id}` : "/"}
-        className="mt-3 inline-block text-sm font-medium text-stone-900 underline"
+        className="mt-3 inline-block text-sm font-medium text-brass underline decoration-brass/50 underline-offset-2 hover:text-brass-2"
       >
-        {id ? "Back to decision" : "Back to dashboard"}
+        {id ? "Back to the decision" : "Back to decisions"}
       </Link>
     </div>
   );
 }
 
+// One quoted piece of evidence behind an assessment: always mono, always with
+// its source and date, so the conclusion stays traceable.
 function Receipt({ receipt }) {
   const evidence = receipt.evidenceId ? getEvidence(receipt.evidenceId) : null;
   return (
-    <li className="rounded-lg bg-stone-50 px-3 py-2 ring-1 ring-inset ring-stone-200">
-      <p className="text-sm italic text-stone-700">“{receipt.quote}”</p>
+    <li className="border-l-2 border-line-2 bg-ink-900 py-2 pl-3 pr-3">
+      <p className="font-mono text-[13px] leading-relaxed text-fg-2">
+        “{receipt.quote}”
+      </p>
       {evidence && (
-        <p className="mt-1 text-xs text-stone-400">
+        <p className="mt-1 font-mono text-xs text-fg-3">
           {sourceTypeLabel(evidence.sourceType)}
           {evidence.date ? ` · ${formatDate(evidence.date)}` : ""}
         </p>
@@ -45,12 +57,13 @@ function Receipt({ receipt }) {
   );
 }
 
-function FindingRow({ finding, assumption }) {
+function FindingRow({ finding, assumption, index }) {
   const status = statusMeta(finding.status);
   const tier = assumption ? tierMeta(assumption.tier) : null;
   return (
-    <div className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm sm:p-5">
+    <li className="py-5">
       <div className="flex flex-wrap items-center gap-2">
+        <span className="font-mono text-xs text-fg-3">A{index + 1}</span>
         <Chip tone={status.chip} dot={status.dot}>
           {status.label}
         </Chip>
@@ -60,11 +73,13 @@ function FindingRow({ finding, assumption }) {
           </Chip>
         )}
       </div>
-      <p className="mt-2 text-sm font-medium text-stone-900">
+      <p className="mt-2 text-sm font-medium leading-relaxed text-fg-1">
         {assumption ? assumption.text : "(assumption removed)"}
       </p>
       {finding.rationale && (
-        <p className="mt-1 text-sm text-stone-600">{finding.rationale}</p>
+        <p className="mt-1 max-w-prose text-sm leading-relaxed text-fg-2">
+          {finding.rationale}
+        </p>
       )}
       {finding.receipts?.length > 0 && (
         <ul className="mt-3 space-y-2">
@@ -73,7 +88,7 @@ function FindingRow({ finding, assumption }) {
           ))}
         </ul>
       )}
-    </div>
+    </li>
   );
 }
 
@@ -89,98 +104,111 @@ export default function Report() {
   const allReports = reportsByDecision(id);
   const assumptions = assumptionsByDecision(id);
   const byId = new Map(assumptions.map((a) => [a.id, a]));
+  const indexById = new Map(assumptions.map((a, i) => [a.id, i]));
 
   const shaping = report.actions.filter((a) => a.type === "shaping");
   const hedging = report.actions.filter((a) => a.type === "hedging");
 
   return (
     <div className="mx-auto max-w-3xl">
-      <Link to={`/decision/${id}`} className="text-sm text-stone-500 hover:text-stone-700">
+      <Link
+        to={`/decision/${id}`}
+        className="text-sm text-fg-2 transition-colors hover:text-fg-1"
+      >
         ← {decision.title || "Decision"}
       </Link>
 
-      {/* Grade header */}
-      <div className="mt-3 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <p className="text-xs font-medium uppercase tracking-wide text-stone-400">
-              Decision Health Report · Review #{report.runNumber} ·{" "}
-              {formatDate(report.createdAt)}
-            </p>
-            <h1 className="mt-1 text-xl font-semibold leading-snug text-stone-900 sm:text-2xl">
-              {decision.statement || decision.title}
-            </h1>
-          </div>
+      {/* Report header: system-generated interpretation, marked with the
+          violet rule to distinguish it from the user-authored decision. */}
+      <header className="mt-3 rounded-md border border-line border-t-2 border-t-review bg-ink-800 p-6">
+        <p className="font-mono text-xs text-fg-3">
+          Decision Health Report · Review #{report.runNumber} ·{" "}
+          {formatDate(report.createdAt)}
+        </p>
+        <div className="mt-2 flex flex-wrap items-start justify-between gap-4">
+          <h1 className="max-w-xl text-xl font-semibold leading-snug text-fg-1 sm:text-2xl">
+            {decision.statement || decision.title}
+          </h1>
           <span
-            className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-semibold ring-1 ring-inset ${grade.chip}`}
+            className={`inline-flex shrink-0 items-center gap-2 rounded-[3px] px-3 py-1 text-sm font-semibold text-fg-1 ring-1 ring-inset ${
+              GRADE_RING[report.healthGrade] ?? "ring-line"
+            }`}
           >
-            <span className={`h-2 w-2 rounded-full ${grade.dot}`} />
+            <span aria-hidden="true" className={`h-2 w-2 rounded-full ${grade.dot}`} />
             {grade.label}
           </span>
         </div>
         {report.summary && (
-          <p className="mt-4 max-w-prose text-base leading-relaxed text-stone-700">
+          <p className="mt-4 max-w-prose text-[15px] leading-relaxed text-fg-2">
             {report.summary}
           </p>
         )}
 
-        {/* Version switcher */}
         {allReports.length > 1 && (
-          <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-stone-100 pt-4">
-            <span className="text-xs font-medium text-stone-500">Reviews:</span>
+          <nav
+            aria-label="Reviews of this decision"
+            className="mt-4 flex flex-wrap items-center gap-2 border-t border-line pt-4"
+          >
+            <span className="text-xs font-medium text-fg-2">Reviews:</span>
             {allReports.map((r) => (
               <Link
                 key={r.id}
                 to={`/decision/${id}/report/${r.runId}`}
-                className={`rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset ${
+                aria-current={r.id === report.id ? "page" : undefined}
+                className={`rounded-[3px] border px-2 py-0.5 font-mono text-xs transition-colors ${
                   r.id === report.id
-                    ? "bg-stone-900 text-white ring-stone-900"
-                    : "bg-stone-100 text-stone-700 ring-stone-200 hover:bg-stone-200"
+                    ? "border-review bg-review/10 text-fg-1"
+                    : "border-line text-fg-2 hover:border-line-2 hover:text-fg-1"
                 }`}
               >
-                #{r.runNumber}
+                #{r.runNumber} · {formatDate(r.createdAt)}
               </Link>
             ))}
-          </div>
+          </nav>
         )}
-      </div>
+      </header>
 
-      {/* Findings */}
-      <section className="mt-8">
-        <h2 className="text-lg font-semibold text-stone-900">
+      {/* Assessments */}
+      <section className="mt-10" aria-labelledby="findings-heading">
+        <h2 id="findings-heading" className="text-lg font-semibold text-fg-1">
           Where each assumption stands
         </h2>
-        <p className="mt-1 text-sm text-stone-500">
+        <p className="mt-1 text-sm text-fg-2">
           Each assessment includes the evidence behind it.
         </p>
-        <div className="mt-4 space-y-3">
+        <ol className="mt-4 divide-y divide-line border-y border-line">
           {report.findings.length === 0 ? (
-            <p className="rounded-lg border border-dashed border-stone-300 p-4 text-center text-sm text-stone-400">
+            <li className="py-4 text-sm text-fg-3">
               This review produced no per-assumption findings.
-            </p>
+            </li>
           ) : (
             report.findings.map((f, i) => (
-              <FindingRow key={i} finding={f} assumption={byId.get(f.assumptionId)} />
+              <FindingRow
+                key={i}
+                finding={f}
+                assumption={byId.get(f.assumptionId)}
+                index={indexById.get(f.assumptionId) ?? i}
+              />
             ))
           )}
-        </div>
+        </ol>
       </section>
 
-      {/* Challenge highlights */}
+      {/* Challenges */}
       {report.challengeHighlights.length > 0 && (
-        <section className="mt-8">
-          <h2 className="text-lg font-semibold text-stone-900">
+        <section className="mt-10" aria-labelledby="challenges-heading">
+          <h2 id="challenges-heading" className="text-lg font-semibold text-fg-1">
             The case against
           </h2>
-          <p className="mt-1 text-sm text-stone-500">
+          <p className="mt-1 text-sm text-fg-2">
             The strongest challenge to each assumption, including the ones that
             still hold.
           </p>
-          <ul className="mt-4 space-y-2">
+          <ul className="mt-4 space-y-3">
             {report.challengeHighlights.map((h, i) => (
               <li
                 key={i}
-                className="rounded-lg border-l-2 border-stone-400 bg-stone-100/60 px-4 py-3 text-sm leading-relaxed text-stone-700"
+                className="border-l-2 border-warn py-1 pl-4 text-sm leading-relaxed text-fg-2"
               >
                 {h}
               </li>
@@ -191,56 +219,54 @@ export default function Report() {
 
       {/* Next actions */}
       {report.actions.length > 0 && (
-        <section className="mt-8">
-          <h2 className="text-lg font-semibold text-stone-900">Next actions</h2>
-          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+        <section className="mt-10" aria-labelledby="actions-heading">
+          <h2 id="actions-heading" className="text-lg font-semibold text-fg-1">
+            Next actions
+          </h2>
+          <div className="mt-4 grid gap-8 sm:grid-cols-2">
             <div>
-              <h3 className="text-sm font-semibold text-stone-700">
-                Strengthen it{" "}
-                <span className="font-normal text-stone-400">
+              <h3 className="text-sm font-semibold text-fg-1">
+                Strengthen{" "}
+                <span className="font-normal text-fg-3">
                   (make the assumption more likely to hold)
                 </span>
               </h3>
-              <ul className="mt-2 space-y-2">
+              <ul className="mt-2 divide-y divide-line border-y border-line">
                 {shaping.length === 0 && (
-                  <li className="text-sm text-stone-400">None recommended.</li>
+                  <li className="py-3 text-sm text-fg-3">None recommended.</li>
                 )}
                 {shaping.map((a, i) => (
-                  <li
-                    key={i}
-                    className="rounded-lg border border-stone-200 bg-white p-3 text-sm text-stone-700 shadow-sm"
-                  >
+                  <li key={i} className="py-3 text-sm leading-relaxed text-fg-1">
                     {a.text}
                     {byId.get(a.assumptionId) && (
-                      <p className="mt-1 text-xs text-stone-400">
-                        Protects: {byId.get(a.assumptionId).text}
-                      </p>
+                      <span className="mt-1 block text-xs text-fg-3">
+                        Protects A{(indexById.get(a.assumptionId) ?? 0) + 1}:{" "}
+                        {byId.get(a.assumptionId).text}
+                      </span>
                     )}
                   </li>
                 ))}
               </ul>
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-stone-700">
+              <h3 className="text-sm font-semibold text-fg-1">
                 Prepare a fallback{" "}
-                <span className="font-normal text-stone-400">
+                <span className="font-normal text-fg-3">
                   (in case it turns out wrong)
                 </span>
               </h3>
-              <ul className="mt-2 space-y-2">
+              <ul className="mt-2 divide-y divide-line border-y border-line">
                 {hedging.length === 0 && (
-                  <li className="text-sm text-stone-400">None recommended.</li>
+                  <li className="py-3 text-sm text-fg-3">None recommended.</li>
                 )}
                 {hedging.map((a, i) => (
-                  <li
-                    key={i}
-                    className="rounded-lg border border-stone-200 bg-white p-3 text-sm text-stone-700 shadow-sm"
-                  >
+                  <li key={i} className="py-3 text-sm leading-relaxed text-fg-1">
                     {a.text}
                     {byId.get(a.assumptionId) && (
-                      <p className="mt-1 text-xs text-stone-400">
-                        Protects: {byId.get(a.assumptionId).text}
-                      </p>
+                      <span className="mt-1 block text-xs text-fg-3">
+                        Protects A{(indexById.get(a.assumptionId) ?? 0) + 1}:{" "}
+                        {byId.get(a.assumptionId).text}
+                      </span>
                     )}
                   </li>
                 ))}
