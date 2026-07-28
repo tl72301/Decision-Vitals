@@ -1,1 +1,67 @@
 @import "tailwindcss";
+
+/*
+  Decision Vitals design system: night ledger.
+
+  One dark chromatic field (blue-ink), hairline rules, ledger numbering.
+  Color roles:
+    ink-950   page background          ink-900  inset / records
+    ink-800   structural panels        ink-700  hover / raised
+    line      hairline borders         line-2   strong borders
+    fg-1      primary text             fg-2     secondary text
+    fg-3      metadata / timestamps
+    brass     identity, links, primary actions, user-authored objects
+    review    system-generated interpretation (reports, agent output)
+    ok        holding / healthy        warn     weakened / watch / signals
+    bad       invalidated / at risk / errors / destructive
+  Focus is always #f2c14e, 2px, offset. Status is never color alone:
+  every status pairs a dot or glyph with a text label.
+*/
+
+@theme {
+  --color-ink-950: #0c111f;
+  --color-ink-900: #10182b;
+  --color-ink-800: #151e33;
+  --color-ink-700: #1b2540;
+  --color-line: #263351;
+  --color-line-2: #3a4a73;
+  --color-fg-1: #edf1fb;
+  --color-fg-2: #a9b4cc;
+  --color-fg-3: #7e89a6;
+  --color-brass: #d9ac55;
+  --color-brass-2: #e8c077;
+  --color-ok: #5fc98b;
+  --color-warn: #e39a55;
+  --color-bad: #e5654e;
+  --color-review: #b29dea;
+
+  --font-sans: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+    background-color: #0c111f;
+  }
+  body {
+    @apply bg-ink-950 font-sans text-fg-1 antialiased;
+  }
+  ::selection {
+    background-color: #d9ac55;
+    color: #0c111f;
+  }
+  :focus-visible {
+    outline: 2px solid #f2c14e;
+    outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}

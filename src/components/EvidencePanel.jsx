@@ -3,14 +3,14 @@ import { createEvidence, evidenceByDecision, deleteEvidence } from "../lib/store
 import { SOURCE_TYPE, sourceTypeLabel, formatDate } from "../lib/labels.js";
 import { isDemo } from "../lib/mode.js";
 import { pullGmail } from "../lib/api.js";
-import Chip from "./Chip.jsx";
+import { inputCls, fieldLabel } from "../lib/ui.js";
 import Spinner from "./Spinner.jsx";
 
 const today = () => new Date().toISOString().slice(0, 10);
 
-// Evidence inbox: paste a snippet, tag its source and date, add it to the list.
-// Adding is always allowed (you add more evidence and re-run). Deleting is
-// blocked once a review has used the evidence, keeping receipts honest.
+// Evidence log: paste a snippet, tag its source and date, add it to the record.
+// Adding is always allowed (you log more evidence and review again). Deleting
+// is blocked once a review has used the evidence, keeping the record honest.
 export default function EvidencePanel({ decisionId, locked }) {
   const [text, setText] = useState("");
   const [sourceType, setSourceType] = useState("meeting_notes");
@@ -57,9 +57,6 @@ export default function EvidencePanel({ decisionId, locked }) {
     }
   }
 
-  const inputCls =
-    "w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm outline-none focus:border-stone-400 focus:ring-2 focus:ring-stone-200";
-
   return (
     <div>
       {!isDemo() && (
@@ -68,27 +65,42 @@ export default function EvidencePanel({ decisionId, locked }) {
             type="button"
             onClick={pullFromGmail}
             disabled={pulling}
-            className="inline-flex items-center gap-2 rounded-lg border border-stone-300 bg-white px-3 py-1.5 text-xs font-medium text-stone-700 transition hover:bg-stone-50 disabled:opacity-50"
+            className="inline-flex min-h-9 items-center gap-2 rounded border border-line px-3 py-1.5 text-xs font-medium text-fg-2 transition-colors hover:border-line-2 hover:text-fg-1 disabled:opacity-50"
           >
             {pulling && <Spinner />}
             {pulling ? "Pulling…" : "Pull from Gmail"}
           </button>
-          {pullNotice && <span className="text-xs text-stone-500">{pullNotice}</span>}
+          {pullNotice && (
+            <span role="status" className="text-xs text-fg-2">
+              {pullNotice}
+            </span>
+          )}
         </div>
       )}
 
-      <form onSubmit={add} className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
+      <form
+        onSubmit={add}
+        aria-label="Log evidence"
+        className="rounded-md border border-line bg-ink-800 p-4"
+      >
+        <label htmlFor="evidence-text" className={fieldLabel}>
+          New evidence
+        </label>
         <textarea
+          id="evidence-text"
           value={text}
           onChange={(e) => setText(e.target.value)}
           rows={3}
           placeholder="Paste a snippet: meeting notes, a support ticket, customer feedback, a market update…"
-          className={inputCls}
+          className={`mt-1 ${inputCls}`}
         />
         <div className="mt-3 flex flex-wrap items-end gap-3">
           <div className="min-w-[10rem] flex-1">
-            <label className="text-xs font-medium text-stone-500">Source type</label>
+            <label htmlFor="evidence-source" className={fieldLabel}>
+              Source type
+            </label>
             <select
+              id="evidence-source"
               value={sourceType}
               onChange={(e) => setSourceType(e.target.value)}
               className={`mt-1 ${inputCls}`}
@@ -101,8 +113,11 @@ export default function EvidencePanel({ decisionId, locked }) {
             </select>
           </div>
           <div>
-            <label className="text-xs font-medium text-stone-500">Date</label>
+            <label htmlFor="evidence-date" className={fieldLabel}>
+              Date
+            </label>
             <input
+              id="evidence-date"
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
@@ -112,45 +127,45 @@ export default function EvidencePanel({ decisionId, locked }) {
           <button
             type="submit"
             disabled={!text.trim()}
-            className="rounded-lg bg-stone-900 px-4 py-2 text-sm font-medium text-white hover:bg-stone-700 disabled:opacity-40"
+            className="inline-flex min-h-10 items-center rounded bg-brass px-4 py-2 text-sm font-semibold text-ink-950 transition-colors hover:bg-brass-2 disabled:cursor-not-allowed disabled:opacity-40"
           >
             Add evidence
           </button>
         </div>
       </form>
 
-      <ul className="mt-4 space-y-3">
-        {evidence.length === 0 && (
-          <li className="rounded-lg border border-dashed border-stone-300 p-4 text-center text-sm text-stone-400">
-            No evidence yet. Add at least one snippet to review this decision.
-          </li>
-        )}
-        {evidence.map((ev) => (
-          <li
-            key={ev.id}
-            className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm"
-          >
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2 text-xs">
-                <Chip tone="bg-stone-100 text-stone-600 ring-stone-200">
+      {evidence.length === 0 ? (
+        <p className="mt-4 border-l-2 border-line py-1 pl-4 text-sm leading-relaxed text-fg-3">
+          No evidence logged yet. A review weighs evidence against each
+          assumption, so it needs at least one entry. Paste the first note,
+          ticket, or update above.
+        </p>
+      ) : (
+        <ul className="mt-4 divide-y divide-line border-y border-line">
+          {evidence.map((ev) => (
+            <li key={ev.id} className="py-3">
+              <div className="flex items-center justify-between gap-3">
+                <p className="font-mono text-xs text-fg-3">
                   {sourceTypeLabel(ev.sourceType)}
-                </Chip>
-                {ev.date && <span className="text-stone-400">{formatDate(ev.date)}</span>}
+                  {ev.date ? ` · ${formatDate(ev.date)}` : ""}
+                </p>
+                {!locked && (
+                  <button
+                    type="button"
+                    onClick={() => deleteEvidence(ev.id)}
+                    className="text-xs font-medium text-fg-3 transition-colors hover:text-bad"
+                  >
+                    Delete
+                  </button>
+                )}
               </div>
-              {!locked && (
-                <button
-                  type="button"
-                  onClick={() => deleteEvidence(ev.id)}
-                  className="text-xs text-stone-400 hover:text-rose-600"
-                >
-                  Delete
-                </button>
-              )}
-            </div>
-            <p className="mt-2 text-sm text-stone-700">{ev.text}</p>
-          </li>
-        ))}
-      </ul>
+              <p className="mt-1.5 border-l-2 border-line-2 pl-3 font-mono text-[13px] leading-relaxed text-fg-2">
+                {ev.text}
+              </p>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

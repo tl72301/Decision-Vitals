@@ -3,9 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { runAgent } from "../lib/api.js";
 import { createDecision, createAssumptions } from "../lib/store.js";
 import { isDemo, subscribeMode } from "../lib/mode.js";
+import { btnPrimary, btnQuiet, inputCls, fieldLabel } from "../lib/ui.js";
 import Spinner from "../components/Spinner.jsx";
 
-// The two Phase-A steps shown in the progress panel while agents run.
+// The two intake steps shown in the progress panel while the decision is read.
 const STEP_DEFS = [
   { key: "intake", label: "Read the decision", role: "Drafts the assumptions the decision depends on" },
   { key: "classifier", label: "Classify each assumption", role: "Marks each one critical or supporting and adds a warning signal to watch" },
@@ -17,28 +18,28 @@ function StepRow({ def, state }) {
       <span className="mt-0.5">
         {state === "running" && <Spinner />}
         {state === "done" && (
-          <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-stone-900 text-[10px] font-bold text-white">
-            ✓
+          <span className="inline-flex h-4 w-4 items-center justify-center rounded-[3px] bg-brass text-[10px] font-bold text-ink-950">
+            ✓<span className="sr-only"> done</span>
           </span>
         )}
         {state === "error" && (
-          <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-rose-400 text-[10px] font-bold text-white">
-            !
+          <span className="inline-flex h-4 w-4 items-center justify-center rounded-[3px] bg-bad text-[10px] font-bold text-ink-950">
+            !<span className="sr-only"> failed</span>
           </span>
         )}
         {state === "pending" && (
-          <span className="inline-block h-4 w-4 rounded-full border-2 border-stone-200" />
+          <span className="inline-block h-4 w-4 rounded-[3px] border-2 border-line" />
         )}
       </span>
       <div>
         <div
           className={`text-sm font-medium ${
-            state === "pending" ? "text-stone-400" : "text-stone-800"
+            state === "pending" ? "text-fg-3" : "text-fg-1"
           }`}
         >
           {def.label}
         </div>
-        <div className="text-xs text-stone-500">{def.role}</div>
+        <div className="text-xs text-fg-3">{def.role}</div>
       </div>
     </li>
   );
@@ -128,98 +129,97 @@ export default function NewDecision() {
     }
   }
 
-  const inputCls =
-    "mt-1 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm text-stone-900 shadow-sm outline-none focus:border-stone-400 focus:ring-2 focus:ring-stone-200";
-
   return (
     <div className="mx-auto max-w-2xl">
-      <h1 className="text-2xl font-semibold text-stone-900">New decision</h1>
-      <p className="mt-1 text-sm text-stone-500">
+      <h1 className="text-xl font-semibold tracking-tight text-fg-1">
+        Record a decision
+      </h1>
+      <p className="mt-1 max-w-xl text-sm leading-relaxed text-fg-2">
         Describe a decision you've already made. Decision Vitals identifies the
         3 to 5 assumptions it depends on and marks which ones are critical. You
-        add evidence and review the decision on the next screen.
+        log evidence and review the decision on the next screen.
       </p>
 
       {demo && (
-        <div className="mt-4 rounded-lg border-l-2 border-stone-400 bg-stone-100/60 px-4 py-3 text-sm text-stone-600">
+        <p className="mt-4 border-l-2 border-warn py-1 pl-4 text-sm leading-relaxed text-fg-2">
           Demo Mode replays recorded reviews of the sample decisions, so it
           can't analyze a new decision. Switch to Live Mode (header toggle) to
-          register your own.
-        </div>
+          record your own.
+        </p>
       )}
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-5">
         <div>
-          <label className="text-sm font-medium text-stone-700">
+          <label htmlFor="nd-statement" className={fieldLabel}>
             Decision statement
           </label>
           <textarea
+            id="nd-statement"
             value={form.statement}
             onChange={update("statement")}
             disabled={running}
             rows={3}
             required
             placeholder="e.g. Migrate our B2B product from per-seat pricing to usage-based billing in Q4."
-            className={inputCls}
+            className={`mt-1 ${inputCls}`}
           />
         </div>
 
         <div>
-          <label className="text-sm font-medium text-stone-700">
-            Context <span className="font-normal text-stone-400">(optional)</span>
+          <label htmlFor="nd-context" className={fieldLabel}>
+            Context <span className="font-normal text-fg-3">(optional)</span>
           </label>
           <textarea
+            id="nd-context"
             value={form.context}
             onChange={update("context")}
             disabled={running}
             rows={3}
             placeholder="What prompted it, constraints, stakeholders."
-            className={inputCls}
+            className={`mt-1 ${inputCls}`}
           />
         </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
-            <label className="text-sm font-medium text-stone-700">
-              Owner <span className="font-normal text-stone-400">(optional)</span>
+            <label htmlFor="nd-owner" className={fieldLabel}>
+              Owner <span className="font-normal text-fg-3">(optional)</span>
             </label>
             <input
+              id="nd-owner"
               type="text"
               value={form.owner}
               onChange={update("owner")}
               disabled={running}
               placeholder="e.g. Casey Rivera"
-              className={inputCls}
+              className={`mt-1 ${inputCls}`}
             />
           </div>
           <div>
-            <label className="text-sm font-medium text-stone-700">
-              Date <span className="font-normal text-stone-400">(optional)</span>
+            <label htmlFor="nd-date" className={fieldLabel}>
+              Date <span className="font-normal text-fg-3">(optional)</span>
             </label>
             <input
+              id="nd-date"
               type="date"
               value={form.date}
               onChange={update("date")}
               disabled={running}
-              className={inputCls}
+              className={`mt-1 ${inputCls}`}
             />
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <button
-            type="submit"
-            disabled={!canSubmit}
-            className="inline-flex items-center gap-2 rounded-lg bg-stone-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-stone-700 disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            {running && <Spinner className="border-stone-500 border-t-white" />}
+        <div className="flex items-center gap-4">
+          <button type="submit" disabled={!canSubmit} className={btnPrimary}>
+            {running && <Spinner className="border-ink-700 border-t-ink-950" />}
             {running ? "Identifying assumptions…" : "Identify assumptions"}
           </button>
           <button
             type="button"
             onClick={() => navigate("/")}
             disabled={running}
-            className="text-sm text-stone-500 hover:text-stone-700 disabled:opacity-40"
+            className={btnQuiet}
           >
             Cancel
           </button>
@@ -227,26 +227,29 @@ export default function NewDecision() {
       </form>
 
       {(running || error) && (
-        <div className="mt-6 rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
-          <div className="text-sm font-medium text-stone-700">
+        <div className="mt-6 rounded-md border border-line bg-ink-800 p-4">
+          <p className="text-sm font-medium text-fg-1">
             Identifying the assumptions behind this decision
-          </div>
+          </p>
           <ol className="mt-3 space-y-3">
             {STEP_DEFS.map((def) => (
               <StepRow key={def.key} def={def} state={steps[def.key]} />
             ))}
           </ol>
           {error && (
-            <div className="mt-4 rounded-lg bg-rose-50 p-3 text-sm text-rose-700 ring-1 ring-inset ring-rose-200">
-              <p className="font-medium">Couldn't identify assumptions</p>
-              <p className="mt-1 text-rose-600">{error}</p>
+            <div
+              role="alert"
+              className="mt-4 rounded border border-bad/40 bg-ink-900 p-3 text-sm"
+            >
+              <p className="font-medium text-bad">Couldn't identify assumptions</p>
+              <p className="mt-1 text-fg-2">{error}</p>
               <button
                 type="button"
                 onClick={() => {
                   setError("");
                   setSteps({ intake: "pending", classifier: "pending" });
                 }}
-                className="mt-2 rounded-md bg-white px-3 py-1 text-xs font-medium text-rose-700 ring-1 ring-inset ring-rose-200 hover:bg-rose-50"
+                className="mt-2 rounded border border-line-2 px-3 py-1 text-xs font-medium text-fg-1 transition-colors hover:bg-ink-700"
               >
                 Try again
               </button>

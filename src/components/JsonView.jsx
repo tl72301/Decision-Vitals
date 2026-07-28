@@ -1,12 +1,12 @@
-// Collapsible pretty-printed JSON. Used to expose each agent's real I/O in the
-// Agent Run view: the visible proof of the typed multi-agent handoffs.
-export default function JsonView({ value, label = "View output", defaultOpen = false }) {
+// Collapsible pretty-printed JSON. Exposes each review step's full output so
+// a conclusion can be traced to the exact findings that produced it.
+export default function JsonView({ value, label = "View full output", defaultOpen = false }) {
   return (
-    <details open={defaultOpen} className="mt-3 rounded-lg bg-stone-900/95">
-      <summary className="cursor-pointer select-none px-3 py-2 text-xs font-medium text-stone-300 hover:text-white">
+    <details open={defaultOpen} className="mt-3 rounded border border-line bg-ink-900">
+      <summary className="cursor-pointer select-none px-3 py-2 font-mono text-xs text-fg-3 transition-colors hover:text-fg-1">
         {label}
       </summary>
-      <pre className="max-h-80 overflow-auto px-3 pb-3 text-xs leading-relaxed text-stone-100">
+      <pre className="max-h-80 overflow-auto border-t border-line px-3 py-3 font-mono text-xs leading-relaxed text-fg-2">
         {JSON.stringify(value, null, 2)}
       </pre>
     </details>

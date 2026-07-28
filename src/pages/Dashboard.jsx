@@ -1,13 +1,14 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { listDecisions, assumptionsByDecision } from "../lib/store.js";
 import { loadSamples } from "../lib/samples.js";
 import { useStoreSync } from "../lib/useStore.js";
 import { formatDate, statusMeta } from "../lib/labels.js";
+import { btnPrimary, btnSecondary } from "../lib/ui.js";
 import HealthBadge from "../components/HealthBadge.jsx";
 import Chip from "../components/Chip.jsx";
 
-// Statuses worth calling out on a card, in severity order. "untested" is implied
+// Statuses worth calling out on a row, in severity order. "untested" is implied
 // by "Not yet reviewed" so it is not listed individually.
 const SUMMARY_STATUSES = ["invalidated", "weakened", "needs_review", "holding"];
 
@@ -20,139 +21,126 @@ function AssumptionSummary({ decisionId, reviewed }) {
   }, {});
 
   return (
-    <div className="mt-3 flex flex-wrap items-center gap-1.5 text-xs">
-      <span className="text-stone-500">
+    <div className="flex flex-wrap items-center gap-1.5 text-xs">
+      <span className="font-mono text-fg-3">
         {total} assumption{total === 1 ? "" : "s"}
       </span>
-      {reviewed ? (
+      {reviewed &&
         SUMMARY_STATUSES.filter((s) => counts[s]).map((s) => (
           <Chip key={s} tone={statusMeta(s).chip} dot={statusMeta(s).dot}>
             {counts[s]} {statusMeta(s).label.toLowerCase()}
           </Chip>
-        ))
-      ) : (
-        <span className="text-stone-400">· not yet reviewed</span>
-      )}
+        ))}
     </div>
   );
 }
 
-function DecisionCard({ decision }) {
+// One decision in the ledger. A row, not a card: title and statement on the
+// left, standing and dates on the right, hairline rules between entries.
+function DecisionRow({ decision }) {
   const reviewed = decision.healthGrade != null;
   return (
-    <Link
-      to={`/decision/${decision.id}`}
-      className="group flex flex-col rounded-xl border border-stone-200 bg-white p-4 shadow-sm transition hover:border-stone-300 hover:shadow-md"
-    >
-      <div className="flex items-start justify-between gap-3">
-        <h3 className="font-semibold leading-snug text-stone-900 group-hover:text-stone-700">
-          {decision.title || decision.statement || "Untitled decision"}
-        </h3>
-        <HealthBadge grade={decision.healthGrade} className="shrink-0" />
-      </div>
-      {decision.statement && decision.title && (
-        <p className="mt-1 line-clamp-2 text-sm text-stone-500">
-          {decision.statement}
-        </p>
-      )}
-      <AssumptionSummary decisionId={decision.id} reviewed={reviewed} />
-      <div className="mt-3 text-xs text-stone-400">
-        {formatDate(decision.createdAt)}
-        {decision.owner ? ` · ${decision.owner}` : ""}
-      </div>
-    </Link>
+    <li>
+      <Link
+        to={`/decision/${decision.id}`}
+        className="grid gap-2 px-2 py-4 transition-colors hover:bg-ink-800 sm:grid-cols-[1fr_auto] sm:gap-6"
+      >
+        <div className="min-w-0">
+          <p className="font-medium leading-snug text-fg-1">
+            {decision.title || decision.statement || "Untitled decision"}
+          </p>
+          {decision.statement && decision.title && (
+            <p className="mt-1 line-clamp-1 text-sm text-fg-2">
+              {decision.statement}
+            </p>
+          )}
+          <div className="mt-2">
+            <AssumptionSummary decisionId={decision.id} reviewed={reviewed} />
+          </div>
+        </div>
+        <div className="flex shrink-0 flex-row items-center gap-3 sm:flex-col sm:items-end sm:justify-between">
+          <HealthBadge grade={decision.healthGrade} />
+          <span className="font-mono text-xs text-fg-3">
+            {formatDate(decision.createdAt)}
+            {decision.owner ? ` · ${decision.owner}` : ""}
+          </span>
+        </div>
+      </Link>
+    </li>
   );
 }
 
-const HOW_IT_WORKS = [
+const PROCESS = [
   {
-    n: "1",
-    title: "Register a decision",
-    body: "Describe a decision you've made. Decision Vitals identifies the key assumptions it depends on and flags which ones are critical.",
+    n: "01",
+    title: "Record a decision",
+    body: "Describe a decision you've made. Decision Vitals identifies the assumptions it depends on and marks which ones are critical.",
   },
   {
-    n: "2",
-    title: "Add evidence over time",
-    body: "Paste in what you learn as it lands: meeting notes, support tickets, customer feedback, market updates.",
+    n: "02",
+    title: "Log evidence",
+    body: "Paste what you learn as it lands: meeting notes, support tickets, customer feedback, market updates.",
   },
   {
-    n: "3",
+    n: "03",
     title: "Review the decision",
-    body: "Specialized AI agents examine the evidence from different perspectives and combine their findings into one clear decision-health assessment, with the supporting evidence behind each conclusion.",
+    body: "Specialized AI agents weigh the evidence for and against each assumption, then combine their findings into one dated decision-health assessment.",
   },
 ];
 
-function HowItWorks() {
+function EmptyState({ onLoadSamples }) {
   return (
-    <div className="grid gap-4 sm:grid-cols-3">
-      {HOW_IT_WORKS.map((step) => (
-        <div
-          key={step.n}
-          className="rounded-xl border border-stone-200 bg-white p-5 text-left shadow-sm"
-        >
-          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-stone-900 text-xs font-semibold text-white">
-            {step.n}
-          </div>
-          <div className="mt-3 text-sm font-semibold text-stone-800">
-            {step.title}
-          </div>
-          <p className="mt-1 text-xs leading-relaxed text-stone-500">
-            {step.body}
-          </p>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// The centered anchor of the home screen. Present whether or not any decisions
-// exist, so the page always reads as a considered landing rather than a bare
-// list. CTAs live here; the decisions grid (or the how-it-works primer) follows.
-function Hero({ hasDecisions, onLoadSamples }) {
-  return (
-    <section className="mx-auto max-w-2xl text-center">
-      <p className="text-xs font-medium uppercase tracking-[0.2em] text-stone-400">
-        Decision monitoring
-      </p>
-      <h1 className="mt-3 text-3xl font-semibold tracking-tight text-stone-900 sm:text-4xl">
-        Watch the assumptions behind your decisions
+    <div>
+      <h1 className="max-w-2xl text-2xl font-semibold leading-snug tracking-tight text-fg-1 sm:text-3xl">
+        Know when the reasoning behind a decision starts to fail.
       </h1>
-      <p className="mx-auto mt-4 max-w-xl text-[15px] leading-relaxed text-stone-500">
+      <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-fg-2">
         Every decision rests on a few assumptions about customers, capacity,
-        timing, or the market. Decision Vitals surfaces them and tells you when
-        the evidence starts to turn against one.
+        timing, or the market. Decision Vitals records them, weighs new evidence
+        against them, and shows you which still hold.
       </p>
-      <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-        <Link
-          to="/new"
-          className="inline-flex items-center rounded-lg bg-stone-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-stone-700"
-        >
-          New decision
+      <div className="mt-6 flex flex-wrap items-center gap-3">
+        <Link to="/new" className={btnPrimary}>
+          Record a decision
         </Link>
-        <button
-          type="button"
-          onClick={onLoadSamples}
-          className="inline-flex items-center rounded-lg border border-stone-300 bg-white px-5 py-2.5 text-sm font-medium text-stone-700 transition hover:bg-stone-50"
-        >
-          {hasDecisions ? "Load more samples" : "Load sample decisions"}
+        <button type="button" onClick={onLoadSamples} className={btnSecondary}>
+          Load sample decisions
         </button>
       </div>
-      {!hasDecisions && (
-        <p className="mt-3 text-xs text-stone-400">
-          New here? Loading the samples is the fastest way to see a finished
-          review.
-        </p>
-      )}
-    </section>
+      <p className="mt-3 text-sm text-fg-3">
+        The samples include finished reviews, the fastest way to see a
+        decision-health report.
+      </p>
+
+      <section className="mt-12" aria-labelledby="how-it-works">
+        <h2 id="how-it-works" className="text-sm font-semibold text-fg-2">
+          How it works
+        </h2>
+        <ol className="mt-4 divide-y divide-line border-y border-line">
+          {PROCESS.map((step) => (
+            <li
+              key={step.n}
+              className="grid gap-1 py-4 sm:grid-cols-[7rem_1fr] sm:gap-6"
+            >
+              <span className="font-mono text-xs text-brass">{step.n}</span>
+              <div>
+                <h3 className="text-sm font-medium text-fg-1">{step.title}</h3>
+                <p className="mt-1 max-w-xl text-sm leading-relaxed text-fg-2">
+                  {step.body}
+                </p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </section>
+    </div>
   );
 }
 
 export default function Dashboard() {
   useStoreSync();
-  const navigate = useNavigate();
   const decisions = listDecisions();
   const [notice, setNotice] = useState("");
-  const hasDecisions = decisions.length > 0;
 
   function handleLoadSamples() {
     const n = loadSamples();
@@ -166,47 +154,56 @@ export default function Dashboard() {
   const sorted = decisions
     .slice()
     .sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+  const reviewed = decisions.filter((d) => d.healthGrade != null).length;
+
+  if (decisions.length === 0) {
+    return (
+      <div>
+        <EmptyState onLoadSamples={handleLoadSamples} />
+        {notice && (
+          <p role="status" className="mt-4 text-sm text-fg-2">
+            {notice}
+          </p>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div>
-      <div className="py-4 sm:py-8">
-        <Hero hasDecisions={hasDecisions} onLoadSamples={handleLoadSamples} />
-        {notice && (
-          <p className="mt-4 text-center text-xs text-stone-500">{notice}</p>
-        )}
-      </div>
-
-      {hasDecisions ? (
-        <section className="mt-6 border-t border-stone-200 pt-8">
-          <div className="mb-4 flex items-baseline justify-between gap-4">
-            <h2 className="text-lg font-semibold text-stone-900">
-              Your decisions
-              <span className="ml-2 text-sm font-normal text-stone-400">
-                {decisions.length}
-              </span>
-            </h2>
-            <button
-              type="button"
-              onClick={() => navigate("/new")}
-              className="text-sm font-medium text-stone-500 transition hover:text-stone-800"
-            >
-              + New decision
-            </button>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {sorted.map((d) => (
-              <DecisionCard key={d.id} decision={d} />
-            ))}
-          </div>
-        </section>
-      ) : (
-        <section className="mt-6 border-t border-stone-200 pt-8">
-          <p className="mb-4 text-center text-xs font-medium uppercase tracking-[0.2em] text-stone-400">
-            How it works
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="text-xl font-semibold tracking-tight text-fg-1">
+            Decisions
+          </h1>
+          <p className="mt-1 font-mono text-xs text-fg-3">
+            {decisions.length} recorded · {reviewed} reviewed
           </p>
-          <HowItWorks />
-        </section>
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={handleLoadSamples}
+            className={btnSecondary}
+          >
+            Load sample decisions
+          </button>
+          <Link to="/new" className={btnPrimary}>
+            Record a decision
+          </Link>
+        </div>
+      </div>
+      {notice && (
+        <p role="status" className="mt-3 text-sm text-fg-2">
+          {notice}
+        </p>
       )}
+
+      <ul className="mt-6 divide-y divide-line border-y border-line">
+        {sorted.map((d) => (
+          <DecisionRow key={d.id} decision={d} />
+        ))}
+      </ul>
     </div>
   );
 }

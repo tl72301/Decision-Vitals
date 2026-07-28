@@ -10,10 +10,11 @@ import {
   purgeOrphanRuns,
 } from "../lib/store.js";
 import { buildAndSaveReport } from "../lib/review.js";
+import { btnPrimary, btnSecondary } from "../lib/ui.js";
 import Spinner from "../components/Spinner.jsx";
 import JsonView from "../components/JsonView.jsx";
 
-// The Phase-B pipeline, in order. Each step's output is the next step's input.
+// The review sequence, in order. Each step's output is the next step's input.
 const PIPELINE = [
   { agent: "evidence_review", name: "Evidence Review", role: "Matches each piece of evidence to the assumptions it bears on" },
   { agent: "challenge", name: "Challenge", role: "Makes the strongest honest case against every assumption" },
@@ -22,22 +23,22 @@ const PIPELINE = [
 ];
 
 function StatusIcon({ status }) {
-  if (status === "running") return <Spinner />;
+  if (status === "running") return <Spinner className="h-5 w-5" />;
   if (status === "done")
     return (
-      <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-stone-900 text-xs font-bold text-white">
-        ✓
+      <span className="inline-flex h-5 w-5 items-center justify-center rounded-[3px] bg-brass text-xs font-bold text-ink-950">
+        ✓<span className="sr-only"> done</span>
       </span>
     );
   if (status === "error")
     return (
-      <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-rose-400 text-xs font-bold text-white">
-        !
+      <span className="inline-flex h-5 w-5 items-center justify-center rounded-[3px] bg-bad text-xs font-bold text-ink-950">
+        !<span className="sr-only"> failed</span>
       </span>
     );
   return (
-    <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border-2 border-stone-200 text-xs text-stone-400">
-      •
+    <span className="inline-flex h-5 w-5 items-center justify-center rounded-[3px] border-2 border-line">
+      <span className="sr-only">pending</span>
     </span>
   );
 }
@@ -122,22 +123,22 @@ export default function AgentRun() {
       switch (agent) {
         case "evidence_review":
           return {
-            summary: `${assumptionsForAgent.length} assumptions × ${evidenceForAgent.length} evidence snippets`,
+            summary: `${assumptionsForAgent.length} assumptions × ${evidenceForAgent.length} evidence entries`,
             payload: { decision: decisionForAgent, assumptions: assumptionsForAgent, evidence: evidenceForAgent },
           };
         case "challenge":
           return {
-            summary: `${assumptionsForAgent.length} assumptions, ${(er.mappings ?? []).length} mappings`,
+            summary: `${assumptionsForAgent.length} assumptions, ${(er.mappings ?? []).length} evidence matches`,
             payload: { decision: decisionForAgent, assumptions: assumptionsForAgent, mappings: er.mappings ?? [] },
           };
         case "risk_ranking":
           return {
-            summary: `${(er.mappings ?? []).length} mappings, ${(ch.challenges ?? []).length} challenges`,
+            summary: `${(er.mappings ?? []).length} evidence matches, ${(ch.challenges ?? []).length} challenges`,
             payload: { assumptions: assumptionsForAgent, mappings: er.mappings ?? [], challenges: ch.challenges ?? [] },
           };
         case "reporter":
           return {
-            summary: `rankings for ${(rr.rankings ?? []).length} assumptions`,
+            summary: `assessments for ${(rr.rankings ?? []).length} assumptions`,
             payload: {
               decision: decisionForAgent,
               assumptions: assumptionsForAgent,
@@ -188,7 +189,7 @@ export default function AgentRun() {
     setDone(true);
   }
 
-  // Item 14: copy the full run (inputs and outputs per agent) to the clipboard.
+  // Copy the full run (inputs and outputs per step) to the clipboard.
   async function copyRunJson() {
     const text = JSON.stringify(
       { ...fullRunRef.current, copiedAt: new Date().toISOString() },
@@ -206,10 +207,13 @@ export default function AgentRun() {
 
   if (!decision) {
     return (
-      <div className="rounded-xl border border-stone-200 bg-white p-8 text-center">
-        <p className="text-stone-600">That decision doesn't exist.</p>
-        <Link to="/" className="mt-3 inline-block text-sm font-medium text-stone-900 underline">
-          Back to dashboard
+      <div className="mx-auto mt-16 max-w-md text-center">
+        <p className="text-fg-2">That decision doesn't exist.</p>
+        <Link
+          to="/"
+          className="mt-3 inline-block text-sm font-medium text-brass underline decoration-brass/50 underline-offset-2 hover:text-brass-2"
+        >
+          Back to decisions
         </Link>
       </div>
     );
@@ -219,16 +223,16 @@ export default function AgentRun() {
   const evidence = evidenceByDecision(id);
   if (assumptions.length === 0 || evidence.length === 0) {
     return (
-      <div className="rounded-xl border border-stone-200 bg-white p-8 text-center">
-        <p className="text-stone-600">
+      <div className="mx-auto mt-16 max-w-md text-center">
+        <p className="leading-relaxed text-fg-2">
           This decision needs at least one assumption and one piece of evidence
           before it can be reviewed.
         </p>
         <Link
           to={`/decision/${id}`}
-          className="mt-3 inline-block text-sm font-medium text-stone-900 underline"
+          className="mt-3 inline-block text-sm font-medium text-brass underline decoration-brass/50 underline-offset-2 hover:text-brass-2"
         >
-          Back to decision
+          Back to the decision
         </Link>
       </div>
     );
@@ -236,87 +240,92 @@ export default function AgentRun() {
 
   return (
     <div className="mx-auto max-w-2xl">
-      <Link to={`/decision/${id}`} className="text-sm text-stone-500 hover:text-stone-700">
+      <Link
+        to={`/decision/${id}`}
+        className="text-sm text-fg-2 transition-colors hover:text-fg-1"
+      >
         ← {decision.title || "Decision"}
       </Link>
-      <h1 className="mt-2 text-2xl font-semibold text-stone-900">Running review</h1>
-      <p className="mt-1 text-sm text-stone-500">
+      <h1 className="mt-2 text-xl font-semibold tracking-tight text-fg-1">
+        Running review
+      </h1>
+      <p className="mt-1 max-w-xl text-sm leading-relaxed text-fg-2">
         Specialized AI agents examine the evidence from different perspectives.
-        Each step shows its full findings, so you can see exactly how the
+        Each step shows its full findings, so you can trace exactly how the
         assessment was reached.
       </p>
 
-      <ol className="mt-6 space-y-4">
+      <ol className="mt-8">
         {steps.map((step, i) => (
-          <li key={step.agent} className="relative">
-            <div className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
-              <div className="flex items-start gap-3">
-                <div className="mt-0.5">
-                  <StatusIcon status={step.status} />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="font-medium text-stone-900">
-                      {i + 1}. {step.name}
-                    </span>
-                    {step.status === "done" && step.durationMs > 0 && (
-                      <span className="text-xs text-stone-400">
-                        {(step.durationMs / 1000).toFixed(1)}s
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-xs text-stone-500">{step.role}</p>
-                  {step.inputSummary && (
-                    <p className="mt-1 text-xs text-stone-400">
-                      Input: {step.inputSummary}
-                    </p>
-                  )}
-                  {step.output && <JsonView value={step.output} />}
-                </div>
-              </div>
+          <li key={step.agent} className="relative pb-8 pl-9 last:pb-0">
+            {i < steps.length - 1 && (
+              <span
+                aria-hidden="true"
+                className="absolute bottom-0 left-[9px] top-7 w-px bg-line"
+              />
+            )}
+            <span className="absolute left-0 top-0.5">
+              <StatusIcon status={step.status} />
+            </span>
+            <div className="flex items-baseline justify-between gap-2">
+              <span className="font-medium text-fg-1">{step.name}</span>
+              {step.status === "done" && step.durationMs > 0 && (
+                <span className="font-mono text-xs text-fg-3">
+                  {(step.durationMs / 1000).toFixed(1)}s
+                </span>
+              )}
             </div>
+            <p className="text-sm text-fg-2">{step.role}</p>
+            {step.inputSummary && (
+              <p className="mt-1 font-mono text-xs text-fg-3">
+                Input: {step.inputSummary}
+              </p>
+            )}
+            {step.output && <JsonView value={step.output} />}
           </li>
         ))}
       </ol>
 
       {error && (
-        <div className="mt-6 rounded-lg bg-rose-50 p-4 text-sm text-rose-700 ring-1 ring-inset ring-rose-200">
-          <p className="font-medium">The review stopped</p>
-          <p className="mt-1 text-rose-600">{error}</p>
-          <div className="mt-3 flex gap-2">
+        <div
+          role="alert"
+          className="mt-6 rounded-md border border-bad/40 bg-ink-800 p-4 text-sm"
+        >
+          <p className="font-medium text-bad">The review stopped</p>
+          <p className="mt-1 leading-relaxed text-fg-2">{error}</p>
+          <p className="mt-1 text-fg-3">
+            Evidence and assumptions are unchanged. Rerunning starts a fresh
+            review.
+          </p>
+          <div className="mt-3 flex gap-3">
             <button
               type="button"
               onClick={() => navigate(0)}
-              className="rounded-md bg-white px-3 py-1 text-xs font-medium text-rose-700 ring-1 ring-inset ring-rose-200 hover:bg-rose-50"
+              className="rounded border border-line-2 px-3 py-1.5 text-xs font-medium text-fg-1 transition-colors hover:bg-ink-700"
             >
-              Start over
+              Rerun the review
             </button>
             <Link
               to={`/decision/${id}`}
-              className="rounded-md px-3 py-1 text-xs font-medium text-stone-500 hover:text-stone-700"
+              className="rounded px-3 py-1.5 text-xs font-medium text-fg-2 transition-colors hover:text-fg-1"
             >
-              Back to decision
+              Back to the decision
             </Link>
           </div>
         </div>
       )}
 
       {done && runId && (
-        <div className="mt-6 flex flex-wrap items-center gap-3">
-          <Link
-            to={`/decision/${id}/report/${runId}`}
-            className="inline-flex items-center rounded-lg bg-stone-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-stone-700"
-          >
-            View report
+        <div className="mt-6 flex flex-wrap items-center gap-3 border-t border-line pt-6">
+          <Link to={`/decision/${id}/report/${runId}`} className={btnPrimary}>
+            Open health report
           </Link>
-          <button
-            type="button"
-            onClick={copyRunJson}
-            className="inline-flex items-center rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-sm font-medium text-stone-700 transition hover:bg-stone-50"
-          >
+          <button type="button" onClick={copyRunJson} className={btnSecondary}>
             {copied ? "Copied ✓" : "Copy run JSON"}
           </button>
-          <span className="text-sm text-stone-500">Review complete.</span>
+          <span role="status" className="text-sm text-fg-2">
+            Review complete.
+          </span>
         </div>
       )}
     </div>

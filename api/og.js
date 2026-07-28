@@ -38,9 +38,9 @@ const chip = (color, label) =>
         gap: 10,
         padding: "10px 22px",
         borderRadius: 9999,
-        border: "1px solid #e7e5e4",
-        backgroundColor: "#ffffff",
-        color: "#44403c",
+        border: "1px solid #263351",
+        backgroundColor: "#151e33",
+        color: "#a9b4cc",
         fontSize: 26,
       },
     },
@@ -60,7 +60,7 @@ export default function handler() {
           flexDirection: "column",
           justifyContent: "center",
           padding: "0 96px",
-          backgroundColor: "#fafaf9",
+          backgroundColor: "#0c111f",
           fontFamily: "sans-serif",
         },
       },
@@ -75,7 +75,8 @@ export default function handler() {
               width: 88,
               height: 88,
               borderRadius: 20,
-              backgroundColor: "#1c1917",
+              backgroundColor: "#151e33",
+              border: "2px solid #263351",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -88,7 +89,7 @@ export default function handler() {
             children: h("path", {
               d: "M10 34h11l5-13 9 25 6-17 4 5h9",
               fill: "none",
-              stroke: "#fafaf9",
+              stroke: "#d9ac55",
               strokeWidth: 4.5,
               strokeLinecap: "round",
               strokeLinejoin: "round",
@@ -101,7 +102,7 @@ export default function handler() {
             style: {
               fontSize: 76,
               fontWeight: 700,
-              color: "#1c1917",
+              color: "#edf1fb",
               letterSpacing: -2,
             },
           },
@@ -116,19 +117,19 @@ export default function handler() {
             marginTop: 36,
             fontSize: 34,
             lineHeight: 1.4,
-            color: "#57534e",
+            color: "#a9b4cc",
             maxWidth: 900,
           },
         },
-        "Vital signs for the decisions you've already made. AI agents watch the assumptions behind a decision and flag when the evidence turns against one."
+        "Vital signs for the decisions you've already made. Track the assumptions behind important decisions, weigh new evidence, and see whether those decisions still hold."
       ),
       // Status chips
       h(
         "div",
         { style: { display: "flex", gap: 20, marginTop: 48 } },
-        chip("#10b981", "Healthy"),
-        chip("#f59e0b", "Watch"),
-        chip("#f43f5e", "At Risk")
+        chip("#5fc98b", "Healthy"),
+        chip("#e39a55", "Watch"),
+        chip("#e5654e", "At Risk")
       )
     ),
     { width: 1200, height: 630 }
