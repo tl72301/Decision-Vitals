@@ -1,6 +1,6 @@
 // Collapsible pretty-printed JSON. Exposes each review step's full output so
 // a conclusion can be traced to the exact findings that produced it.
-export default function JsonView({ value, label = "View full output", defaultOpen = false }) {
+export default function JsonView({ value, label = "View reasoning", defaultOpen = false }) {
   return (
     <details open={defaultOpen} className="mt-3 rounded border border-line bg-ink-900">
       <summary className="cursor-pointer select-none px-3 py-2 font-mono text-xs text-fg-3 transition-colors hover:text-fg-1">

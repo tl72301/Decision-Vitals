@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { runAgent } from "../lib/api.js";
 import { createDecision, createAssumptions } from "../lib/store.js";
 import { isDemo, subscribeMode } from "../lib/mode.js";
-import { btnPrimary, btnQuiet, inputCls, fieldLabel } from "../lib/ui.js";
+import { requestLiveMode } from "../lib/liveSwitch.js";
+import { btnPrimary, btnSecondary, btnQuiet, inputCls, fieldLabel } from "../lib/ui.js";
 import Spinner from "../components/Spinner.jsx";
 
 // The two intake steps shown in the progress panel while the decision is read.
@@ -64,7 +65,7 @@ export default function NewDecision() {
   const update = (field) => (e) =>
     setForm((f) => ({ ...f, [field]: e.target.value }));
 
-  const canSubmit = form.statement.trim().length > 0 && !running && !demo;
+  const canSubmit = form.statement.trim().length > 0 && !running;
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -134,20 +135,36 @@ export default function NewDecision() {
       <h1 className="text-xl font-semibold tracking-tight text-fg-1">
         Record a decision
       </h1>
-      <p className="mt-1 max-w-xl text-sm leading-relaxed text-fg-2">
+      <p className="mt-1 max-w-xl text-[15px] leading-relaxed text-fg-2">
         Describe a decision you've already made. Decision Vitals identifies the
         3 to 5 assumptions it depends on and marks which ones are critical. You
         log evidence and review the decision on the next screen.
       </p>
 
-      {demo && (
-        <p className="mt-4 border-l-2 border-warn py-1 pl-4 text-sm leading-relaxed text-fg-2">
-          Demo Mode replays recorded reviews of the sample decisions, so it
-          can't analyze a new decision. Switch to Live Mode (header toggle) to
-          record your own.
-        </p>
-      )}
-
+      {demo ? (
+        <div className="mt-6 rounded-md border border-line bg-ink-800 p-6">
+          <h2 className="text-base font-semibold text-fg-1">
+            Recording needs Live Mode
+          </h2>
+          <p className="mt-2 max-w-lg text-[15px] leading-relaxed text-fg-2">
+            Demo Mode replays recorded reviews of the sample decisions. It
+            can't analyze a new one. Switch to Live Mode with the passphrase to
+            record your own.
+          </p>
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              onClick={requestLiveMode}
+              className={btnPrimary}
+            >
+              Switch to Live Mode
+            </button>
+            <Link to="/" className={btnSecondary}>
+              View sample decisions
+            </Link>
+          </div>
+        </div>
+      ) : (
       <form onSubmit={handleSubmit} className="mt-6 space-y-5">
         <div>
           <label htmlFor="nd-statement" className={fieldLabel}>
@@ -160,7 +177,7 @@ export default function NewDecision() {
             disabled={running}
             rows={3}
             required
-            placeholder="e.g. Migrate our B2B product from per-seat pricing to usage-based billing in Q4."
+            placeholder="e.g. Extend store hours into the evening starting next month."
             className={`mt-1 ${inputCls}`}
           />
         </div>
@@ -225,8 +242,9 @@ export default function NewDecision() {
           </button>
         </div>
       </form>
+      )}
 
-      {(running || error) && (
+      {!demo && (running || error) && (
         <div className="mt-6 rounded-md border border-line bg-ink-800 p-4">
           <p className="text-sm font-medium text-fg-1">
             Identifying the assumptions behind this decision

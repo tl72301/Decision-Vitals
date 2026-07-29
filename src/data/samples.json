@@ -75,7 +75,7 @@
     },
     {
       "id": "sample-chat",
-      "title": "Migrate Team Chat Platform This Quarter",
+      "title": "Replace the team chat platform this quarter",
       "statement": "Migrate the entire team from the current chat application to a new, lower-cost platform before the current contract renews this quarter.",
       "context": "Our current chat tool keeps going down and the new one is cheaper, and leadership wants the switch done before the current contract renews.",
       "owner": "",
@@ -156,7 +156,7 @@
     },
     {
       "id": "sample-3pl",
-      "title": "Outsource fulfillment to a 3PL by Q2",
+      "title": "Move order fulfillment to an outside warehouse",
       "statement": "Move e-commerce fulfillment from our in-house warehouse to a third-party logistics provider (3PL) by Q2.",
       "context": "Order volume up 60 percent year over year; warehouse lease renewal due in 8 months; 3PL quotes suggest 18 percent cost savings at current volume.",
       "owner": "",

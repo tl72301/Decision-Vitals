@@ -98,16 +98,36 @@ export default function DecisionDetail() {
         )}
       </header>
 
-      <p className="mt-6 max-w-2xl text-sm leading-relaxed text-fg-2">
+      <p className="mt-6 max-w-2xl text-[15px] leading-relaxed text-fg-2">
         <span className="font-medium text-fg-1">Assumptions</span> are what this
         decision depends on; <span className="font-medium text-fg-1">evidence</span>{" "}
         is what you've learned since. Log at least one piece of evidence, then
         review the decision to weigh each assumption against it.
       </p>
 
+      {/* Compact section navigator for long single-column (mobile) pages */}
+      <nav
+        aria-label="Sections on this page"
+        className="mt-4 flex flex-wrap gap-2 lg:hidden"
+      >
+        {[
+          ["#assumptions", "Assumptions"],
+          ["#evidence", "Evidence"],
+          ["#review", "Review"],
+        ].map(([href, label]) => (
+          <a
+            key={href}
+            href={href}
+            className="rounded border border-line px-3 py-1.5 text-sm font-medium text-fg-2 transition-colors hover:border-line-2 hover:text-fg-1"
+          >
+            {label}
+          </a>
+        ))}
+      </nav>
+
       {/* Split view: assumptions ledger + evidence log */}
       <div className="mt-6 grid gap-10 lg:grid-cols-2 lg:gap-12">
-        <section aria-labelledby="assumptions-heading">
+        <section id="assumptions" className="scroll-mt-20" aria-labelledby="assumptions-heading">
           <div className="mb-3 flex items-baseline justify-between">
             <h2
               id="assumptions-heading"
@@ -120,7 +140,7 @@ export default function DecisionDetail() {
             </span>
           </div>
           {locked && (
-            <p className="mb-3 border-l-2 border-line py-1 pl-4 text-xs leading-relaxed text-fg-3">
+            <p className="mb-3 border-l-2 border-line py-1 pl-4 text-sm leading-relaxed text-fg-2">
               Locked since the first review, so every report stays traceable to
               the assumptions it judged.
             </p>
@@ -145,7 +165,7 @@ export default function DecisionDetail() {
           )}
         </section>
 
-        <section aria-labelledby="evidence-heading">
+        <section id="evidence" className="scroll-mt-20" aria-labelledby="evidence-heading">
           <div className="mb-3 flex items-baseline justify-between">
             <h2
               id="evidence-heading"
@@ -162,7 +182,7 @@ export default function DecisionDetail() {
       </div>
 
       {/* Review action */}
-      <div className="mt-10 flex flex-col items-start gap-2 border-t border-line pt-6">
+      <div id="review" className="mt-10 flex scroll-mt-20 flex-col items-start gap-2 border-t border-line pt-6">
         {canReview ? (
           <Link to={`/decision/${id}/run`} className={btnPrimary}>
             {reports.length > 0 ? "Review decision again" : "Review decision"}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { listDecisions, assumptionsByDecision } from "../lib/store.js";
 import { loadSamples } from "../lib/samples.js";
@@ -9,7 +9,7 @@ import HealthBadge from "../components/HealthBadge.jsx";
 import Chip from "../components/Chip.jsx";
 
 // Statuses worth calling out on a row, in severity order. "untested" is implied
-// by "Not yet reviewed" so it is not listed individually.
+// by "Unreviewed" so it is not listed individually.
 const SUMMARY_STATUSES = ["invalidated", "weakened", "needs_review", "holding"];
 
 function AssumptionSummary({ decisionId, reviewed }) {
@@ -43,10 +43,10 @@ function DecisionRow({ decision }) {
     <li>
       <Link
         to={`/decision/${decision.id}`}
-        className="grid gap-2 px-2 py-4 transition-colors hover:bg-ink-800 sm:grid-cols-[1fr_auto] sm:gap-6"
+        className="group grid gap-2 px-2 py-4 transition-colors hover:bg-ink-800 sm:grid-cols-[1fr_auto] sm:gap-6"
       >
         <div className="min-w-0">
-          <p className="font-medium leading-snug text-fg-1">
+          <p className="font-medium leading-snug text-fg-1 underline-offset-4 group-hover:underline group-hover:decoration-line-2">
             {decision.title || decision.statement || "Untitled decision"}
           </p>
           {decision.statement && decision.title && (
@@ -60,7 +60,7 @@ function DecisionRow({ decision }) {
         </div>
         <div className="flex shrink-0 flex-row items-center gap-3 sm:flex-col sm:items-end sm:justify-between">
           <HealthBadge grade={decision.healthGrade} />
-          <span className="font-mono text-xs text-fg-3">
+          <span className="font-mono text-xs text-fg-2">
             {formatDate(decision.createdAt)}
             {decision.owner ? ` · ${decision.owner}` : ""}
           </span>
@@ -84,7 +84,7 @@ const PROCESS = [
   {
     n: "03",
     title: "Review the decision",
-    body: "Specialized AI agents weigh the evidence for and against each assumption, then combine their findings into one dated decision-health assessment.",
+    body: "The review weighs the evidence for and against each assumption and produces a dated assessment of the decision's health.",
   },
 ];
 
@@ -107,9 +107,8 @@ function EmptyState({ onLoadSamples }) {
           Load sample decisions
         </button>
       </div>
-      <p className="mt-3 text-sm text-fg-3">
-        The samples include finished reviews, the fastest way to see a
-        decision-health report.
+      <p className="mt-3 text-sm text-fg-2">
+        Load a sample to see a completed decision review.
       </p>
 
       <section className="mt-12" aria-labelledby="how-it-works">
@@ -141,7 +140,10 @@ export default function Dashboard() {
   useStoreSync();
   const decisions = listDecisions();
   const [notice, setNotice] = useState("");
+  const noticeTimer = useRef(null);
+  useEffect(() => () => clearTimeout(noticeTimer.current), []);
 
+  // Transient feedback: confirm the load, then get out of the way.
   function handleLoadSamples() {
     const n = loadSamples();
     setNotice(
@@ -149,6 +151,8 @@ export default function Dashboard() {
         ? `Loaded ${n} sample decision${n === 1 ? "" : "s"}.`
         : "Sample decisions are already loaded."
     );
+    clearTimeout(noticeTimer.current);
+    noticeTimer.current = setTimeout(() => setNotice(""), 4000);
   }
 
   const sorted = decisions
