@@ -89,7 +89,7 @@ const PROCESS = [
   {
     n: "04",
     title: "Review again as things change",
-    body: "Add evidence and review again whenever something moves. Each review is numbered and dated, so you can see what changed since the last one.",
+    body: "Add evidence and review again whenever something moves. Every review is kept, numbered and dated, so the decision builds a history you can look back through.",
   },
 ];
 
