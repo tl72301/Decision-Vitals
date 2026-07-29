@@ -5,7 +5,8 @@ import Chip from "./Chip.jsx";
 
 // One assumption as a ledger entry: index, importance, current status, the
 // assumption itself, and the warning signal to watch. Before the first review
-// it can be reworded, reranked, or deleted; after a review it is read-only.
+// it can be reworded, reranked, or deleted (delete lives inside Edit, behind
+// a confirm); after a review it is read-only.
 export default function AssumptionCard({ assumption, index, locked, onSave, onDelete }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState({
@@ -84,21 +85,36 @@ export default function AssumptionCard({ assumption, index, locked, onSave, onDe
             />
           </div>
         </div>
-        <div className="mt-3 flex gap-2">
+        <div className="mt-3 flex flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={save}
             disabled={!draft.text.trim()}
-            className="rounded bg-brass px-3 py-1.5 text-xs font-semibold text-ink-950 transition-colors hover:bg-brass-2 disabled:opacity-40"
+            className="rounded bg-brass px-3 py-2 text-xs font-semibold text-ink-950 transition-colors hover:bg-brass-2 disabled:opacity-40"
           >
             Save changes
           </button>
           <button
             type="button"
             onClick={() => setEditing(false)}
-            className="rounded px-3 py-1.5 text-xs font-medium text-fg-2 transition-colors hover:text-fg-1"
+            className="rounded px-3 py-2 text-xs font-medium text-fg-2 transition-colors hover:text-fg-1"
           >
             Cancel
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              if (
+                window.confirm(
+                  `Delete assumption ${ref}? The review will no longer consider it.`
+                )
+              ) {
+                onDelete(assumption.id);
+              }
+            }}
+            className="ml-auto rounded px-3 py-2 text-xs font-medium text-fg-3 transition-colors hover:text-bad"
+          >
+            Delete assumption
           </button>
         </div>
       </li>
@@ -121,25 +137,16 @@ export default function AssumptionCard({ assumption, index, locked, onSave, onDe
           )}
         </div>
         {!locked && (
-          <div className="flex shrink-0 gap-3 text-xs">
-            <button
-              type="button"
-              onClick={startEdit}
-              className="font-medium text-fg-2 transition-colors hover:text-fg-1"
-            >
-              Edit
-            </button>
-            <button
-              type="button"
-              onClick={() => onDelete(assumption.id)}
-              className="font-medium text-fg-3 transition-colors hover:text-bad"
-            >
-              Delete
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={startEdit}
+            className="shrink-0 rounded border border-line px-2.5 py-1 text-xs font-medium text-fg-2 transition-colors hover:border-line-2 hover:text-fg-1"
+          >
+            Edit
+          </button>
         )}
       </div>
-      <p className="mt-2 text-sm leading-relaxed text-fg-1">{assumption.text}</p>
+      <p className="mt-2 text-[15px] leading-relaxed text-fg-1">{assumption.text}</p>
       {assumption.signpost && (
         <p className="mt-2 flex gap-2 text-sm leading-relaxed text-fg-2">
           <span aria-hidden="true" className="mt-px text-warn">

@@ -10,7 +10,7 @@ import {
   purgeOrphanRuns,
 } from "../lib/store.js";
 import { buildAndSaveReport } from "../lib/review.js";
-import { btnPrimary, btnSecondary } from "../lib/ui.js";
+import { btnPrimary } from "../lib/ui.js";
 import Spinner from "../components/Spinner.jsx";
 import JsonView from "../components/JsonView.jsx";
 
@@ -247,12 +247,12 @@ export default function AgentRun() {
         ← {decision.title || "Decision"}
       </Link>
       <h1 className="mt-2 text-xl font-semibold tracking-tight text-fg-1">
-        Running review
+        Reviewing decision
       </h1>
-      <p className="mt-1 max-w-xl text-sm leading-relaxed text-fg-2">
-        Specialized AI agents examine the evidence from different perspectives.
-        Each step shows its full findings, so you can trace exactly how the
-        assessment was reached.
+      <p className="mt-1 max-w-xl text-[15px] leading-relaxed text-fg-2">
+        The review weighs the evidence for and against each assumption. Each
+        stage shows its findings, so you can trace how the assessment was
+        reached.
       </p>
 
       <ol className="mt-8">
@@ -316,16 +316,32 @@ export default function AgentRun() {
       )}
 
       {done && runId && (
-        <div className="mt-6 flex flex-wrap items-center gap-3 border-t border-line pt-6">
-          <Link to={`/decision/${id}/report/${runId}`} className={btnPrimary}>
-            Open health report
-          </Link>
-          <button type="button" onClick={copyRunJson} className={btnSecondary}>
-            {copied ? "Copied ✓" : "Copy run JSON"}
-          </button>
-          <span role="status" className="text-sm text-fg-2">
-            Review complete.
-          </span>
+        <div className="mt-6 border-t border-line pt-6">
+          <div className="flex flex-wrap items-center gap-3">
+            <Link to={`/decision/${id}/report/${runId}`} className={btnPrimary}>
+              Open health report
+            </Link>
+            <span role="status" className="text-sm text-fg-2">
+              Review complete.
+            </span>
+          </div>
+          <details className="mt-4">
+            <summary className="cursor-pointer select-none text-sm font-medium text-fg-3 transition-colors hover:text-fg-1">
+              Advanced
+            </summary>
+            <div className="mt-2 flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                onClick={copyRunJson}
+                className="rounded border border-line px-3 py-1.5 text-xs font-medium text-fg-2 transition-colors hover:border-line-2 hover:text-fg-1"
+              >
+                {copied ? "Copied ✓" : "Copy review data"}
+              </button>
+              <span className="text-xs text-fg-3">
+                Copies every stage's full input and output for this review.
+              </span>
+            </div>
+          </details>
         </div>
       )}
     </div>

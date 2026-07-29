@@ -6,7 +6,7 @@ const SectionTitle = ({ children }) => (
 );
 
 const P = ({ children }) => (
-  <p className="mt-3 max-w-prose text-[15px] leading-relaxed text-fg-2">
+  <p className="mt-3 max-w-prose text-base leading-relaxed text-fg-2">
     {children}
   </p>
 );
@@ -127,12 +127,14 @@ export default function About() {
           <Strong>critical</Strong>: if they turn out to be wrong, the decision
           could seriously weaken or break. Others are <Strong>supporting</Strong>:
           they still matter, but the decision can probably survive if they
-          change. For each one there is a <Strong>warning signal</Strong>, the
-          specific thing you should watch for that would show the assumption may
-          no longer be true. This way of pressure-testing a plan comes from a
-          decades-old risk-planning method (credited below); the bet here is
-          that AI agents make it light enough to actually use on everyday
-          decisions.
+          change. Each one gets a <Strong>warning signal</Strong>: the specific
+          thing to watch for that would show the assumption may no longer be
+          true.
+        </P>
+        <P>
+          This way of pressure-testing a plan comes from a decades-old
+          risk-planning method (credited below). The bet here is that AI makes
+          it light enough to use on everyday decisions.
         </P>
       </Section>
 
@@ -141,25 +143,31 @@ export default function About() {
           You record a decision and Decision Vitals identifies the assumptions
           underneath it, marks which are critical, and gives each a warning
           signal to watch. You log evidence as it accumulates: meeting notes,
-          tickets, customer feedback, market updates. When you review the
-          decision, specialized AI agents examine the evidence from different
-          perspectives and combine their findings into a Decision Health Report:
-          an overall grade, an assessment of each assumption with its supporting
+          tickets, customer feedback, market updates.
+        </P>
+        <P>
+          When you review the decision, the review weighs the evidence for and
+          against each assumption and produces a Decision Health Report: an
+          overall grade, an assessment of each assumption with its supporting
           evidence, the strongest case against it, and recommended next steps.
-          Reviews are numbered and dated, so a decision builds up a health
-          history instead of a single one-time assessment.
+          Reviews are numbered and dated, so a decision builds a health history
+          instead of a single one-time assessment.
         </P>
       </Section>
 
       <Section title="How reviews work">
         <P>
-          Each review is carried out by six specialized AI agents, each with a
-          single job: two identify and classify the assumptions when you record
-          a decision, and four run the review. Different agents examine the
-          evidence, make the case against each assumption, assess where each one
-          stands, and write the report. Splitting the work this way keeps every
-          step focused, and it means no single perspective dominates: the agent
-          arguing against an assumption has no say in the final grade.
+          A review is a sequence of six focused AI steps, each with one job.
+          Two run when you record a decision: they identify the assumptions and
+          classify how much each one matters. Four run the review: one connects
+          each piece of evidence to the assumptions it affects, one makes the
+          strongest honest case against every assumption, one assesses where
+          each assumption stands, and one writes the report.
+        </P>
+        <P>
+          Splitting the work keeps every step focused, and it means no single
+          perspective dominates: the step arguing against an assumption has no
+          say in the final grade.
         </P>
         <Pipeline />
         <P>

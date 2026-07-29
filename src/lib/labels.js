@@ -25,7 +25,7 @@ export const HEALTH_GRADE = {
 };
 
 export const HEALTH_GRADE_UNREVIEWED = {
-  label: "Not yet reviewed",
+  label: "Unreviewed",
   chip: "bg-transparent text-fg-3 ring-line",
   dot: "bg-line-2",
 };
@@ -65,7 +65,7 @@ export function tierMeta(tier) {
 /** Per-assumption status. Flat tag + colored dot. */
 export const STATUS = {
   untested: {
-    label: "Not checked yet",
+    label: "Unreviewed",
     chip: "bg-transparent text-fg-3 ring-line",
     dot: "bg-line-2",
   },

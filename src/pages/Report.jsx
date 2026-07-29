@@ -38,22 +38,53 @@ function NotFound({ id }) {
   );
 }
 
-// One quoted piece of evidence behind an assessment: always mono, always with
-// its source and date, so the conclusion stays traceable.
+// One quoted piece of evidence behind an assessment, always with its source
+// and date, so the conclusion stays traceable.
 function Receipt({ receipt }) {
   const evidence = receipt.evidenceId ? getEvidence(receipt.evidenceId) : null;
   return (
-    <li className="border-l-2 border-line-2 bg-ink-900 py-2 pl-3 pr-3">
-      <p className="font-mono text-[13px] leading-relaxed text-fg-2">
+    <li className="border-l-2 border-line-2 bg-ink-900 py-2.5 pl-4 pr-3">
+      <p className="max-w-prose text-[15px] leading-relaxed text-fg-1">
         “{receipt.quote}”
       </p>
       {evidence && (
-        <p className="mt-1 font-mono text-xs text-fg-3">
+        <p className="mt-1 font-mono text-xs text-fg-2">
           {sourceTypeLabel(evidence.sourceType)}
           {evidence.date ? ` · ${formatDate(evidence.date)}` : ""}
         </p>
       )}
     </li>
+  );
+}
+
+// Recommended actions as scannable tasks: the action first, then which
+// assumption it protects. Owner and timing appear only if the review named
+// them inside the action text; nothing is invented.
+function ActionList({ actions, byId, indexById }) {
+  if (actions.length === 0) {
+    return <p className="mt-2 py-2 text-sm text-fg-3">None recommended.</p>;
+  }
+  return (
+    <ul className="mt-2 divide-y divide-line border-y border-line">
+      {actions.map((a, i) => {
+        const target = byId.get(a.assumptionId);
+        return (
+          <li key={i} className="py-3">
+            <p className="max-w-prose text-[15px] leading-relaxed text-fg-1">
+              {a.text}
+            </p>
+            {target && (
+              <p className="mt-1.5 text-sm leading-snug text-fg-2">
+                <span className="font-mono text-xs text-fg-3">
+                  Protects A{(indexById.get(a.assumptionId) ?? 0) + 1}
+                </span>{" "}
+                · {target.text}
+              </p>
+            )}
+          </li>
+        );
+      })}
+    </ul>
   );
 }
 
@@ -73,11 +104,11 @@ function FindingRow({ finding, assumption, index }) {
           </Chip>
         )}
       </div>
-      <p className="mt-2 text-sm font-medium leading-relaxed text-fg-1">
+      <p className="mt-2 text-[15px] font-medium leading-relaxed text-fg-1">
         {assumption ? assumption.text : "(assumption removed)"}
       </p>
       {finding.rationale && (
-        <p className="mt-1 max-w-prose text-sm leading-relaxed text-fg-2">
+        <p className="mt-1 max-w-prose text-[15px] leading-relaxed text-fg-2">
           {finding.rationale}
         </p>
       )}
@@ -139,7 +170,7 @@ export default function Report() {
           </span>
         </div>
         {report.summary && (
-          <p className="mt-4 max-w-prose text-[15px] leading-relaxed text-fg-2">
+          <p className="mt-4 max-w-prose text-base leading-relaxed text-fg-2">
             {report.summary}
           </p>
         )}
@@ -208,7 +239,7 @@ export default function Report() {
             {report.challengeHighlights.map((h, i) => (
               <li
                 key={i}
-                className="border-l-2 border-warn py-1 pl-4 text-sm leading-relaxed text-fg-2"
+                className="max-w-prose border-l-2 border-warn py-1 pl-4 text-[15px] leading-relaxed text-fg-2"
               >
                 {h}
               </li>
@@ -231,22 +262,7 @@ export default function Report() {
                   (make the assumption more likely to hold)
                 </span>
               </h3>
-              <ul className="mt-2 divide-y divide-line border-y border-line">
-                {shaping.length === 0 && (
-                  <li className="py-3 text-sm text-fg-3">None recommended.</li>
-                )}
-                {shaping.map((a, i) => (
-                  <li key={i} className="py-3 text-sm leading-relaxed text-fg-1">
-                    {a.text}
-                    {byId.get(a.assumptionId) && (
-                      <span className="mt-1 block text-xs text-fg-3">
-                        Protects A{(indexById.get(a.assumptionId) ?? 0) + 1}:{" "}
-                        {byId.get(a.assumptionId).text}
-                      </span>
-                    )}
-                  </li>
-                ))}
-              </ul>
+              <ActionList actions={shaping} byId={byId} indexById={indexById} />
             </div>
             <div>
               <h3 className="text-sm font-semibold text-fg-1">
@@ -255,22 +271,7 @@ export default function Report() {
                   (in case it turns out wrong)
                 </span>
               </h3>
-              <ul className="mt-2 divide-y divide-line border-y border-line">
-                {hedging.length === 0 && (
-                  <li className="py-3 text-sm text-fg-3">None recommended.</li>
-                )}
-                {hedging.map((a, i) => (
-                  <li key={i} className="py-3 text-sm leading-relaxed text-fg-1">
-                    {a.text}
-                    {byId.get(a.assumptionId) && (
-                      <span className="mt-1 block text-xs text-fg-3">
-                        Protects A{(indexById.get(a.assumptionId) ?? 0) + 1}:{" "}
-                        {byId.get(a.assumptionId).text}
-                      </span>
-                    )}
-                  </li>
-                ))}
-              </ul>
+              <ActionList actions={hedging} byId={byId} indexById={indexById} />
             </div>
           </div>
         </section>

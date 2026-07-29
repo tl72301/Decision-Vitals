@@ -135,7 +135,7 @@ export default function EvidencePanel({ decisionId, locked }) {
       </form>
 
       {evidence.length === 0 ? (
-        <p className="mt-4 border-l-2 border-line py-1 pl-4 text-sm leading-relaxed text-fg-3">
+        <p className="mt-4 border-l-2 border-line py-1 pl-4 text-sm leading-relaxed text-fg-2">
           No evidence logged yet. A review weighs evidence against each
           assumption, so it needs at least one entry. Paste the first note,
           ticket, or update above.
@@ -145,21 +145,25 @@ export default function EvidencePanel({ decisionId, locked }) {
           {evidence.map((ev) => (
             <li key={ev.id} className="py-3">
               <div className="flex items-center justify-between gap-3">
-                <p className="font-mono text-xs text-fg-3">
+                <p className="font-mono text-xs text-fg-2">
                   {sourceTypeLabel(ev.sourceType)}
                   {ev.date ? ` · ${formatDate(ev.date)}` : ""}
                 </p>
                 {!locked && (
                   <button
                     type="button"
-                    onClick={() => deleteEvidence(ev.id)}
+                    onClick={() => {
+                      if (window.confirm("Delete this evidence entry?")) {
+                        deleteEvidence(ev.id);
+                      }
+                    }}
                     className="text-xs font-medium text-fg-3 transition-colors hover:text-bad"
                   >
                     Delete
                   </button>
                 )}
               </div>
-              <p className="mt-1.5 border-l-2 border-line-2 pl-3 font-mono text-[13px] leading-relaxed text-fg-2">
+              <p className="mt-1.5 border-l-2 border-line-2 pl-3 text-[15px] leading-relaxed text-fg-2">
                 {ev.text}
               </p>
             </li>

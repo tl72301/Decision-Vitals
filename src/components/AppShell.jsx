@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { isDemo, setMode, subscribeMode } from "../lib/mode.js";
-import { verifyLivePassphrase } from "../lib/api.js";
+import { requestLiveMode } from "../lib/liveSwitch.js";
 import { startMcpSync } from "../lib/mcpSync.js";
 
 function ModeToggle() {
@@ -14,16 +14,7 @@ function ModeToggle() {
       setMode("demo");
       return;
     }
-    const passphrase = window.prompt(
-      "Live Mode runs real AI reviews (and spends real credits).\nEnter the Live Mode passphrase:"
-    );
-    if (passphrase === null) return; // cancelled
-    const result = await verifyLivePassphrase(passphrase);
-    if (result.ok) {
-      setMode("live", passphrase);
-    } else {
-      window.alert(result.error || "Incorrect passphrase.");
-    }
+    await requestLiveMode();
   }
 
   return (
