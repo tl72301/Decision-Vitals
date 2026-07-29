@@ -89,7 +89,7 @@ const PROCESS = [
   {
     n: "04",
     title: "Review again as things change",
-    body: "Add evidence and review again whenever something moves. Every review is kept, numbered and dated, so the decision builds a history you can look back through.",
+    body: "Add evidence and review again whenever something moves. From the second review on, the report shows which assumptions changed status since the last one.",
   },
 ];
 
@@ -137,6 +137,11 @@ function EmptyState({ onLoadSamples }) {
             </li>
           ))}
         </ol>
+        <p className="mt-5 max-w-xl text-sm leading-relaxed text-fg-2">
+          Decision Vitals also works from Claude: connect it as a Claude
+          connector and, in Live Mode, Claude can list your decisions and file
+          evidence into them straight from a conversation.
+        </p>
       </section>
     </div>
   );

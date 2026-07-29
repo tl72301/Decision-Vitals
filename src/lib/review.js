@@ -13,6 +13,7 @@ import {
   updateAssumption,
   updateDecision,
   createReport,
+  getDecision,
 } from "./store.js";
 
 const VALID_STATUS = new Set(["holding", "weakened", "invalidated", "needs_review"]);
@@ -72,6 +73,12 @@ export function buildAndSaveReport(decisionId, run, outputs) {
   const rr = outputs.risk_ranking ?? {};
   const rep = outputs.reporter ?? {};
 
+  // 0. Snapshot the pre-review state so the report can show what moved.
+  const priorStatus = new Map(
+    assumptionsByDecision(decisionId).map((a) => [a.id, a.status])
+  );
+  const previousHealthGrade = getDecision(decisionId)?.healthGrade ?? null;
+
   // 1. Statuses from Risk Ranking; fall back to Reporter findings if absent.
   const rankings = Array.isArray(rr.rankings) ? rr.rankings : [];
   if (rankings.length > 0) {
@@ -94,14 +101,21 @@ export function buildAndSaveReport(decisionId, run, outputs) {
     : deriveHealthGrade(decisionId);
   updateDecision(decisionId, { healthGrade });
 
-  // 3. Persist the Report, numbered by its run.
+  // 3. Persist the Report, numbered by its run. Each finding carries the
+  // status the assumption had before this review, so reports can show
+  // Holding -> Weakened style movement.
+  const findings = normalizeFindings(rep.findings).map((f) => ({
+    ...f,
+    previousStatus: priorStatus.get(f.assumptionId) ?? "untested",
+  }));
   return createReport({
     decisionId,
     runId: run.id,
     runNumber: run.runNumber,
     healthGrade,
+    previousHealthGrade,
     summary: rep.summary ?? "",
-    findings: normalizeFindings(rep.findings),
+    findings,
     challengeHighlights: Array.isArray(rep.challengeHighlights)
       ? rep.challengeHighlights
       : [],

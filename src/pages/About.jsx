@@ -159,8 +159,9 @@ export default function About() {
         <P>
           Nothing about this is one-and-done. Evidence can be added at any
           point, and you can review a decision again whenever something moves.
-          Every review is kept, so you can open an earlier one and see how an
-          assumption stood the last time you checked.
+          From the second review on, the report shows which assumptions changed
+          status since the previous one, so you can see an assumption weaken
+          before it breaks.
         </P>
       </Section>
 
@@ -207,9 +208,10 @@ export default function About() {
           remove them.
         </P>
         <P>
-          Reviews also don't compare themselves. Each one is kept and dated, but
-          the app won't tell you which assumptions moved since the last review,
-          so you have to open both and read them side by side.
+          Assumptions also lock after the first review. That keeps every report
+          traceable to the exact assumptions it judged, but it means a decision
+          that changes shape should be recorded as a new decision, not edited in
+          place.
         </P>
       </Section>
 
