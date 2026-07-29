@@ -159,8 +159,8 @@ export default function About() {
         <P>
           Nothing about this is one-and-done. Evidence can be added at any
           point, and you can review a decision again whenever something moves.
-          Comparing a review against the previous one is how you see an
-          assumption weaken before it breaks.
+          Every review is kept, so you can open an earlier one and see how an
+          assumption stood the last time you checked.
         </P>
       </Section>
 
@@ -205,6 +205,11 @@ export default function About() {
           the model's read on how strongly a piece of evidence cuts is a
           judgment call, the built-in rules limit the worst mistakes but don't
           remove them.
+        </P>
+        <P>
+          Reviews also don't compare themselves. Each one is kept and dated, but
+          the app won't tell you which assumptions moved since the last review,
+          so you have to open both and read them side by side.
         </P>
       </Section>
 
