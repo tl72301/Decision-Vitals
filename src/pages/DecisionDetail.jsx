@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   getDecision,
   assumptionsByDecision,
@@ -6,6 +6,7 @@ import {
   reportsByDecision,
   updateAssumption,
   deleteAssumption,
+  deleteDecision,
 } from "../lib/store.js";
 import { useStoreSync } from "../lib/useStore.js";
 import { formatDate } from "../lib/labels.js";
@@ -34,6 +35,7 @@ function NotFound() {
 export default function DecisionDetail() {
   useStoreSync();
   const { id } = useParams();
+  const navigate = useNavigate();
   const decision = getDecision(id);
 
   if (!decision) return <NotFound />;
@@ -200,6 +202,30 @@ export default function DecisionDetail() {
             </p>
           </>
         )}
+      </div>
+
+      {/* Destructive zone: quiet, confirmed, and last on the page */}
+      <div className="mt-10 border-t border-line pt-5">
+        <button
+          type="button"
+          onClick={() => {
+            const name = decision.title || decision.statement || "this decision";
+            if (
+              window.confirm(
+                `Delete "${name}"? This also removes its assumptions, evidence, and reports from this browser.`
+              )
+            ) {
+              deleteDecision(id);
+              navigate("/");
+            }
+          }}
+          className="text-sm font-medium text-fg-3 transition-colors hover:text-bad"
+        >
+          Delete this decision
+        </button>
+        <p className="mt-1 text-xs text-fg-3">
+          Removes its assumptions, evidence, and reports from this browser.
+        </p>
       </div>
     </div>
   );

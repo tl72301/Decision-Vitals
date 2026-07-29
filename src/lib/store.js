@@ -69,6 +69,7 @@ const STORAGE_KEY = "decision_vitals_state";
  * @typedef {Object} ReportFinding
  * @property {string} assumptionId
  * @property {string} status
+ * @property {string} [previousStatus]  Status before this review (reports from newer runs only).
  * @property {string} rationale
  * @property {ReportReceipt[]} receipts
  *
@@ -84,6 +85,7 @@ const STORAGE_KEY = "decision_vitals_state";
  * @property {number} runNumber
  * @property {string} createdAt     ISO string.
  * @property {"healthy" | "watch" | "at_risk"} healthGrade
+ * @property {HealthGrade} previousHealthGrade  Grade before this review (null on older reports).
  * @property {string} summary
  * @property {ReportFinding[]} findings
  * @property {string[]} challengeHighlights
@@ -508,6 +510,7 @@ export function createReport(input) {
     runNumber: input.runNumber ?? nextRunNumber(input.decisionId),
     createdAt: input.createdAt ?? nowIso(),
     healthGrade: input.healthGrade ?? "healthy",
+    previousHealthGrade: input.previousHealthGrade ?? null,
     summary: input.summary ?? "",
     findings: input.findings ?? [],
     challengeHighlights: input.challengeHighlights ?? [],

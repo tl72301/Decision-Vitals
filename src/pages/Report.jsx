@@ -103,6 +103,13 @@ function FindingRow({ finding, assumption, index }) {
             {tier.label}
           </Chip>
         )}
+        {finding.previousStatus &&
+          finding.previousStatus !== "untested" &&
+          finding.previousStatus !== finding.status && (
+            <span className="font-mono text-xs text-fg-2">
+              was {statusMeta(finding.previousStatus).label}
+            </span>
+          )}
       </div>
       <p className="mt-2 text-[15px] font-medium leading-relaxed text-fg-1">
         {assumption ? assumption.text : "(assumption removed)"}
@@ -198,6 +205,86 @@ export default function Report() {
           </nav>
         )}
       </header>
+
+      {/* What changed: only from the second review on, and only for reports
+          new enough to carry previous statuses. */}
+      {report.runNumber > 1 &&
+        report.findings.some((f) => f.previousStatus != null) && (
+          <section className="mt-10" aria-labelledby="changes-heading">
+            <h2 id="changes-heading" className="text-lg font-semibold text-fg-1">
+              What changed
+            </h2>
+            <p className="mt-1 text-sm text-fg-2">
+              Compared with review #{report.runNumber - 1}.
+            </p>
+            {(() => {
+              const moved = report.findings.filter(
+                (f) => f.previousStatus && f.previousStatus !== f.status
+              );
+              const gradeMoved =
+                report.previousHealthGrade &&
+                report.previousHealthGrade !== report.healthGrade;
+              if (moved.length === 0 && !gradeMoved) {
+                return (
+                  <p className="mt-3 border-l-2 border-line py-1 pl-4 text-[15px] text-fg-2">
+                    No assumption changed status since the last review.
+                  </p>
+                );
+              }
+              return (
+                <ul className="mt-4 divide-y divide-line border-y border-line">
+                  {gradeMoved && (
+                    <li className="flex flex-wrap items-center gap-2 py-3">
+                      <span className="text-sm font-medium text-fg-1">
+                        Overall health
+                      </span>
+                      <Chip
+                        tone={healthGradeMeta(report.previousHealthGrade).chip}
+                        dot={healthGradeMeta(report.previousHealthGrade).dot}
+                      >
+                        {healthGradeMeta(report.previousHealthGrade).label}
+                      </Chip>
+                      <span aria-hidden="true" className="text-fg-3">
+                        →
+                      </span>
+                      <Chip tone={grade.chip} dot={grade.dot}>
+                        {grade.label}
+                      </Chip>
+                    </li>
+                  )}
+                  {moved.map((f, i) => {
+                    const a = byId.get(f.assumptionId);
+                    const prev = statusMeta(f.previousStatus);
+                    const now = statusMeta(f.status);
+                    return (
+                      <li key={i} className="py-3">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="font-mono text-xs text-fg-3">
+                            A{(indexById.get(f.assumptionId) ?? i) + 1}
+                          </span>
+                          <Chip tone={prev.chip} dot={prev.dot}>
+                            {prev.label}
+                          </Chip>
+                          <span aria-hidden="true" className="text-fg-3">
+                            →
+                          </span>
+                          <Chip tone={now.chip} dot={now.dot}>
+                            {now.label}
+                          </Chip>
+                        </div>
+                        {a && (
+                          <p className="mt-1.5 max-w-prose text-sm leading-snug text-fg-2">
+                            {a.text}
+                          </p>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              );
+            })()}
+          </section>
+        )}
 
       {/* Assessments */}
       <section className="mt-10" aria-labelledby="findings-heading">
