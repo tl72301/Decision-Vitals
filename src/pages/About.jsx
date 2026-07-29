@@ -69,8 +69,8 @@ function Pipeline() {
 
 const PRODUCT_DECISIONS = [
   [
-    "Paste-only evidence",
-    "No integrations, no file parsing. Adoption beats automation for a tool like this: if logging a piece of evidence takes more than a paste, it doesn't happen.",
+    "Evidence capture stays cheap",
+    "Logging a piece of evidence should never take more than a paste. Gmail is the one integration, because email is where most of this arrives anyway. No file parsing, no connectors to configure.",
   ],
   [
     "You edit the assumptions",
@@ -143,7 +143,10 @@ export default function About() {
           You record a decision and Decision Vitals identifies the assumptions
           underneath it, marks which are critical, and gives each a warning
           signal to watch. You log evidence as it accumulates: meeting notes,
-          tickets, customer feedback, market updates.
+          tickets, customer feedback, market updates. Label an email
+          <Strong> decision-evidence</Strong> in Gmail and it can be pulled in
+          directly, so the evidence that lands in your inbox does not have to be
+          copied by hand.
         </P>
         <P>
           When you review the decision, the review weighs the evidence for and
@@ -152,6 +155,12 @@ export default function About() {
           evidence, the strongest case against it, and recommended next steps.
           Reviews are numbered and dated, so a decision builds a health history
           instead of a single one-time assessment.
+        </P>
+        <P>
+          Nothing about this is one-and-done. Evidence can be added at any
+          point, and you can review a decision again whenever something moves.
+          Comparing a review against the previous one is how you see an
+          assumption weaken before it breaks.
         </P>
       </Section>
 
@@ -201,10 +210,10 @@ export default function About() {
 
       <Section title="What's next">
         <P>
-          Pulling evidence automatically from one source (a project tool is the
-          natural first one), linking related decisions so a broken assumption
-          in one flags the others, and alerting the owner the moment a warning
-          signal shows up rather than waiting for a manual review.
+          Pulling evidence from more of the places it already lands, linking
+          related decisions so a broken assumption in one flags the others, and
+          alerting the owner the moment a warning signal shows up rather than
+          waiting for a manual review.
         </P>
       </Section>
 
