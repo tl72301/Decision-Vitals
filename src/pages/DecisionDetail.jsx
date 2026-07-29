@@ -102,7 +102,8 @@ export default function DecisionDetail() {
         <span className="font-medium text-fg-1">Assumptions</span> are what this
         decision depends on; <span className="font-medium text-fg-1">evidence</span>{" "}
         is what you've learned since. Log at least one piece of evidence, then
-        review the decision to weigh each assumption against it.
+        review the decision to weigh each assumption against it. Keep adding
+        evidence over time and review again whenever something changes.
       </p>
 
       {/* Compact section navigator for long single-column (mobile) pages */}

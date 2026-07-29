@@ -59,23 +59,41 @@ export default function EvidencePanel({ decisionId, locked }) {
 
   return (
     <div>
-      {!isDemo() && (
-        <div className="mb-3 flex flex-wrap items-center gap-3">
-          <button
-            type="button"
-            onClick={pullFromGmail}
-            disabled={pulling}
-            className="inline-flex min-h-9 items-center gap-2 rounded border border-line px-3 py-1.5 text-xs font-medium text-fg-2 transition-colors hover:border-line-2 hover:text-fg-1 disabled:opacity-50"
-          >
-            {pulling && <Spinner />}
-            {pulling ? "Pulling…" : "Pull from Gmail"}
-          </button>
-          {pullNotice && (
-            <span role="status" className="text-xs text-fg-2">
-              {pullNotice}
+      {/* Gmail capture: a real action in Live Mode, named in Demo Mode so the
+          route into the product is visible either way. */}
+      <div className="mb-4 rounded-md border border-line bg-ink-900 p-3">
+        {isDemo() ? (
+          <p className="text-sm leading-relaxed text-fg-2">
+            <span className="font-medium text-fg-1">Evidence from Gmail.</span>{" "}
+            Label an email <code className="font-mono text-fg-1">decision-evidence</code>{" "}
+            and pull it straight into a decision. Available in Live Mode.
+          </p>
+        ) : (
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              onClick={pullFromGmail}
+              disabled={pulling}
+              className="inline-flex min-h-9 items-center gap-2 rounded border border-line-2 px-3 py-1.5 text-sm font-medium text-fg-1 transition-colors hover:bg-ink-700 disabled:opacity-50"
+            >
+              {pulling && <Spinner />}
+              {pulling ? "Pulling…" : "Pull from Gmail"}
+            </button>
+            <span className="text-sm text-fg-2">
+              {pullNotice || (
+                <>
+                  Pulls emails labeled{" "}
+                  <code className="font-mono text-fg-1">decision-evidence</code>.
+                </>
+              )}
             </span>
-          )}
-        </div>
+          </div>
+        )}
+      </div>
+      {pullNotice && (
+        <p role="status" className="sr-only">
+          {pullNotice}
+        </p>
       )}
 
       <form

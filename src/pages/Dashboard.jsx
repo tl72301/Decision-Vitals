@@ -78,13 +78,18 @@ const PROCESS = [
   },
   {
     n: "02",
-    title: "Log evidence",
-    body: "Paste what you learn as it lands: meeting notes, support tickets, customer feedback, market updates.",
+    title: "Log evidence as it arrives",
+    body: "Paste meeting notes, support tickets, customer feedback, or market updates. Label an email in Gmail and pull it in without leaving your inbox.",
   },
   {
     n: "03",
     title: "Review the decision",
     body: "The review weighs the evidence for and against each assumption and produces a dated assessment of the decision's health.",
+  },
+  {
+    n: "04",
+    title: "Review again as things change",
+    body: "Add evidence and review again whenever something moves. Each review is numbered and dated, so you can see what changed since the last one.",
   },
 ];
 
@@ -96,8 +101,9 @@ function EmptyState({ onLoadSamples }) {
       </h1>
       <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-fg-2">
         Every decision rests on a few assumptions about customers, capacity,
-        timing, or the market. Decision Vitals records them, weighs new evidence
-        against them, and shows you which still hold.
+        timing, or the market. Decision Vitals records them, then weighs new
+        evidence against them as it arrives. Review a decision whenever
+        something changes and compare it to the last time you checked.
       </p>
       <div className="mt-6 flex flex-wrap items-center gap-3">
         <Link to="/new" className={btnPrimary}>
