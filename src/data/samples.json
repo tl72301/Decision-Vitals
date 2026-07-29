@@ -86,7 +86,7 @@
           "id": "sample-chat-a1",
           "text": "The new chat platform will have reliability that meets or exceeds the team's current needs",
           "loadBearing": true,
-          "vulnerable": true,
+          "vulnerable": false,
           "tier": "load_bearing",
           "signpost": "Platform experiences outages, message delivery failures, or sustained uptime below 99% during first month of production use"
         },
@@ -94,23 +94,23 @@
           "id": "sample-chat-a2",
           "text": "All important data and conversation history can be successfully migrated from the current tool without loss",
           "loadBearing": true,
-          "vulnerable": true,
+          "vulnerable": false,
           "tier": "load_bearing",
           "signpost": "Post-migration audit reveals missing conversation threads, corrupted message content, attachment failures, or metadata loss; users report inability to locate previously accessible conversations"
         },
         {
           "id": "sample-chat-a3",
           "text": "The team can adopt and productively use the new platform within this quarter",
-          "loadBearing": true,
+          "loadBearing": false,
           "vulnerable": true,
-          "tier": "load_bearing",
+          "tier": "vulnerable",
           "signpost": "After 4+ weeks on new platform, team members revert to old platform for critical communications, error rates increase, communication latency rises, or user satisfaction surveys show sustained dissatisfaction"
         },
         {
           "id": "sample-chat-a4",
           "text": "The new platform integrates adequately with other critical tools the team currently depends on",
           "loadBearing": true,
-          "vulnerable": true,
+          "vulnerable": false,
           "tier": "load_bearing",
           "signpost": "Integrations with critical tools (project management, CRM, ticketing, monitoring) fail to sync data reliably; manual workarounds become necessary; integration latency or data loss between systems is observed"
         },
@@ -118,7 +118,7 @@
           "id": "sample-chat-a5",
           "text": "The contract renewal timeline provides sufficient runway to complete migration and stabilization",
           "loadBearing": true,
-          "vulnerable": true,
+          "vulnerable": false,
           "tier": "load_bearing",
           "signpost": "Migration milestones slip; planned stabilization period compresses before renewal deadline; escalations occur citing time pressure; team discusses rollback contingencies within 4 weeks of renewal"
         }
@@ -167,7 +167,7 @@
           "id": "sample-3pl-a1",
           "text": "The 3PL can match our in-house shipping speed and accuracy closely enough that customers don't notice.",
           "loadBearing": true,
-          "vulnerable": true,
+          "vulnerable": false,
           "tier": "load_bearing",
           "signpost": "Pilot same-day-ship rate or mispick rate diverging from in-house baselines; shipping complaints rising."
         },
@@ -175,7 +175,7 @@
           "id": "sample-3pl-a2",
           "text": "The quoted 18 percent cost savings will hold at our actual volumes and SKU count.",
           "loadBearing": true,
-          "vulnerable": true,
+          "vulnerable": false,
           "tier": "load_bearing",
           "signpost": "Pricing-tier triggers in the contract, such as SKU count or volume thresholds, coming into play."
         },
