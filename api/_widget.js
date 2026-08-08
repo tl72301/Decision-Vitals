@@ -17,16 +17,24 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 
 const BRIDGE_PLACEHOLDER = "/*__MCP_APP_BRIDGE__*/";
 
-let cached = null;
+const cache = new Map();
 
-/** The widget HTML with the MCP Apps bridge inlined, exposed as window.__MCP_APP__. */
+/** The Assumption Matrix, with the MCP Apps bridge inlined. */
 export function assumptionMatrixHtml() {
-  if (cached) return cached;
+  return widgetHtml("assumption-matrix.html");
+}
 
-  const template = readFileSync(
-    join(HERE, "..", "src", "widgets", "assumption-matrix.html"),
-    "utf8"
-  );
+/** The Pipeline Progress Board, with the MCP Apps bridge inlined. */
+export function progressBoardHtml() {
+  return widgetHtml("progress-board.html");
+}
+
+/** Read a widget template and inline the bridge. Cached per function instance. */
+function widgetHtml(file) {
+  const hit = cache.get(file);
+  if (hit) return hit;
+
+  const template = readFileSync(join(HERE, "..", "src", "widgets", file), "utf8");
   const bridgeSrc = readFileSync(
     require.resolve("@modelcontextprotocol/ext-apps/app-with-deps"),
     "utf8"
@@ -43,8 +51,9 @@ export function assumptionMatrixHtml() {
   // Replacer function, not a string: a minified bundle contains `$&` and `$'`
   // sequences, which String.replace would interpret as pattern references and
   // splice parts of the template back into the script.
-  cached = template.replace(BRIDGE_PLACEHOLDER, () => inlined);
-  return cached;
+  const html = template.replace(BRIDGE_PLACEHOLDER, () => inlined);
+  cache.set(file, html);
+  return html;
 }
 
 /**

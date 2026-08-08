@@ -11,6 +11,8 @@
 //   open_assumptions    - render the Assumption Matrix widget for a decision
 //   correct_assumptions - apply human corrections, then re-run the review
 //   start_review        - run the review as a task, polled for per-stage progress
+//   watch_review        - start a review and render the live Progress Board
+//   review_progress     - current per-stage progress for a running review
 //
 // The last two are the human-in-the-loop path: a person changes how an
 // assumption is classified and every downstream stage re-runs against the
@@ -34,7 +36,7 @@ import {
   writeDecisionState,
   applyCorrection,
 } from "./_state.js";
-import { assumptionMatrixHtml } from "./_widget.js";
+import { assumptionMatrixHtml, progressBoardHtml } from "./_widget.js";
 import {
   RedisTaskStore,
   readTaskRecord,
@@ -43,6 +45,7 @@ import {
 import { STAGES, STAGE_LABEL } from "./_review-core.js";
 
 const MATRIX_URI = "ui://decision-vitals/assumption-matrix";
+const BOARD_URI = "ui://decision-vitals/progress-board";
 
 const SOURCE_TYPES = [
   "meeting_notes",
@@ -336,6 +339,119 @@ function buildServer() {
     }
   );
 
+  // ---- Progress Board --------------------------------------------------
+  //
+  // Read-only. It answers "what is happening right now" during a multi-minute
+  // run, which is the gap a task id alone leaves. Progress comes from the task
+  // record, so the board reports what actually ran rather than a simulation.
+  registerAppResource(
+    server,
+    "progress-board",
+    BOARD_URI,
+    {
+      title: "Review progress",
+      description: "Live per-stage progress for a decision review.",
+    },
+    async (uri) => ({
+      contents: [
+        { uri: uri.href, mimeType: "text/html;profile=mcp-app", text: progressBoardHtml() },
+      ],
+    })
+  );
+
+  registerAppTool(
+    server,
+    "watch_review",
+    {
+      title: "Review a decision and watch progress",
+      description:
+        "Start a review of a decision and show its progress stage by stage as it runs.",
+      inputSchema: { decisionId: z.string().describe("Decision id") },
+      _meta: { ui: { resourceUri: BOARD_URI } },
+    },
+    async ({ decisionId }) => {
+      const state = await readDecisionState(decisionId);
+      if (!state) {
+        return {
+          content: [{ type: "text", text: `No decision "${decisionId}".` }],
+          isError: true,
+        };
+      }
+      const store = new RedisTaskStore();
+      const task = await store.createTask({ ttl: 30 * 60 * 1000 });
+      const record = await readTaskRecord(task.taskId);
+      await writeTaskRecord(task.taskId, {
+        ...record,
+        pipeline: { decisionId, outputs: {}, timings: {} },
+      });
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Reviewing "${state.decision.title}". ${STAGES.length} stages; progress updates as each finishes.`,
+          },
+        ],
+        structuredContent: {
+          taskId: task.taskId,
+          decisionId,
+          decisionTitle: state.decision.title,
+          taskStatus: "working",
+          statusMessage: "Starting",
+          stages: progressRows({ outputs: {}, timings: {} }, "working"),
+        },
+      };
+    }
+  );
+
+  registerAppTool(
+    server,
+    "review_progress",
+    {
+      title: "Review progress",
+      description:
+        "Current per-stage progress for a running review. Advances the run by one stage.",
+      inputSchema: { taskId: z.string().describe("Task id from watch_review") },
+      _meta: { ui: { resourceUri: BOARD_URI } },
+    },
+    async ({ taskId }) => {
+      let record = await readTaskRecord(taskId);
+      if (!record) {
+        return {
+          content: [{ type: "text", text: `No review task "${taskId}".` }],
+          isError: true,
+        };
+      }
+      if (record.task.status === "working") {
+        record = (await advanceReviewTask(record)) ?? record;
+      }
+
+      const pipeline = record.pipeline ?? {};
+      const status = record.task.status;
+      const report = pipeline.report ?? null;
+
+      return {
+        content: [
+          { type: "text", text: record.task.statusMessage ?? status },
+        ],
+        structuredContent: {
+          taskId,
+          taskStatus: status,
+          statusMessage: record.task.statusMessage ?? "",
+          stages: progressRows(pipeline, status),
+          report: report
+            ? {
+                runNumber: report.runNumber,
+                healthGrade: report.healthGrade,
+                summary: report.summary,
+              }
+            : null,
+          error: status === "failed" ? record.task.statusMessage : null,
+        },
+      };
+    }
+  );
+
   // ---- The review as a task -------------------------------------------
   //
   // A full run is four agent sessions and takes minutes, so it returns a task
@@ -378,6 +494,38 @@ function buildServer() {
 }
 
 /**
+ * Per-stage rows for the Progress Board, derived from what the task actually
+ * recorded. A stage is "done" when its output exists, "running" when it is the
+ * next one and the task is still working, "failed" when the task failed on it.
+ */
+function progressRows(pipeline, taskStatus) {
+  const outputs = pipeline?.outputs ?? {};
+  const timings = pipeline?.timings ?? {};
+  const nextStage = STAGES.find((s) => !(s in outputs));
+  return STAGES.map((agent) => {
+    let status = "pending";
+    if (agent in outputs) status = "done";
+    else if (agent === nextStage) {
+      status = taskStatus === "failed" ? "failed" : taskStatus === "working" ? "running" : "pending";
+    }
+    return {
+      agent,
+      name: STAGE_NAME[agent] ?? agent,
+      what: STAGE_LABEL[agent] ?? "",
+      status,
+      elapsedMs: timings[agent] ?? null,
+    };
+  });
+}
+
+const STAGE_NAME = {
+  evidence_review: "Evidence Review",
+  challenge: "Challenge",
+  risk_ranking: "Risk Ranking",
+  reporter: "Reporter",
+};
+
+/**
  * Advance a review task by one stage. Called from the task store on every poll,
  * because on serverless a poll is the only moment work can happen.
  *
@@ -389,8 +537,11 @@ async function advanceReviewTask(record) {
   const pipeline = record.pipeline;
   if (!pipeline?.decisionId) return record;
 
+  const startedAt = Date.now();
   try {
     const step = await advanceReview(pipeline.decisionId, pipeline);
+    const timings = { ...(pipeline.timings ?? {}) };
+    if (step.stage) timings[step.stage] = Date.now() - startedAt;
 
     if (step.done) {
       const next = {
@@ -411,6 +562,7 @@ async function advanceReviewTask(record) {
           ],
           structuredContent: { decisionId: pipeline.decisionId, report: step.report },
         },
+        pipeline: { ...pipeline, timings, report: step.report },
       };
       return writeTaskRecord(record.task.taskId, next);
     }
@@ -423,7 +575,7 @@ async function advanceReviewTask(record) {
         status: "working",
         statusMessage: `${STAGE_LABEL[step.stage] ?? step.stage} (${doneCount} of ${STAGES.length} stages)`,
       },
-      pipeline: { ...pipeline, outputs: step.outputs },
+      pipeline: { ...pipeline, outputs: step.outputs, timings },
     });
   } catch (e) {
     const stage = STAGES.find((x) => !(x in (pipeline.outputs ?? {}))) ?? "unknown";
