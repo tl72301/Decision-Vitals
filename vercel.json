@@ -1,3 +1,6 @@
 {
-  "rewrites": [{ "source": "/((?!api/|\\.well-known/).*)", "destination": "/" }]
+  "rewrites": [
+    { "source": "/.well-known/(.*)", "destination": "/api/no-oauth" },
+    { "source": "/((?!api/|\\.well-known/).*)", "destination": "/" }
+  ]
 }
