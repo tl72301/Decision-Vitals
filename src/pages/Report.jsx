@@ -60,14 +60,14 @@ function Receipt({ receipt }) {
 // Recommended actions as scannable tasks: the action first, then which
 // assumption it protects. Owner and timing appear only if the review named
 // them inside the action text; nothing is invented.
-function ActionList({ actions, byId, indexById }) {
+function ActionList({ actions, byId, indexById, judgedById }) {
   if (actions.length === 0) {
     return <p className="mt-2 py-2 text-sm text-fg-3">None recommended.</p>;
   }
   return (
     <ul className="mt-2 divide-y divide-line border-y border-line">
       {actions.map((a, i) => {
-        const target = byId.get(a.assumptionId);
+        const target = judgedById?.get(a.assumptionId) ?? byId.get(a.assumptionId);
         return (
           <li key={i} className="py-3">
             <p className="max-w-prose text-[15px] leading-relaxed text-fg-1">
@@ -90,7 +90,15 @@ function ActionList({ actions, byId, indexById }) {
 
 function FindingRow({ finding, assumption, index }) {
   const status = statusMeta(finding.status);
-  const tier = assumption ? tierMeta(assumption.tier) : null;
+  // Prefer the snapshot taken when this review ran. Older reports predate the
+  // snapshot and fall back to the live assumption.
+  const judgedText = finding.assumptionText ?? assumption?.text;
+  const judgedTier = finding.assumptionTier ?? assumption?.tier;
+  const tier = judgedTier ? tierMeta(judgedTier) : null;
+  const revisedSince =
+    finding.assumptionRevision != null &&
+    assumption?.revision != null &&
+    assumption.revision > finding.assumptionRevision;
   return (
     <li className="py-5">
       <div className="flex flex-wrap items-center gap-2">
@@ -112,8 +120,13 @@ function FindingRow({ finding, assumption, index }) {
           )}
       </div>
       <p className="mt-2 text-[15px] font-medium leading-relaxed text-fg-1">
-        {assumption ? assumption.text : "(assumption removed)"}
+        {judgedText ?? "(assumption removed)"}
       </p>
+      {revisedSince && (
+        <p className="mt-1 font-mono text-xs text-fg-3">
+          Corrected since this review. Re-review to reassess.
+        </p>
+      )}
       {finding.rationale && (
         <p className="mt-1 max-w-prose text-[15px] leading-relaxed text-fg-2">
           {finding.rationale}
@@ -143,6 +156,13 @@ export default function Report() {
   const assumptions = assumptionsByDecision(id);
   const byId = new Map(assumptions.map((a) => [a.id, a]));
   const indexById = new Map(assumptions.map((a, i) => [a.id, i]));
+  // Assumptions as this review judged them, for reports new enough to carry the
+  // snapshot. Keeps a report readable even after its assumptions are corrected.
+  const judgedById = new Map(
+    report.findings
+      .filter((f) => f.assumptionText != null)
+      .map((f) => [f.assumptionId, { text: f.assumptionText, tier: f.assumptionTier }])
+  );
 
   const shaping = report.actions.filter((a) => a.type === "shaping");
   const hedging = report.actions.filter((a) => a.type === "hedging");
@@ -253,7 +273,7 @@ export default function Report() {
                     </li>
                   )}
                   {moved.map((f, i) => {
-                    const a = byId.get(f.assumptionId);
+                    const a = judgedById.get(f.assumptionId) ?? byId.get(f.assumptionId);
                     const prev = statusMeta(f.previousStatus);
                     const now = statusMeta(f.status);
                     return (
@@ -349,7 +369,7 @@ export default function Report() {
                   (make the assumption more likely to hold)
                 </span>
               </h3>
-              <ActionList actions={shaping} byId={byId} indexById={indexById} />
+              <ActionList actions={shaping} byId={byId} indexById={indexById} judgedById={judgedById} />
             </div>
             <div>
               <h3 className="text-sm font-semibold text-fg-1">
@@ -358,7 +378,7 @@ export default function Report() {
                   (in case it turns out wrong)
                 </span>
               </h3>
-              <ActionList actions={hedging} byId={byId} indexById={indexById} />
+              <ActionList actions={hedging} byId={byId} indexById={indexById} judgedById={judgedById} />
             </div>
           </div>
         </section>
