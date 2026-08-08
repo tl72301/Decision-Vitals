@@ -8,6 +8,12 @@
 //   list_decisions  - the decisions currently registered, with health grades
 //   get_decision    - one decision's assumptions, importance, and status
 //   add_evidence    - file a new piece of evidence against a decision
+//   open_assumptions    - render the Assumption Matrix widget for a decision
+//   correct_assumptions - apply human corrections, then re-run the review
+//
+// The last two are the human-in-the-loop path: a person changes how an
+// assumption is classified and every downstream stage re-runs against the
+// correction.
 //
 // The web app (in Live Mode) syncs its decisions up and pulls filed evidence
 // down via /api/sync, so agents and the browser stay consistent without the
@@ -15,9 +21,21 @@
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
+import {
+  registerAppResource,
+  registerAppTool,
+} from "@modelcontextprotocol/ext-apps/server";
 import { z } from "zod";
 import { randomUUID } from "node:crypto";
 import { kvConfigured, kvGetJson, kvSetJson, KEYS } from "./_kv.js";
+import {
+  readDecisionState,
+  writeDecisionState,
+  applyCorrection,
+} from "./_state.js";
+import { assumptionMatrixHtml } from "./_widget.js";
+
+const MATRIX_URI = "ui://decision-vitals/assumption-matrix";
 
 const SOURCE_TYPES = [
   "meeting_notes",
@@ -161,7 +179,153 @@ function buildServer() {
     }
   );
 
+  // ---- MCP Apps: the human-in-the-loop surface -------------------------
+  //
+  // The widget is a predeclared template the host can review before rendering.
+  // It carries no data: the tool result supplies the decision, and the widget
+  // reads current state from /api/decision-state, which is server-owned and
+  // never depends on a browser tab having synced recently.
+  registerAppResource(
+    server,
+    "assumption-matrix",
+    MATRIX_URI,
+    {
+      title: "Assumption Matrix",
+      description:
+        "Review and correct the assumptions behind a decision, then re-run the review.",
+    },
+    async (uri) => ({
+      contents: [
+        {
+          uri: uri.href,
+          mimeType: "text/html;profile=mcp-app",
+          text: assumptionMatrixHtml(),
+        },
+      ],
+    })
+  );
+
+  registerAppTool(
+    server,
+    "open_assumptions",
+    {
+      title: "Open assumptions",
+      description:
+        "Show the assumptions behind a decision so they can be reviewed and corrected.",
+      inputSchema: { decisionId: z.string().describe("Decision id") },
+      _meta: { ui: { resourceUri: MATRIX_URI } },
+    },
+    async ({ decisionId }) => {
+      const state = await readDecisionState(decisionId);
+      if (!state) {
+        return {
+          content: [{ type: "text", text: `No decision "${decisionId}".` }],
+          isError: true,
+        };
+      }
+      return {
+        content: [
+          {
+            type: "text",
+            text:
+              `Showing ${state.assumptions.length} assumptions for "${state.decision.title}". ` +
+              `Change how one is classified and the review re-runs against the correction.`,
+          },
+        ],
+        structuredContent: { decisionId, state },
+      };
+    }
+  );
+
+  registerAppTool(
+    server,
+    "correct_assumptions",
+    {
+      title: "Correct assumptions",
+      description:
+        "Apply human corrections to a decision's assumptions and re-run the review against them.",
+      inputSchema: {
+        decisionId: z.string(),
+        corrections: z
+          .array(
+            z.object({
+              assumptionId: z.string(),
+              text: z.string().optional(),
+              tier: z.enum(["load_bearing", "vulnerable", "lower_risk"]).optional(),
+              signpost: z.string().optional(),
+              outOfScope: z.boolean().optional(),
+            })
+          )
+          .min(1),
+        rerun: z.boolean().optional(),
+      },
+      _meta: { ui: { resourceUri: MATRIX_URI } },
+    },
+    async ({ decisionId, corrections, rerun }) => {
+      let state = await readDecisionState(decisionId);
+      if (!state) {
+        return {
+          content: [{ type: "text", text: `No decision "${decisionId}".` }],
+          isError: true,
+        };
+      }
+
+      const applied = [];
+      for (const c of corrections) {
+        const { state: next, before, after } = applyCorrection(state, c.assumptionId, c);
+        state = next;
+        applied.push({ id: c.assumptionId, before, after });
+      }
+      state = await writeDecisionState(decisionId, state);
+
+      let report = null;
+      let rerunError = null;
+      if (rerun !== false) {
+        try {
+          report = await rerunReview(decisionId);
+          const fresh = await readDecisionState(decisionId);
+          if (fresh) state = fresh;
+        } catch (e) {
+          rerunError = String(e?.message || e);
+        }
+      }
+
+      const lines = applied.map((a) => {
+        const bits = [];
+        if (a.before.tier !== a.after.tier) {
+          bits.push(`importance ${(TIER_LABEL[a.before.tier] ?? a.before.tier)} -> ${(TIER_LABEL[a.after.tier] ?? a.after.tier)}`);
+        }
+        if (a.before.text !== a.after.text) bits.push("reworded");
+        if (!a.before.outOfScope && a.after.outOfScope) bits.push("marked out of scope");
+        if (a.before.outOfScope && !a.after.outOfScope) bits.push("brought back into scope");
+        return `- ${a.after.text}: ${bits.join(", ") || "updated"}`;
+      });
+
+      const summary = report
+        ? `Re-reviewed against the corrections. Overall health: ${report.healthGrade}.`
+        : rerunError
+          ? `Corrections saved, but the re-review failed: ${rerunError}`
+          : "Corrections saved.";
+
+      return {
+        content: [
+          { type: "text", text: `${lines.join("\n")}\n\n${summary}` },
+        ],
+        structuredContent: { decisionId, state, report },
+      };
+    }
+  );
+
   return server;
+}
+
+/**
+ * Re-run the review server-side after a correction. Imported lazily so the
+ * connector's read-only tools do not pull the agent runner into every request.
+ */
+async function rerunReview(decisionId) {
+  const { runReviewForDecision } = await import("./_review-core.js");
+  return runReviewForDecision(decisionId);
 }
 
 export default async function handler(req, res) {
