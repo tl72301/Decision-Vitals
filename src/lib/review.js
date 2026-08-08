@@ -73,10 +73,14 @@ export function buildAndSaveReport(decisionId, run, outputs) {
   const rr = outputs.risk_ranking ?? {};
   const rep = outputs.reporter ?? {};
 
-  // 0. Snapshot the pre-review state so the report can show what moved.
-  const priorStatus = new Map(
-    assumptionsByDecision(decisionId).map((a) => [a.id, a.status])
-  );
+  // 0. Snapshot the pre-review state so the report can show what moved, and
+  // capture each assumption AS JUDGED. Reports render from this snapshot rather
+  // than from the live store, so correcting an assumption later cannot
+  // retroactively rewrite what an earlier report appears to have judged. That
+  // decoupling is what allows assumptions to stay correctable after review.
+  const judged = assumptionsByDecision(decisionId);
+  const priorStatus = new Map(judged.map((a) => [a.id, a.status]));
+  const asJudged = new Map(judged.map((a) => [a.id, a]));
   const previousHealthGrade = getDecision(decisionId)?.healthGrade ?? null;
 
   // 1. Statuses from Risk Ranking; fall back to Reporter findings if absent.
@@ -104,10 +108,16 @@ export function buildAndSaveReport(decisionId, run, outputs) {
   // 3. Persist the Report, numbered by its run. Each finding carries the
   // status the assumption had before this review, so reports can show
   // Holding -> Weakened style movement.
-  const findings = normalizeFindings(rep.findings).map((f) => ({
-    ...f,
-    previousStatus: priorStatus.get(f.assumptionId) ?? "untested",
-  }));
+  const findings = normalizeFindings(rep.findings).map((f) => {
+    const a = asJudged.get(f.assumptionId);
+    return {
+      ...f,
+      previousStatus: priorStatus.get(f.assumptionId) ?? "untested",
+      assumptionText: a?.text ?? "",
+      assumptionTier: a?.tier ?? "lower_risk",
+      assumptionRevision: a?.revision ?? 1,
+    };
+  });
   return createReport({
     decisionId,
     runId: run.id,
