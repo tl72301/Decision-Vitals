@@ -10,6 +10,7 @@
 //   add_evidence    - file a new piece of evidence against a decision
 //   open_assumptions    - render the Assumption Matrix widget for a decision
 //   correct_assumptions - apply human corrections, then re-run the review
+//   start_review        - run the review as a task, polled for per-stage progress
 //
 // The last two are the human-in-the-loop path: a person changes how an
 // assumption is classified and every downstream stage re-runs against the
@@ -34,6 +35,12 @@ import {
   applyCorrection,
 } from "./_state.js";
 import { assumptionMatrixHtml } from "./_widget.js";
+import {
+  RedisTaskStore,
+  readTaskRecord,
+  writeTaskRecord,
+} from "./_task-store.js";
+import { STAGES, STAGE_LABEL } from "./_review-core.js";
 
 const MATRIX_URI = "ui://decision-vitals/assumption-matrix";
 
@@ -80,7 +87,20 @@ async function getIndex() {
 }
 
 function buildServer() {
-  const server = new McpServer({ name: "decision-vitals", version: "1.0.0" });
+  const server = new McpServer(
+    { name: "decision-vitals", version: "1.0.0" },
+    {
+      // Task state lives in Redis, not memory: every request here is a fresh
+      // serverless instance. The onPoll tick is what advances a review, since
+      // nothing runs between requests.
+      taskStore: new RedisTaskStore({ onPoll: advanceReviewTask }),
+      capabilities: {
+        // Declares that tools/call may create a task. Without this the SDK
+        // refuses task creation before a handler is ever reached.
+        tasks: { requests: { tools: { call: true } } },
+      },
+    }
+  );
 
   server.registerTool(
     "list_decisions",
@@ -316,7 +336,115 @@ function buildServer() {
     }
   );
 
+  // ---- The review as a task -------------------------------------------
+  //
+  // A full run is four agent sessions and takes minutes, so it returns a task
+  // id immediately rather than holding a request open. Each poll advances one
+  // stage (see _task-store.js for why that is the shape on serverless), so the
+  // caller sees real per-stage progress and can disconnect and reconnect
+  // without losing the run.
+  server.experimental.tasks.registerToolTask(
+    "start_review",
+    {
+      title: "Review a decision",
+      description:
+        "Weigh the evidence for and against each assumption and produce a dated decision-health report. Returns a task to poll.",
+      inputSchema: { decisionId: z.string().describe("Decision id") },
+      execution: { taskSupport: "required" },
+    },
+    {
+      createTask: async ({ decisionId }, extra) => {
+        const state = await readDecisionState(decisionId);
+        if (!state) throw new Error(`No decision "${decisionId}".`);
+
+        const task = await extra.taskStore.createTask({ ttl: 30 * 60 * 1000 });
+        const record = await readTaskRecord(task.taskId);
+        await writeTaskRecord(task.taskId, {
+          ...record,
+          task: {
+            ...record.task,
+            statusMessage: `Starting review of "${state.decision.title}" (0 of ${STAGES.length} stages)`,
+          },
+          pipeline: { decisionId, outputs: {} },
+        });
+        return { task };
+      },
+      getTask: async (_args, extra) => extra.taskStore.getTask(extra.taskId),
+      getTaskResult: async (_args, extra) => extra.taskStore.getTaskResult(extra.taskId),
+    }
+  );
+
   return server;
+}
+
+/**
+ * Advance a review task by one stage. Called from the task store on every poll,
+ * because on serverless a poll is the only moment work can happen.
+ *
+ * A failing stage marks the task failed with the stage that failed and why,
+ * rather than leaving a task that never resolves.
+ */
+async function advanceReviewTask(record) {
+  const { advanceReview } = await import("./_review-core.js");
+  const pipeline = record.pipeline;
+  if (!pipeline?.decisionId) return record;
+
+  try {
+    const step = await advanceReview(pipeline.decisionId, pipeline);
+
+    if (step.done) {
+      const next = {
+        ...record,
+        task: {
+          ...record.task,
+          status: "completed",
+          statusMessage: `Review complete. Overall health: ${step.report.healthGrade}.`,
+        },
+        result: {
+          content: [
+            {
+              type: "text",
+              text:
+                `Review #${step.report.runNumber} complete. ` +
+                `Overall health: ${step.report.healthGrade}.\n\n${step.report.summary}`,
+            },
+          ],
+          structuredContent: { decisionId: pipeline.decisionId, report: step.report },
+        },
+      };
+      return writeTaskRecord(record.task.taskId, next);
+    }
+
+    const doneCount = Object.keys(step.outputs).length;
+    return writeTaskRecord(record.task.taskId, {
+      ...record,
+      task: {
+        ...record.task,
+        status: "working",
+        statusMessage: `${STAGE_LABEL[step.stage] ?? step.stage} (${doneCount} of ${STAGES.length} stages)`,
+      },
+      pipeline: { ...pipeline, outputs: step.outputs },
+    });
+  } catch (e) {
+    const stage = STAGES.find((x) => !(x in (pipeline.outputs ?? {}))) ?? "unknown";
+    return writeTaskRecord(record.task.taskId, {
+      ...record,
+      task: {
+        ...record.task,
+        status: "failed",
+        statusMessage: `${STAGE_LABEL[stage] ?? stage} failed: ${String(e?.message || e)}`,
+      },
+      result: {
+        content: [
+          {
+            type: "text",
+            text: `The review stopped at "${STAGE_LABEL[stage] ?? stage}": ${String(e?.message || e)}`,
+          },
+        ],
+        isError: true,
+      },
+    });
+  }
 }
 
 /**
