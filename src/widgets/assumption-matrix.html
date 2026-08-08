@@ -1,0 +1,332 @@
+<div id="root">
+  <p class="loading">Loading assumptions…</p>
+</div>
+
+<style>
+  /* Surface and text come from the host so the widget sits correctly in a
+     light or dark conversation. Only the identity survives a theme change:
+     brass as the single accent, mono for data values, hairline rules, and a
+     status that always pairs a dot with its label. No gradients, no cards,
+     no decorative icons. */
+  :root {
+    /* Let system colours follow whichever scheme the host conversation uses,
+       so Field/FieldText/CanvasText adapt without us guessing. */
+    color-scheme: light dark;
+
+    --brass: #d9ac55;
+    --ok: #5fc98b;
+    --warn: #e39a55;
+    --bad: #e5654e;
+    --review: #b29dea;
+    --fg: var(--mcp-ui-color-text, CanvasText);
+    /* Secondary tones mix from currentColor, not from --fg, so they stay
+       correct even if the host supplies a text colour we never see: they are
+       always derived from the colour actually inherited at the element. */
+    --fg-dim: color-mix(in srgb, currentColor 78%, transparent);
+    --fg-faint: color-mix(in srgb, currentColor 60%, transparent);
+    --rule: color-mix(in srgb, currentColor 22%, transparent);
+    --rule-strong: color-mix(in srgb, currentColor 42%, transparent);
+    --sans: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: transparent;
+    color: var(--fg);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  .loading, .empty { color: var(--fg-dim); font-size: 14px; margin: 0; padding: 8px 0; }
+
+  header { padding-bottom: 12px; border-bottom: 1px solid var(--rule); }
+  h1 { font-size: 15px; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
+  .sub { margin: 4px 0 0; font-size: 13px; color: var(--fg-dim); }
+  .meta { font-family: var(--mono); font-size: 12px; color: var(--fg-faint); }
+
+  ol { list-style: none; margin: 0; padding: 0; }
+  li.row { padding: 14px 0; border-bottom: 1px solid var(--rule); }
+
+  .tags { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .ref { font-family: var(--mono); font-size: 12px; color: var(--fg-faint); }
+
+  .tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 1px 7px; border-radius: 3px; font-size: 12px; font-weight: 500;
+    border: 1px solid var(--rule-strong);
+  }
+  .tag.critical { background: var(--brass); border-color: var(--brass); color: #0c111f; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; flex: none; }
+  .dot.untested { background: var(--fg-faint); }
+  .dot.holding { background: var(--ok); }
+  .dot.weakened { background: var(--warn); }
+  .dot.invalidated { background: var(--bad); }
+  .dot.needs_review { background: var(--review); }
+
+  .text { margin: 8px 0 0; }
+  li.scoped-out .text { text-decoration: line-through; opacity: 0.55; }
+  .signal { margin: 6px 0 0; font-size: 13px; color: var(--fg-dim); }
+
+  .controls {
+    display: flex; flex-wrap: wrap; gap: 8px 14px;
+    margin-top: 10px; align-items: center; justify-content: flex-start;
+  }
+  label.field { font-size: 12px; color: var(--fg-dim); display: inline-flex; align-items: center; gap: 6px; }
+
+  select, textarea {
+    font: inherit; font-size: 13px;
+    color: FieldText; background: Field;
+    border: 1px solid var(--rule-strong);
+    border-radius: 4px; padding: 5px 7px;
+  }
+  textarea { width: 100%; font-size: 14px; margin-top: 8px; resize: vertical; }
+  select:focus-visible, textarea:focus-visible, button:focus-visible {
+    outline: 2px solid #f2c14e; outline-offset: 2px;
+  }
+
+  button {
+    font: inherit; font-size: 13px; font-weight: 600;
+    border-radius: 4px; padding: 7px 12px; cursor: pointer;
+    border: 1px solid var(--rule-strong); background: transparent; color: var(--fg);
+    min-height: 34px;
+  }
+  button.primary { background: var(--brass); border-color: var(--brass); color: #0c111f; }
+  button:disabled { opacity: 0.45; cursor: not-allowed; }
+  button.link {
+    border: none; padding: 4px 0; font-weight: 500; font-size: 12px;
+    color: var(--fg-dim); text-decoration: underline; text-underline-offset: 3px;
+    min-height: 0;
+  }
+
+  footer { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; padding-top: 14px; }
+  .status { font-size: 13px; color: var(--fg-dim); }
+  .changed { font-family: var(--mono); font-size: 12px; color: var(--brass); }
+
+  @media (max-width: 420px) {
+    label.field { width: 100%; }
+    select { flex: 1; min-width: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<script type="module">
+/*__MCP_APP_BRIDGE__*/
+
+const TIERS = [
+  ["load_bearing", "Critical"],
+  ["vulnerable", "Supporting"],
+  ["lower_risk", "Minor"],
+];
+const STATUS_LABEL = {
+  untested: "Unreviewed",
+  holding: "Holding",
+  weakened: "Weakened",
+  invalidated: "Invalidated",
+  needs_review: "Needs review",
+};
+
+const root = document.getElementById("root");
+const esc = (s) =>
+  String(s ?? "").replace(/[&<>"']/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])
+  );
+
+let app = null;
+let decisionId = null;
+let state = null;
+const pending = new Map(); // assumptionId -> patch
+
+function render() {
+  if (!state) {
+    root.innerHTML = `<p class="empty">No decision loaded. Ask Claude to open a decision's assumptions.</p>`;
+    return;
+  }
+  const list = state.assumptions ?? [];
+  const dirty = pending.size > 0;
+
+  root.innerHTML = `
+    <header>
+      <h1>${esc(state.decision?.title ?? "Assumptions")}</h1>
+      <p class="sub">${esc(state.decision?.statement ?? "")}</p>
+      <p class="meta">${list.length} assumption${list.length === 1 ? "" : "s"} · ${
+        (state.evidence ?? []).length
+      } evidence</p>
+    </header>
+    <ol>
+      ${list
+        .map((a, i) => {
+          const p = pending.get(a.id) ?? {};
+          const tier = p.tier ?? a.tier;
+          const outOfScope = p.outOfScope ?? !!a.outOfScope;
+          const status = a.status ?? "untested";
+          const changed = Object.keys(p).length > 0;
+          return `
+        <li class="row${outOfScope ? " scoped-out" : ""}" data-id="${esc(a.id)}">
+          <div class="tags">
+            <span class="ref">A${i + 1}</span>
+            <span class="tag${tier === "load_bearing" ? " critical" : ""}">${
+              TIERS.find(([v]) => v === tier)?.[1] ?? tier
+            }</span>
+            <span class="tag"><span class="dot ${esc(status)}"></span>${
+              STATUS_LABEL[status] ?? status
+            }</span>
+            ${(a.revision ?? 1) > 1 ? `<span class="ref">rev ${a.revision}</span>` : ""}
+            ${changed ? `<span class="changed">edited</span>` : ""}
+          </div>
+          <p class="text">${esc(p.text ?? a.text)}</p>
+          ${a.signpost ? `<p class="signal"><strong>Warning signal:</strong> ${esc(a.signpost)}</p>` : ""}
+          <div class="controls">
+            <label class="field">Importance
+              <select data-act="tier" data-id="${esc(a.id)}">
+                ${TIERS.map(
+                  ([v, l]) =>
+                    `<option value="${v}"${v === tier ? " selected" : ""}>${l}</option>`
+                ).join("")}
+              </select>
+            </label>
+            <button class="link" data-act="reword" data-id="${esc(a.id)}">Reword</button>
+            <button class="link" data-act="scope" data-id="${esc(a.id)}">${
+              outOfScope ? "Bring back into scope" : "Mark out of scope"
+            }</button>
+          </div>
+        </li>`;
+        })
+        .join("")}
+    </ol>
+    <footer>
+      <button class="primary" data-act="submit" ${dirty ? "" : "disabled"}>
+        ${dirty ? `Apply ${pending.size} correction${pending.size === 1 ? "" : "s"} and re-review` : "No corrections yet"}
+      </button>
+      ${dirty ? `<button data-act="discard">Discard</button>` : ""}
+      <span class="status" id="status"></span>
+    </footer>`;
+}
+
+function setStatus(msg) {
+  const el = document.getElementById("status");
+  if (el) el.textContent = msg;
+}
+
+function patch(id, key, value) {
+  const cur = pending.get(id) ?? {};
+  const original = state.assumptions.find((a) => a.id === id) ?? {};
+  const next = { ...cur, [key]: value };
+  // Drop keys that match the stored value again, so "edited" stays honest.
+  for (const k of Object.keys(next)) {
+    const base = k === "outOfScope" ? !!original.outOfScope : original[k];
+    if (next[k] === base) delete next[k];
+  }
+  if (Object.keys(next).length === 0) pending.delete(id);
+  else pending.set(id, next);
+  render();
+}
+
+root.addEventListener("change", (e) => {
+  const el = e.target.closest("[data-act='tier']");
+  if (el) patch(el.dataset.id, "tier", el.value);
+});
+
+root.addEventListener("click", async (e) => {
+  const el = e.target.closest("[data-act]");
+  if (!el) return;
+  const act = el.dataset.act;
+
+  if (act === "reword") {
+    const a = state.assumptions.find((x) => x.id === el.dataset.id);
+    const cur = pending.get(el.dataset.id)?.text ?? a.text;
+    const next = window.prompt("Reword this assumption:", cur);
+    if (next != null && next.trim()) patch(el.dataset.id, "text", next.trim());
+    return;
+  }
+  if (act === "scope") {
+    const a = state.assumptions.find((x) => x.id === el.dataset.id);
+    const cur = pending.get(el.dataset.id)?.outOfScope ?? !!a.outOfScope;
+    patch(el.dataset.id, "outOfScope", !cur);
+    return;
+  }
+  if (act === "discard") {
+    pending.clear();
+    render();
+    return;
+  }
+  if (act === "submit") {
+    el.disabled = true;
+    setStatus("Applying corrections and re-running the review…");
+    try {
+      const corrections = [...pending.entries()].map(([assumptionId, p]) => ({
+        assumptionId,
+        ...p,
+      }));
+      const result = await app.callServerTool({
+        name: "correct_assumptions",
+        arguments: { decisionId, corrections, rerun: true },
+      });
+      const next = result?.structuredContent;
+      if (next?.state) {
+        state = next.state;
+        pending.clear();
+        render();
+        setStatus(
+          next.report
+            ? `Re-reviewed. Overall health: ${next.report.healthGrade}.`
+            : "Corrections saved."
+        );
+      } else {
+        setStatus("Corrections sent. Check the conversation for the result.");
+      }
+    } catch (err) {
+      setStatus(`Could not apply: ${err?.message ?? err}`);
+      el.disabled = false;
+    }
+  }
+});
+
+async function loadState(id) {
+  const res = await fetch(`/api/decision-state?id=${encodeURIComponent(id)}`);
+  const json = await res.json();
+  if (!json.ok) throw new Error(json.error ?? "Could not load the decision.");
+  return json.state;
+}
+
+async function boot() {
+  app = new window.__MCP_APP__.App(
+    { name: "decision-vitals-assumption-matrix", version: "1.0.0" },
+    { capabilities: {} }
+  );
+
+  // Take surface and text colour from the host so the widget reads correctly
+  // in whichever theme the conversation is using.
+  app.onhostcontextchanged = () => {
+    try {
+      window.__MCP_APP__.applyHostStyleVariables(app.getHostContext());
+      window.__MCP_APP__.applyDocumentTheme(app.getHostContext());
+    } catch {}
+  };
+
+  app.ontoolresult = async (notification) => {
+    const sc = notification?.params?.result?.structuredContent;
+    if (sc?.decisionId) {
+      decisionId = sc.decisionId;
+      state = sc.state ?? (await loadState(decisionId));
+      render();
+    }
+  };
+
+  await app.connect();
+  try {
+    window.__MCP_APP__.applyHostStyleVariables(app.getHostContext());
+    window.__MCP_APP__.applyDocumentTheme(app.getHostContext());
+  } catch {}
+
+  app.setupSizeChangedNotifications?.();
+  render();
+}
+
+boot().catch((err) => {
+  root.innerHTML = `<p class="empty">Could not start: ${esc(err?.message ?? err)}</p>`;
+});
+</script>
