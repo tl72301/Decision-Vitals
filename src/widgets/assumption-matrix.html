@@ -307,12 +307,30 @@ async function boot() {
     } catch {}
   };
 
-  app.ontoolresult = async (notification) => {
-    const sc = notification?.params?.result?.structuredContent;
+  // The handler receives the notification's params DIRECTLY, so the payload is
+  // params.structuredContent. Reading params.result.structuredContent silently
+  // yields undefined and the widget renders its empty state forever.
+  app.ontoolresult = async (params) => {
+    const sc = params?.structuredContent;
     if (sc?.decisionId) {
       decisionId = sc.decisionId;
       state = sc.state ?? (await loadState(decisionId));
       render();
+    }
+  };
+
+  // Fallback: the tool's arguments arrive separately and always carry the id,
+  // so the widget can still recover if the result notification is missed.
+  app.ontoolinput = async (params) => {
+    const id = params?.arguments?.decisionId;
+    if (id && !state) {
+      decisionId = id;
+      try {
+        state = await loadState(id);
+        render();
+      } catch {
+        /* the result notification is the primary path; stay on the empty state */
+      }
     }
   };
 

@@ -180,8 +180,9 @@ async function boot() {
   };
   app.onhostcontextchanged = applyTheme;
 
-  app.ontoolresult = (notification) => {
-    const sc = notification?.params?.result?.structuredContent;
+  // params, not params.result: see the note in the Assumption Matrix.
+  app.ontoolresult = (params) => {
+    const sc = params?.structuredContent;
     if (sc?.taskId) {
       taskId = sc.taskId;
       view = {
