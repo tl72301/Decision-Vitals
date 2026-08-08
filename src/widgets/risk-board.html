@@ -1,0 +1,369 @@
+<div id="root">
+  <p class="loading">Loading risk board…</p>
+</div>
+
+<style>
+  /* Same system as the Assumption Matrix and Progress Board: surface and text
+     from the host, brass as the only accent, mono for every number, hairline
+     rules, and a band never carried by colour alone. The bars are the one new
+     element, and they are plain rectangles sized by the score — no gradient,
+     no rounded flourish, nothing that implies precision the number does not
+     have. */
+  :root {
+    color-scheme: light dark;
+
+    --brass: #d9ac55;
+    --ok: #5fc98b;
+    --warn: #e39a55;
+    --bad: #e5654e;
+    --review: #b29dea;
+    --fg: var(--mcp-ui-color-text, CanvasText);
+    /* Derived from currentColor, not --fg, so these stay legible even when the
+       host supplies a text colour we never see. */
+    --fg-dim: color-mix(in srgb, currentColor 78%, transparent);
+    --fg-faint: color-mix(in srgb, currentColor 60%, transparent);
+    --rule: color-mix(in srgb, currentColor 22%, transparent);
+    --rule-strong: color-mix(in srgb, currentColor 42%, transparent);
+    --track: color-mix(in srgb, currentColor 12%, transparent);
+    --sans: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+
+  body {
+    margin: 0; background: transparent; color: var(--fg);
+    font-family: var(--sans); font-size: 15px; line-height: 1.5;
+  }
+
+  .loading, .empty { color: var(--fg-dim); font-size: 14px; margin: 0; padding: 8px 0; }
+
+  header { padding-bottom: 12px; border-bottom: 1px solid var(--rule); }
+  h1 { font-size: 15px; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
+  .lede { margin: 6px 0 0; font-size: 14px; color: var(--fg-dim); max-width: 62ch; }
+  .meta { margin: 4px 0 0; font-family: var(--mono); font-size: 12px; color: var(--fg-faint); }
+
+  ol { list-style: none; margin: 0; padding: 0; }
+  li.row { padding: 13px 0; border-bottom: 1px solid var(--rule); }
+
+  .top { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .ref { font-family: var(--mono); font-size: 12px; color: var(--fg-faint); }
+  .score { font-family: var(--mono); font-size: 13px; font-weight: 600; margin-left: auto; }
+
+  .tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 1px 7px; border-radius: 3px; font-size: 12px; font-weight: 500;
+    border: 1px solid var(--rule-strong);
+  }
+  .tag.high { background: var(--bad); border-color: var(--bad); color: #0c111f; }
+  .tag.elevated { background: var(--brass); border-color: var(--brass); color: #0c111f; }
+
+  .dot { width: 6px; height: 6px; border-radius: 50%; flex: none; }
+  .dot.untested { background: var(--fg-faint); }
+  .dot.holding { background: var(--ok); }
+  .dot.weakened { background: var(--warn); }
+  .dot.invalidated { background: var(--bad); }
+  .dot.needs_review { background: var(--review); }
+
+  .text { margin: 7px 0 0; }
+
+  /* The bar is a second reading of the number beside it, never the only one. */
+  .track { height: 4px; background: var(--track); margin: 9px 0 0; }
+  .bar { height: 100%; background: var(--brass); transition: width 140ms ease; }
+  .bar.high { background: var(--bad); }
+  .bar.contained { background: var(--fg-faint); }
+
+  /* The arithmetic, shown rather than asserted: anyone can check the score. */
+  .why { margin: 7px 0 0; font-family: var(--mono); font-size: 12px; color: var(--fg-faint); }
+  .rationale { margin: 6px 0 0; font-size: 13px; color: var(--fg-dim); max-width: 62ch; }
+
+  .controls { display: flex; flex-wrap: wrap; gap: 8px 14px; margin-top: 9px; align-items: center; }
+  label.field { font-size: 12px; color: var(--fg-dim); display: inline-flex; align-items: center; gap: 6px; }
+
+  select {
+    font: inherit; font-size: 13px;
+    color: FieldText; background: Field;
+    border: 1px solid var(--rule-strong); border-radius: 4px; padding: 5px 7px;
+  }
+  select:focus-visible, button:focus-visible { outline: 2px solid #f2c14e; outline-offset: 2px; }
+
+  button {
+    font: inherit; font-size: 13px; font-weight: 600;
+    border-radius: 4px; padding: 7px 12px; cursor: pointer;
+    border: 1px solid var(--rule-strong); background: transparent; color: var(--fg);
+    min-height: 34px;
+  }
+  button.primary { background: var(--brass); border-color: var(--brass); color: #0c111f; }
+  button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  footer { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; padding-top: 14px; }
+  .status { font-size: 13px; color: var(--fg-dim); }
+  .note { margin: 10px 0 0; font-size: 13px; color: var(--fg-dim); max-width: 62ch; }
+
+  @media (max-width: 420px) {
+    label.field { width: 100%; }
+    select { flex: 1; min-width: 0; }
+    .score { margin-left: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) { .bar { transition: none; } }
+</style>
+
+<script type="module">
+/*__MCP_APP_BRIDGE__*/
+
+const TIERS = [
+  ["load_bearing", "Critical"],
+  ["vulnerable", "Supporting"],
+  ["lower_risk", "Minor"],
+];
+const STATUS_LABEL = {
+  untested: "Unreviewed",
+  holding: "Holding",
+  weakened: "Weakened",
+  invalidated: "Invalidated",
+  needs_review: "Needs review",
+};
+const CONFIDENCE_LABEL = { low: "low confidence", medium: "medium confidence", high: "high confidence" };
+
+const root = document.getElementById("root");
+const esc = (s) =>
+  String(s ?? "").replace(/[&<>"']/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])
+  );
+const one = (n) => (Math.round(n * 10) / 10).toFixed(1);
+
+let app = null;
+let board = null;
+const reweighted = new Map(); // assumptionId -> tier chosen here, not yet applied
+
+/**
+ * Re-score a row under a locally chosen importance. This is the whole point of
+ * the board being a widget rather than a picture: exposure is impact times
+ * fragility, impact is the thing a human owns, so a re-weighting reorders the
+ * board immediately with no server round trip and no model call. The constants
+ * come from the payload, so this stays in step with the server's scoring.
+ */
+function scored(row) {
+  const tier = reweighted.get(row.id) ?? row.tier;
+  if (tier === row.tier) return { ...row, tier, moved: false };
+  const impact = board.scale.impact[tier] ?? 1;
+  const exposure = Math.round(impact * row.fragility * 10) / 10;
+  return { ...row, tier, impact, exposure, band: bandFor(exposure), moved: true };
+}
+
+function bandFor(exposure) {
+  const bands = board.scale.bands;
+  return (bands.find((b) => exposure >= b.min) ?? bands[bands.length - 1]).key;
+}
+
+function bandLabel(key) {
+  return board.scale.bands.find((b) => b.key === key)?.label ?? key;
+}
+
+function render() {
+  if (!board) {
+    root.innerHTML = `<p class="empty">No decision loaded. Ask Claude to show a decision's risk board.</p>`;
+    return;
+  }
+
+  const rows = board.rows
+    .map(scored)
+    .sort((a, b) => b.exposure - a.exposure || b.impact - a.impact || a.ref.localeCompare(b.ref, undefined, { numeric: true }));
+
+  const total = Math.round(rows.reduce((s, r) => s + r.exposure, 0) * 10) / 10;
+  const topShare = total > 0 ? Math.round((rows[0].exposure / total) * 100) : 0;
+  const dirty = reweighted.size > 0;
+  const max = board.scale.maxExposure ?? 12;
+
+  root.innerHTML = `
+    <header>
+      <h1>Where the risk sits — ${esc(board.decisionTitle)}</h1>
+      <p class="lede">${
+        rows.length
+          ? `${topShare}% of this decision's exposure rests on ${esc(rows[0].ref)}.`
+          : "No assumptions in scope."
+      }</p>
+      <p class="meta">${
+        board.reviewed
+          ? `review #${esc(board.runNumber)} · ${esc((board.reviewedAt ?? "").slice(0, 10))}`
+          : "not reviewed yet — every assumption scored as unchecked"
+      } · total ${one(total)}${
+        board.excludedCount ? ` · ${board.excludedCount} out of scope, not counted` : ""
+      }</p>
+    </header>
+    <ol>
+      ${rows
+        .map((r) => {
+          const pct = Math.max(2, Math.min(100, (r.exposure / max) * 100));
+          const conf = r.confidence ? `, ${CONFIDENCE_LABEL[r.confidence] ?? r.confidence}` : "";
+          return `
+      <li class="row" data-id="${esc(r.id)}">
+        <div class="top">
+          <span class="ref">${esc(r.ref)}</span>
+          <span class="tag ${esc(r.band)}">${esc(bandLabel(r.band))}</span>
+          <span class="tag"><span class="dot ${esc(r.status)}"></span>${
+            STATUS_LABEL[r.status] ?? r.status
+          }</span>
+          ${r.moved ? `<span class="ref">re-weighted</span>` : ""}
+          <span class="score">${one(r.exposure)}<span class="sr-only"> exposure out of ${max}</span></span>
+        </div>
+        <p class="text">${esc(r.text)}</p>
+        <div class="track" aria-hidden="true"><div class="bar ${esc(r.band)}" style="width:${pct}%"></div></div>
+        <p class="why">importance ${r.impact} × fragility ${one(r.fragility)} = ${one(r.exposure)}${esc(conf)}</p>
+        ${r.rationale ? `<p class="rationale">${esc(r.rationale)}</p>` : ""}
+        <div class="controls">
+          <label class="field">Importance
+            <select data-act="tier" data-id="${esc(r.id)}">
+              ${TIERS.map(
+                ([v, l]) => `<option value="${v}"${v === r.tier ? " selected" : ""}>${l}</option>`
+              ).join("")}
+            </select>
+          </label>
+        </div>
+      </li>`;
+        })
+        .join("")}
+    </ol>
+    ${
+      dirty
+        ? `<p class="note">Re-weighted here only. Applying saves the change and re-runs the review, which can move statuses as well as scores.</p>`
+        : ""
+    }
+    <footer>
+      <button class="primary" data-act="submit" ${dirty ? "" : "disabled"}>
+        ${
+          dirty
+            ? `Apply ${reweighted.size} change${reweighted.size === 1 ? "" : "s"} and re-review`
+            : "Change an importance to re-weight"
+        }
+      </button>
+      ${dirty ? `<button data-act="discard">Reset</button>` : ""}
+      <span class="status" id="status"></span>
+    </footer>`;
+}
+
+function setStatus(msg) {
+  const el = document.getElementById("status");
+  if (el) el.textContent = msg;
+}
+
+root.addEventListener("change", (e) => {
+  const el = e.target.closest("[data-act='tier']");
+  if (!el) return;
+  const row = board.rows.find((r) => r.id === el.dataset.id);
+  // Selecting the stored value again clears the pending change, so
+  // "re-weighted" never marks a row that is back where it started.
+  if (row && el.value === row.tier) reweighted.delete(el.dataset.id);
+  else reweighted.set(el.dataset.id, el.value);
+  render();
+});
+
+root.addEventListener("click", async (e) => {
+  const el = e.target.closest("[data-act]");
+  if (!el) return;
+
+  if (el.dataset.act === "discard") {
+    reweighted.clear();
+    render();
+    return;
+  }
+
+  if (el.dataset.act === "submit") {
+    el.disabled = true;
+    setStatus("Saving the re-weighting and re-running the review…");
+    try {
+      const corrections = [...reweighted.entries()].map(([assumptionId, tier]) => ({
+        assumptionId,
+        tier,
+      }));
+      const result = await app.callServerTool({
+        name: "correct_assumptions",
+        arguments: { decisionId: board.decisionId, corrections, rerun: true },
+      });
+      const next = result?.structuredContent;
+      if (next?.board) {
+        board = next.board;
+        reweighted.clear();
+        render();
+        setStatus(
+          next.report
+            ? `Re-reviewed. Overall health: ${next.report.healthGrade}.`
+            : "Saved."
+        );
+      } else {
+        // correct_assumptions is shared with the Assumption Matrix and answers
+        // in that widget's shape. Re-read the board rather than guessing.
+        board = await loadBoard(board.decisionId);
+        reweighted.clear();
+        render();
+        setStatus("Saved and re-scored.");
+      }
+    } catch (err) {
+      setStatus(`Could not apply: ${err?.message ?? err}`);
+      el.disabled = false;
+    }
+  }
+});
+
+async function loadBoard(id) {
+  const res = await fetch(`/api/decision-state?id=${encodeURIComponent(id)}&view=risk`);
+  const json = await res.json();
+  if (!json.ok) throw new Error(json.error ?? "Could not load the decision.");
+  return json.board;
+}
+
+async function boot() {
+  app = new window.__MCP_APP__.App(
+    { name: "decision-vitals-risk-board", version: "1.0.0" },
+    { capabilities: {} }
+  );
+
+  const applyTheme = () => {
+    try {
+      window.__MCP_APP__.applyHostStyleVariables(app.getHostContext());
+      window.__MCP_APP__.applyDocumentTheme(app.getHostContext());
+    } catch {}
+  };
+  app.onhostcontextchanged = applyTheme;
+
+  // params, not params.result: the handler receives the notification's params
+  // directly. Reading a level deeper yields undefined and leaves the widget on
+  // its empty state forever.
+  app.ontoolresult = async (params) => {
+    const sc = params?.structuredContent;
+    if (sc?.board) {
+      board = sc.board;
+      reweighted.clear();
+      render();
+    }
+  };
+
+  // Fallback: the arguments arrive separately and always carry the id, so the
+  // board can still load if the result notification is missed.
+  app.ontoolinput = async (params) => {
+    const id = params?.arguments?.decisionId;
+    if (id && !board) {
+      try {
+        board = await loadBoard(id);
+        render();
+      } catch {
+        /* the result notification is the primary path; stay on the empty state */
+      }
+    }
+  };
+
+  await app.connect();
+  applyTheme();
+  app.setupSizeChangedNotifications?.();
+  render();
+}
+
+boot().catch((err) => {
+  root.innerHTML = `<p class="empty">Could not start: ${esc(err?.message ?? err)}</p>`;
+});
+</script>

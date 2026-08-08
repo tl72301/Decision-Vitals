@@ -21,6 +21,7 @@ const DEADLINE_MS = 290_000;
 
 const VALID_STATUS = new Set(["holding", "weakened", "invalidated", "needs_review"]);
 const VALID_GRADE = new Set(["healthy", "watch", "at_risk"]);
+const VALID_CONFIDENCE = new Set(["low", "medium", "high"]);
 
 /**
  * Derive the grade from assumption statuses. Mirrors deriveHealthGrade() in
@@ -229,6 +230,16 @@ export async function finishReview(decisionId, outputs, stageLog = []) {
       .map((r) => [r.assumptionId, r.status])
   );
 
+  // Risk Ranking is the only stage that reports how sure it is. The Reporter
+  // does not carry it through, so it is joined on here: without it the risk
+  // score has a single real input and a confident reading is indistinguishable
+  // from a guess.
+  const confidenceById = new Map(
+    rankings
+      .filter((r) => r?.assumptionId && VALID_CONFIDENCE.has(r.confidence))
+      .map((r) => [r.assumptionId, r.confidence])
+  );
+
   const priorStatus = new Map(state.assumptions.map((a) => [a.id, a.status]));
   const nextAssumptions = state.assumptions.map((a) =>
     statusById.has(a.id) ? { ...a, status: statusById.get(a.id) } : a
@@ -246,6 +257,7 @@ export async function finishReview(decisionId, outputs, stageLog = []) {
     return {
       assumptionId: f?.assumptionId ?? null,
       status: f?.status ?? "needs_review",
+      confidence: confidenceById.get(f?.assumptionId) ?? null,
       rationale: f?.rationale ?? "",
       receipts: Array.isArray(f?.receipts) ? f.receipts : [],
       previousStatus: priorStatus.get(f?.assumptionId) ?? "untested",

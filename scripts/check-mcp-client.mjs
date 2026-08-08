@@ -12,7 +12,11 @@
 // Run: node scripts/check-mcp-client.mjs
 // Exits non-zero on failure, so it is safe to wire into CI.
 
-process.env.LIVE_MODE_PASSPHRASE = "local-test-passphrase";
+// A throwaway value, invented here and used only by this script. The server
+// compares the query key against whatever LIVE_MODE_PASSPHRASE holds, so the
+// test proves the gate works without the real one ever appearing in the repo.
+const PASSPHRASE = "local-test-passphrase";
+process.env.LIVE_MODE_PASSPHRASE = PASSPHRASE;
 process.env.KV_REST_API_URL = "https://fake-kv.example.com";
 process.env.KV_REST_API_TOKEN = "tok";
 const kv = new Map();
@@ -45,7 +49,7 @@ const server = createServer(async (req, res) => {
 });
 await new Promise(r => server.listen(0, r));
 const port = server.address().port;
-const url = `http://127.0.0.1:${port}/api/mcp?key=local-test-passphrase`;
+const url = `http://127.0.0.1:${port}/api/mcp?key=${encodeURIComponent(PASSPHRASE)}`;
 
 const { Client } = await import("/home/user/Decision-Vitals/node_modules/@modelcontextprotocol/sdk/dist/esm/client/index.js");
 const { StreamableHTTPClientTransport } = await import("/home/user/Decision-Vitals/node_modules/@modelcontextprotocol/sdk/dist/esm/client/streamableHttp.js");

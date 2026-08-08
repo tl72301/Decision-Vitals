@@ -18,6 +18,7 @@ import {
 
 const VALID_STATUS = new Set(["holding", "weakened", "invalidated", "needs_review"]);
 const VALID_GRADE = new Set(["healthy", "watch", "at_risk"]);
+const VALID_CONFIDENCE = new Set(["low", "medium", "high"]);
 
 /** Derive the grade from current assumption statuses (PLAN.md rules). */
 export function deriveHealthGrade(decisionId) {
@@ -108,10 +109,21 @@ export function buildAndSaveReport(decisionId, run, outputs) {
   // 3. Persist the Report, numbered by its run. Each finding carries the
   // status the assumption had before this review, so reports can show
   // Holding -> Weakened style movement.
+  // Risk Ranking is the only stage that says how sure it is, and the Reporter
+  // does not carry it through. Joining it onto the finding is what lets the
+  // Risk Board tell a confident reading apart from a guess. Mirrors the same
+  // join in api/_review-core.js.
+  const confidenceById = new Map(
+    rankings
+      .filter((r) => r?.assumptionId && VALID_CONFIDENCE.has(r.confidence))
+      .map((r) => [r.assumptionId, r.confidence])
+  );
+
   const findings = normalizeFindings(rep.findings).map((f) => {
     const a = asJudged.get(f.assumptionId);
     return {
       ...f,
+      confidence: confidenceById.get(f.assumptionId) ?? null,
       previousStatus: priorStatus.get(f.assumptionId) ?? "untested",
       assumptionText: a?.text ?? "",
       assumptionTier: a?.tier ?? "lower_risk",

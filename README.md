@@ -90,13 +90,40 @@ and file new evidence ("just got off a call with Meridian, log this against
 the pricing decision"). Evidence filed by an agent appears in the app within
 about 20 seconds while it is open in Live Mode, ready for a re-review.
 
-Tools: `list_decisions`, `get_decision`, `add_evidence`.
+Read and write:
+
+| Tool | What it does |
+| --- | --- |
+| `list_decisions` | The decisions on record, with health grades |
+| `get_decision` | One decision's assumptions, importance and status |
+| `add_evidence` | File a new piece of evidence against a decision |
+| `start_review` | Run the review as a task, polled per stage |
+
+Three of the tools render a panel in the conversation rather than returning
+text, using the MCP Apps extension (`ui://` resources, `text/html;profile=mcp-app`):
+
+| Tool | Panel |
+| --- | --- |
+| `open_assumptions` | **Assumption Matrix** — change how an assumption is classified, or reword it, and the review re-runs against the correction |
+| `open_risk_board` | **Risk Board** — where the decision's risk is concentrated, ranked by exposure, with the arithmetic on every row; re-weighting importance reorders it instantly |
+| `watch_review` | **Progress Board** — live per-stage progress while a review runs |
+
+The Risk Board is the one place the system does arithmetic rather than asking a
+model. Exposure is `importance × fragility`: importance is the human's to set,
+fragility comes from the review's status and how confident it was. Risk Ranking
+is deliberately never asked for a number — a model producing "likelihood 0.72"
+is false precision, and two runs over the same evidence would not agree. The
+scoring lives in `api/_risk.js`, is deterministic, and is printed on each row so
+a reader can check it. Because importance is one factor of a product, the panel
+re-scores and re-sorts locally with no round trip and no model call.
 
 How it works: decisions live in the browser's localStorage, so the app (Live
 Mode only) syncs a snapshot to a small Redis store via `/api/sync` and pulls
 back any evidence agents filed. `api/mcp.js` serves the MCP Streamable HTTP
 endpoint (stateless, JSON responses) against that store, protected by the same
-passphrase as Live Mode.
+passphrase as Live Mode. Panels read from `dv:decision:<id>`, which the server
+owns end to end, rather than from the snapshot a browser tab writes — a panel
+in a conversation has no tab behind it.
 
 Setup:
 
@@ -167,7 +194,18 @@ Built entirely through Claude Code on the web and deployed by pushing to
 npm install
 npm run build    # production build
 npm run dev      # local dev server (requires vercel dev for the /api routes)
+
+node scripts/check-mcp-client.mjs   # a real MCP client, over real HTTP
+node scripts/check-risk-board.mjs   # risk scoring, then the same over MCP
 ```
+
+Both checks stand up the handler behind a real HTTP server and connect a genuine
+MCP `Client` to it. That is deliberate: the two worst bugs in this project both
+passed handler-level tests and failed the moment a real client connected — once
+because a capability was declared as a boolean where the schema wanted an
+object, once because a widget read the notification payload one level too deep
+while the test that "covered" it made the same mistake. Neither is reachable
+from a test that calls the handler directly.
 
 ## Deliberate scope limits
 

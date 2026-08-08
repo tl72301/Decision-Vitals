@@ -29,6 +29,11 @@ export function progressBoardHtml() {
   return widgetHtml("progress-board.html");
 }
 
+/** The Risk Board, with the MCP Apps bridge inlined. */
+export function riskBoardHtml() {
+  return widgetHtml("risk-board.html");
+}
+
 /** Read a widget template and inline the bridge. Cached per function instance. */
 function widgetHtml(file) {
   const hit = cache.get(file);

@@ -9,6 +9,7 @@
 //   get_decision    - one decision's assumptions, importance, and status
 //   add_evidence    - file a new piece of evidence against a decision
 //   open_assumptions    - render the Assumption Matrix widget for a decision
+//   open_risk_board     - render the Risk Board: where a decision's risk sits
 //   correct_assumptions - apply human corrections, then re-run the review
 //   start_review        - run the review as a task, polled for per-stage progress
 //   watch_review        - start a review and render the live Progress Board
@@ -36,7 +37,8 @@ import {
   writeDecisionState,
   applyCorrection,
 } from "./_state.js";
-import { assumptionMatrixHtml, progressBoardHtml } from "./_widget.js";
+import { assumptionMatrixHtml, progressBoardHtml, riskBoardHtml } from "./_widget.js";
+import { buildRiskBoard } from "./_risk.js";
 import {
   RedisTaskStore,
   readTaskRecord,
@@ -46,6 +48,7 @@ import { STAGES, STAGE_LABEL } from "./_review-core.js";
 
 const MATRIX_URI = "ui://decision-vitals/assumption-matrix";
 const BOARD_URI = "ui://decision-vitals/progress-board";
+const RISK_URI = "ui://decision-vitals/risk-board";
 
 const SOURCE_TYPES = [
   "meeting_notes",
@@ -266,6 +269,63 @@ function buildServer() {
     }
   );
 
+  // ---- Risk Board ------------------------------------------------------
+  //
+  // The Matrix answers "what are we assuming"; this answers "where is the risk
+  // concentrated". Both factors are already owned elsewhere — importance by the
+  // human, fragility by the review — so the board adds no new judgement, only
+  // arithmetic, and the arithmetic is shown on every row (see _risk.js).
+  //
+  // Because exposure is impact times fragility and impact is the human's to
+  // set, re-weighting reorders the board client-side with no round trip.
+  registerAppResource(
+    server,
+    "risk-board",
+    RISK_URI,
+    {
+      title: "Risk board",
+      description: "Where a decision's risk is concentrated, and what happens if importance changes.",
+    },
+    async (uri) => ({
+      contents: [
+        { uri: uri.href, mimeType: "text/html;profile=mcp-app", text: riskBoardHtml() },
+      ],
+    })
+  );
+
+  registerAppTool(
+    server,
+    "open_risk_board",
+    {
+      title: "Open the risk board",
+      description:
+        "Show where a decision's risk is concentrated: each assumption's exposure, ranked, with the importance and fragility that produced it. Importance can be re-weighted to see the ranking change.",
+      inputSchema: { decisionId: z.string().describe("Decision id") },
+      _meta: { ui: { resourceUri: RISK_URI } },
+    },
+    async ({ decisionId }) => {
+      const state = await readDecisionState(decisionId);
+      if (!state) {
+        return {
+          content: [{ type: "text", text: `No decision "${decisionId}".` }],
+          isError: true,
+        };
+      }
+      const board = buildRiskBoard(state, decisionId);
+      const top = board.rows[0];
+      const summary = top
+        ? `${board.topShare}% of the exposure in "${board.decisionTitle}" rests on ${top.ref}: ` +
+          `${top.text} (importance ${top.impact} × fragility ${top.fragility} = ${top.exposure}).` +
+          (board.reviewed ? "" : " Nothing has been reviewed yet, so every assumption is scored as unchecked.")
+        : `"${board.decisionTitle}" has no assumptions in scope.`;
+
+      return {
+        content: [{ type: "text", text: summary }],
+        structuredContent: { decisionId, board },
+      };
+    }
+  );
+
   registerAppTool(
     server,
     "correct_assumptions",
@@ -336,11 +396,20 @@ function buildServer() {
           ? `Corrections saved, but the re-review failed: ${rerunError}`
           : "Corrections saved.";
 
+      // Both widgets call this tool, so the answer carries both shapes: the
+      // Matrix reads `state`, the Risk Board reads `board`. Scoring is a pure
+      // function of state, so including it costs nothing and saves the Risk
+      // Board a second request just to re-read what it already caused.
       return {
         content: [
           { type: "text", text: `${lines.join("\n")}\n\n${summary}` },
         ],
-        structuredContent: { decisionId, state, report },
+        structuredContent: {
+          decisionId,
+          state,
+          report,
+          board: buildRiskBoard(state, decisionId),
+        },
       };
     }
   );
