@@ -1,0 +1,207 @@
+<div id="root">
+  <p class="loading">Starting review…</p>
+</div>
+
+<style>
+  /* Same system as the Assumption Matrix: surface and text from the host,
+     brass as the only accent, mono for data, hairline rules, status never
+     carried by colour alone. No spinners for their own sake: the only motion
+     is the marker on the stage actually running. */
+  :root {
+    color-scheme: light dark;
+    --brass: #d9ac55;
+    --ok: #5fc98b;
+    --bad: #e5654e;
+    --fg: var(--mcp-ui-color-text, CanvasText);
+    --fg-dim: color-mix(in srgb, currentColor 78%, transparent);
+    --fg-faint: color-mix(in srgb, currentColor 60%, transparent);
+    --rule: color-mix(in srgb, currentColor 22%, transparent);
+    --rule-strong: color-mix(in srgb, currentColor 42%, transparent);
+    --sans: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  /* State is spelled out for screen readers so it never rests on the glyph or
+     its colour alone, but it is not repeated visually. */
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+
+  body {
+    margin: 0; background: transparent; color: var(--fg);
+    font-family: var(--sans); font-size: 15px; line-height: 1.5;
+  }
+
+  .loading, .empty { color: var(--fg-dim); font-size: 14px; margin: 0; padding: 8px 0; }
+
+  header { padding-bottom: 12px; border-bottom: 1px solid var(--rule); }
+  h1 { font-size: 15px; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
+  .meta { margin: 4px 0 0; font-family: var(--mono); font-size: 12px; color: var(--fg-faint); }
+
+  ol { list-style: none; margin: 0; padding: 0; }
+  li.stage {
+    display: grid; grid-template-columns: 18px 1fr auto;
+    gap: 10px; align-items: baseline;
+    padding: 11px 0; border-bottom: 1px solid var(--rule);
+  }
+  .mark { font-family: var(--mono); font-size: 12px; line-height: 1.5; color: var(--fg-faint); }
+  .mark.done { color: var(--brass); }
+  .mark.failed { color: var(--bad); }
+  .mark.running { color: var(--brass); animation: pulse 1.1s ease-in-out infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1 } 50% { opacity: 0.35 } }
+
+  .name { font-weight: 500; }
+  li.pending .name { color: var(--fg-faint); font-weight: 400; }
+  .what { grid-column: 2 / -1; margin: 2px 0 0; font-size: 13px; color: var(--fg-dim); }
+  .elapsed { font-family: var(--mono); font-size: 12px; color: var(--fg-faint); }
+
+  footer { padding-top: 14px; }
+  .verdict { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .grade {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 2px 9px; border-radius: 3px; font-size: 13px; font-weight: 600;
+    border: 1px solid var(--rule-strong);
+  }
+  .dot { width: 7px; height: 7px; border-radius: 50%; }
+  .dot.healthy { background: var(--ok); }
+  .dot.watch { background: var(--brass); }
+  .dot.at_risk { background: var(--bad); }
+  .summary { margin: 10px 0 0; font-size: 14px; color: var(--fg-dim); max-width: 62ch; }
+  .error { margin: 10px 0 0; font-size: 14px; color: var(--bad); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mark.running { animation: none; }
+  }
+</style>
+
+<script type="module">
+/*__MCP_APP_BRIDGE__*/
+
+const GRADE_LABEL = { healthy: "Healthy", watch: "Watch", at_risk: "At Risk" };
+
+const root = document.getElementById("root");
+const esc = (s) =>
+  String(s ?? "").replace(/[&<>"']/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])
+  );
+const secs = (ms) => (ms == null ? "" : `${(ms / 1000).toFixed(1)}s`);
+
+let app = null;
+let taskId = null;
+let view = null;   // { decisionTitle, stages, taskStatus, statusMessage, report, error }
+let polling = false;
+
+// Status is never carried by colour alone: each stage has a glyph and, for
+// screen readers, a spelled-out state.
+const MARK = { done: ["✓", "done"], running: ["▸", "running"], failed: ["✕", "failed"], pending: ["·", "not started"] };
+
+function render() {
+  if (!view) {
+    root.innerHTML = `<p class="loading">Starting review…</p>`;
+    return;
+  }
+  const { stages = [], report, taskStatus, statusMessage, error } = view;
+  const doneCount = stages.filter((s) => s.status === "done").length;
+
+  root.innerHTML = `
+    <header>
+      <h1>${esc(view.decisionTitle ?? "Reviewing decision")}</h1>
+      <p class="meta">${doneCount} of ${stages.length} stages${
+        taskStatus === "working" ? " · running" : ""
+      }</p>
+    </header>
+    <ol>
+      ${stages
+        .map((s) => {
+          const [glyph, word] = MARK[s.status] ?? MARK.pending;
+          return `
+        <li class="stage ${esc(s.status)}">
+          <span class="mark ${esc(s.status)}" aria-hidden="true">${glyph}</span>
+          <span class="name">${esc(s.name)}<span class="sr-only"> (${word})</span></span>
+          <span class="elapsed">${esc(secs(s.elapsedMs))}</span>
+          <p class="what">${esc(s.what)}</p>
+        </li>`;
+        })
+        .join("")}
+    </ol>
+    <footer>
+      ${
+        report
+          ? `<div class="verdict">
+               <span class="grade"><span class="dot ${esc(report.healthGrade)}"></span>${
+                 GRADE_LABEL[report.healthGrade] ?? report.healthGrade
+               }</span>
+               <span class="meta">Review #${esc(report.runNumber)}</span>
+             </div>
+             ${report.summary ? `<p class="summary">${esc(report.summary)}</p>` : ""}`
+          : error
+            ? `<p class="error">${esc(error)}</p>`
+            : `<p class="meta">${esc(statusMessage ?? "")}</p>`
+      }
+    </footer>`;
+}
+
+async function tick() {
+  if (polling || !taskId) return;
+  polling = true;
+  try {
+    const res = await app.callServerTool({
+      name: "review_progress",
+      arguments: { taskId },
+    });
+    const sc = res?.structuredContent;
+    if (sc) {
+      view = { ...view, ...sc };
+      render();
+      if (sc.taskStatus === "working") setTimeout(tick, 1500);
+    }
+  } catch (err) {
+    view = { ...view, error: err?.message ?? String(err) };
+    render();
+  } finally {
+    polling = false;
+  }
+}
+
+async function boot() {
+  app = new window.__MCP_APP__.App(
+    { name: "decision-vitals-progress-board", version: "1.0.0" },
+    { capabilities: {} }
+  );
+
+  const applyTheme = () => {
+    try {
+      window.__MCP_APP__.applyHostStyleVariables(app.getHostContext());
+      window.__MCP_APP__.applyDocumentTheme(app.getHostContext());
+    } catch {}
+  };
+  app.onhostcontextchanged = applyTheme;
+
+  app.ontoolresult = (notification) => {
+    const sc = notification?.params?.result?.structuredContent;
+    if (sc?.taskId) {
+      taskId = sc.taskId;
+      view = {
+        decisionTitle: sc.decisionTitle,
+        stages: sc.stages ?? [],
+        taskStatus: sc.taskStatus,
+        statusMessage: sc.statusMessage,
+      };
+      render();
+      tick();
+    }
+  };
+
+  await app.connect();
+  applyTheme();
+  app.setupSizeChangedNotifications?.();
+  render();
+}
+
+boot().catch((err) => {
+  root.innerHTML = `<p class="empty">Could not start: ${esc(err?.message ?? err)}</p>`;
+});
+</script>
