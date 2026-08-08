@@ -64,7 +64,89 @@ function payloadFor(agent, ctx) {
   }
 }
 
-const STAGES = ["evidence_review", "challenge", "risk_ranking", "reporter"];
+export const STAGES = ["evidence_review", "challenge", "risk_ranking", "reporter"];
+
+/** Human labels for progress messages. */
+export const STAGE_LABEL = {
+  evidence_review: "Matching evidence to assumptions",
+  challenge: "Making the case against each assumption",
+  risk_ranking: "Assessing where each assumption stands",
+  reporter: "Writing the health report",
+};
+
+/**
+ * Run exactly ONE outstanding stage and return the updated progress.
+ *
+ * Split out from runReviewForDecision so a review can advance across separate
+ * serverless invocations: each poll does one stage's work, which fits inside a
+ * function timeout, and every intermediate output is persisted by the caller.
+ *
+ * @param {string} decisionId
+ * @param {{outputs: Record<string, object>}} progress  outputs collected so far
+ * @returns {Promise<{done: boolean, stage: string|null, outputs: object, report: object|null}>}
+ */
+export async function advanceReview(decisionId, progress) {
+  const outputs = progress?.outputs ?? {};
+  const next = STAGES.find((s) => !(s in outputs));
+
+  // Every stage has run: assemble and persist the report.
+  if (!next) {
+    const report = await finishReview(decisionId, outputs);
+    return { done: true, stage: null, outputs, report };
+  }
+
+  const apiKey = requireApiKey();
+  const state = await readDecisionState(decisionId);
+  if (!state) throw new Error(`No decision "${decisionId}".`);
+
+  const ctx = buildContext(state);
+  ctx.out = outputs;
+
+  const [agentIds, environmentId] = await Promise.all([
+    resolveAgentIds(apiKey),
+    resolveEnvironmentId(apiKey),
+  ]);
+  const agentId = agentIds[next];
+  if (!agentId) {
+    throw new Error(`Agent "${next}" is not registered. Call /api/setup first.`);
+  }
+
+  const { output } = await runOneAgent({
+    apiKey,
+    agentSlug: next,
+    agentId,
+    environmentId,
+    payload: payloadFor(next, ctx),
+    deadline: Date.now() + 50_000,
+  });
+
+  return { done: false, stage: next, outputs: { ...outputs, [next]: output }, report: null };
+}
+
+/** Shared context builder for both the one-shot and incremental paths. */
+function buildContext(state) {
+  const assumptions = activeAssumptions(state).map((a) => ({
+    id: a.id,
+    text: a.text,
+    tier: a.tier,
+    signpost: a.signpost,
+    loadBearing: a.tier === "load_bearing",
+    vulnerable: a.tier === "vulnerable",
+  }));
+  if (assumptions.length === 0) {
+    throw new Error("No assumptions in scope to review.");
+  }
+  return {
+    decision: {
+      title: state.decision.title,
+      statement: state.decision.statement,
+      context: state.decision.context ?? "",
+    },
+    assumptions,
+    evidence: state.evidence ?? [],
+    out: {},
+  };
+}
 
 /**
  * Run the full review for one decision and persist the resulting report.
@@ -125,6 +207,18 @@ export async function runReviewForDecision(decisionId) {
     ctx.out[agentSlug] = output;
     stageLog.push({ agent: agentSlug, sessionId, durationMs: Date.now() - t0 });
   }
+
+  return finishReview(decisionId, ctx.out, stageLog);
+}
+
+/**
+ * Turn collected stage outputs into a persisted report. Shared by the one-shot
+ * route and the incremental task path so both produce identical reports.
+ */
+export async function finishReview(decisionId, outputs, stageLog = []) {
+  const state = await readDecisionState(decisionId);
+  if (!state) throw new Error(`No decision "${decisionId}".`);
+  const ctx = { out: outputs };
 
   // Apply statuses, then derive the grade under the same rules the app uses.
   const rep = ctx.out.reporter ?? {};
