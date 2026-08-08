@@ -278,3 +278,174 @@ support. Revisit when `LATEST_PROTOCOL_VERSION` moves past `2025-11-25`.
 
 Cloud sessions load only the first-party GitHub integration, so I cannot add
 Decision Vitals as a connector and click through it.
+
+---
+
+# Addendum: answers to review questions
+
+Added after Phase 0 review. HEAD confirmed `mcp-app-conversion` @ `892b6bd`
+before this work.
+
+## Q1. Does a widget with no browser tab behind it force a move to Redis?
+
+**Yes, and it is larger than it looks. This is the real precondition, not
+Tasks.**
+
+What crosses into Redis today, verified by reading `src/lib/mcpSync.js`,
+`api/sync.js`, `api/_kv.js`, `api/mcp.js`:
+
+| Key | Written by | Contents |
+| --- | --- | --- |
+| `dv:index` | Browser tab, every 20 s, Live Mode only | Per decision: `id, title, statement, healthGrade, evidenceCount`, and per assumption `id, text, tier, status, signpost` |
+| `dv:inbox` | `add_evidence` MCP tool | Queued evidence, **drained and deleted by the browser** on next sync |
+
+Three consequences:
+
+1. **Reads are nearly covered but stale.** The snapshot carries every field the
+   Assumption Matrix needs to render. But it only exists if a tab has been open
+   in Live Mode within the last 20 seconds. With no tab, `dv:index` is whatever
+   was left behind, possibly nothing.
+2. **Evidence text is not in Redis at all.** Only `evidenceCount`. Any
+   server-side pipeline run needs the actual evidence strings, so Evidence
+   Review cannot run server-side today.
+3. **There is no server write path to the source of truth.** `add_evidence`
+   appends to a queue that only a browser drains. A correction submitted from a
+   widget has nowhere durable to land. This is the blocking gap.
+
+**Scope of the move:** effectively the whole store. `src/lib/store.js` (~560
+lines) owns decisions, assumptions, evidence, agent runs and reports behind a
+clean per-entity API. The move is to make Redis authoritative in Live Mode and
+turn the browser into a client of it, keeping localStorage as the Demo Mode
+path. The per-entity API means this is mechanical rather than a redesign, and
+the existing function signatures can be preserved.
+
+I would **not** attempt bidirectional reconciliation between an offline
+localStorage and server state. Redis authoritative in Live Mode, localStorage
+authoritative in Demo Mode, no merge.
+
+## Q2. Design tokens already in this codebase
+
+Read from `src/index.css` (`@theme`). Nothing invented, nothing imported.
+
+```
+Surfaces   ink-950 #0c111f   ink-900 #10182b   ink-800 #151e33   ink-700 #1b2540
+Rules      line    #263351   line-2  #3a4a73
+Text       fg-1    #edf1fb   fg-2    #a9b4cc   fg-3    #8b96b2
+Accent     brass   #d9ac55   brass-2 #e8c077
+Semantic   ok      #5fc98b   warn    #e39a55   bad     #e5654e   review #b29dea
+Focus      #f2c14e, 2px, 2px offset
+Type       Instrument Sans (400/500/600) · IBM Plex Mono (400/500)
+```
+
+Accent discipline is already in force and measurable: 28 `brass` usages against
+3 semantic-fill usages across all JSX. Brass carries identity, links, primary
+actions and user-authored objects; `review` violet marks system-generated
+interpretation; ok/warn/bad are status only and never appear without a text
+label beside them.
+
+**What survives a host theme change**, and therefore what carries the identity
+into a widget: brass `#d9ac55` as the single accent, the Instrument Sans +
+IBM Plex Mono pairing with mono reserved for data values and identifiers, the
+`A1`/`A2` ledger reference scheme, hairline rules instead of cards, and the
+rule that status is never colour alone.
+
+Per your constraint I will build widgets on a transparent background taking
+surface and text colour from host CSS variables, with brass and the semantic
+trio as fixed values, and show you both host themes before deciding anything
+further.
+
+## Q4. Runtime contradiction: closed, does not reproduce
+
+Searched `src/`, `README.md` and `docs/` for any claim that the pipeline runs on
+the MCP SDK: zero matches outside my own Phase 0 report.
+
+- `src/pages/About.jsx` makes exactly one runtime claim, line 229: "agents
+  hosted on Claude Managed Agents". Correct.
+- There is no Tools component in this codebase. `src/components/` contains
+  AppShell, AssumptionCard, Chip, ErrorBoundary, EvidencePanel, HealthBadge,
+  JsonView, Spinner.
+- `Chip.jsx` is a generic tag primitive with no runtime text.
+- The About page's `Pipeline` component lists the six agent names only, with no
+  runtime attribution.
+
+Closing it out. No copy changed.
+
+## Q7. Re-run: what was verified versus inferred
+
+**Now verified by execution, not inference.** In the Phase 0 report this was a
+code read. It no longer is.
+
+Test: `rerun.mjs`, headless Chromium against the production build, with
+`/api/agent` intercepted so the request payloads could be captured and no
+credits spent. Live Mode forced via an init script.
+
+Procedure: load the café sample, open the decision, edit assumption A1 through
+the real UI to reword it with a unique marker string **and** change its
+importance from Critical to Supporting, save, then run the review.
+
+Result, captured from the four real outbound request bodies:
+
+| Stage | Received corrected text | Tier it saw for A1 |
+| --- | --- | --- |
+| Evidence Review | yes | `vulnerable` |
+| Challenge | yes | `vulnerable` |
+| Risk Ranking | yes | `vulnerable` |
+| Reporter | yes | `vulnerable` |
+
+Both halves of the correction reached every downstream stage's input.
+
+**Still inferred, honestly flagged:** that a corrected input produces a
+*different model output*. That is a claim about model behaviour and cannot be
+tested without live credits. What is proven is the plumbing: the pipeline reads
+assumptions from the store at run time, so a correction is carried into every
+downstream stage rather than being discarded.
+
+**Known blocker, unchanged:** `DecisionDetail.jsx` sets `locked = reports.length
+> 0`, so this path is only open before the first review. The correction feature
+must version assumptions rather than hard-lock them.
+
+## Q6. Orchestration estimate
+
+**This section is a prediction, not a code read. Confidence labelled per line.**
+
+| Work | Estimate | Confidence |
+| --- | --- | --- |
+| Server-authoritative store + CRUD routes, mirroring `store.js` | 2 to 3 days | **Moderate-high**, the entity API is clean and the port is mechanical |
+| Move the pipeline loop out of `AgentRun.jsx` into a server route, run state in Redis | 2 to 3 days | **Moderate**, the loop is small and stages are pure, but error, retry and resume semantics are new |
+| Tasks wrapper over that route | 1 to 2 days | **Low-moderate**, I have not written against the Tasks extension |
+| Three Apps widgets | 3 to 5 days | **Low-moderate**, first time against `ext-apps`, and I cannot see them render |
+| Rewire the app UI to read server state in Live Mode | 2 to 3 days | **Moderate** |
+| **Total** | **10 to 16 working days** | **Low-moderate overall** |
+
+**Is Apps plus the migration achievable in two weeks?** Two weeks is ten working
+days. My estimate starts at ten and runs to sixteen. So: **only at the optimistic
+end, and only if nothing surprises.** I would not commit to it. The two items I
+cannot estimate well are the ones I have never built, Tasks and Apps, and the
+one I cannot verify myself is widget rendering.
+
+**Smallest version that still demonstrates the claim.** The claim is: a human
+corrects the Assumption Classifier mid-pipeline and every downstream agent
+inherits the correction. That needs, and only needs:
+
+1. Assumptions and evidence readable and writable server-side for one decision.
+   No full store migration; two Redis keys and four routes.
+2. One server route that runs stages 3 to 6 in sequence, synchronously, and
+   persists the report. No Tasks, no progress streaming.
+3. One MCP tool that returns the Assumption Matrix UI resource.
+4. One MCP tool the widget calls on submit: persist the correction, re-run the
+   pipeline, return the new statuses.
+5. Assumption versioning to replace the lock.
+
+**Estimate: 4 to 6 working days. Confidence: moderate**, higher than the full
+plan because it drops both unfamiliar pieces to one, Apps, and removes the
+migration.
+
+What it gives up: the Progress Board, the Risk Board, disconnect and reconnect
+survival, and the multi-minute run feels like a hang. What it keeps: the entire
+architectural claim, demonstrable end to end in a Claude conversation.
+
+**Recommendation:** build the minimum first as a vertical slice. It de-risks the
+one thing neither of us can currently verify, that Claude renders our widget at
+all, in days rather than after two weeks of migration work. If it renders and
+the correction propagates, the remaining phases are additive and individually
+optional.
