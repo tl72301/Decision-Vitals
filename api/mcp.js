@@ -100,7 +100,13 @@ function buildServer() {
       capabilities: {
         // Declares that tools/call may create a task. Without this the SDK
         // refuses task creation before a handler is ever reached.
-        tasks: { requests: { tools: { call: true } } },
+        //
+        // `call` MUST be an object, not `true`. A boolean fails the client's
+        // schema validation of the initialize result, which surfaces to a user
+        // as nothing more specific than "couldn't connect to the server".
+        // `list` and `cancel` are deliberately absent: this server does not
+        // support either, and claiming them would be a lie a client acts on.
+        tasks: { requests: { tools: { call: {} } } },
       },
     }
   );
