@@ -609,6 +609,22 @@ async function rerunReview(decisionId) {
 }
 
 export default async function handler(req, res) {
+  // CORS. A connector may reach this endpoint from a browser origin, in which
+  // case the browser sends an OPTIONS preflight first. Answering that with 405
+  // and no CORS headers fails the connection before the MCP handshake is ever
+  // attempted, which surfaces to the user only as "couldn't connect".
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "content-type, authorization, accept, mcp-session-id, mcp-protocol-version, last-event-id"
+  );
+  res.setHeader("Access-Control-Expose-Headers", "mcp-session-id, mcp-protocol-version");
+  res.setHeader("Access-Control-Max-Age", "86400");
+  if (req.method === "OPTIONS") {
+    return res.status(204).end();
+  }
+
   // Same gate as the rest of Live Mode: the passphrase, passed as ?key= or a
   // bearer token, since MCP clients can't easily set custom headers.
   const required = process.env.LIVE_MODE_PASSPHRASE;
@@ -631,6 +647,33 @@ export default async function handler(req, res) {
       error: { code: -32000, message: "Method not allowed. This MCP endpoint is stateless; POST only." },
       id: null,
     });
+  }
+
+  // The SDK's transport rejects a request whose Accept header does not list
+  // BOTH application/json and text/event-stream, with a 406. Clients that only
+  // ever expect JSON therefore cannot connect. This server runs with
+  // enableJsonResponse and never opens an SSE stream, so it only ever replies
+  // with application/json: widening the inbound header satisfies the guard
+  // without any client receiving a content type it did not ask for.
+  const accept = String(req.headers.accept ?? "");
+  if (!accept.includes("text/event-stream")) {
+    const widened = accept.includes("application/json")
+      ? `${accept}, text/event-stream`
+      : "application/json, text/event-stream";
+    req.headers.accept = widened;
+    // The transport converts this Node request to a Web Request via Hono,
+    // which reads rawHeaders rather than the parsed headers object, so both
+    // have to be updated or the widening is silently ignored.
+    if (Array.isArray(req.rawHeaders)) {
+      let found = false;
+      for (let i = 0; i < req.rawHeaders.length; i += 2) {
+        if (String(req.rawHeaders[i]).toLowerCase() === "accept") {
+          req.rawHeaders[i + 1] = widened;
+          found = true;
+        }
+      }
+      if (!found) req.rawHeaders.push("accept", widened);
+    }
   }
 
   try {
