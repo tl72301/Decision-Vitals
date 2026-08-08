@@ -37,7 +37,12 @@ import {
   writeDecisionState,
   applyCorrection,
 } from "./_state.js";
-import { assumptionMatrixHtml, progressBoardHtml, riskBoardHtml } from "./_widget.js";
+import {
+  assumptionMatrixHtml,
+  progressBoardHtml,
+  riskBoardHtml,
+  originOf,
+} from "./_widget.js";
 import { buildRiskBoard } from "./_risk.js";
 import {
   RedisTaskStore,
@@ -92,7 +97,18 @@ async function getIndex() {
   return index;
 }
 
-function buildServer() {
+/**
+ * CSP for a widget resource.
+ *
+ * This is not optional boilerplate. The spec is explicit that connectDomains
+ * "empty or omitted -> no network connections (secure default)", so a widget
+ * that does not declare its own origin has connect-src 'none' and every fetch
+ * it makes is blocked before it leaves the iframe. That is silent: the widget
+ * simply never gets its data.
+ */
+const cspFor = (origin) => ({ ui: { csp: { connectDomains: origin ? [origin] : [] } } });
+
+function buildServer(origin = "") {
   const server = new McpServer(
     { name: "decision-vitals", version: "1.0.0" },
     {
@@ -225,13 +241,15 @@ function buildServer() {
       title: "Assumption Matrix",
       description:
         "Review and correct the assumptions behind a decision, then re-run the review.",
+      _meta: cspFor(origin),
     },
     async (uri) => ({
       contents: [
         {
           uri: uri.href,
           mimeType: "text/html;profile=mcp-app",
-          text: assumptionMatrixHtml(),
+          text: assumptionMatrixHtml(origin),
+          _meta: cspFor(origin),
         },
       ],
     })
@@ -285,10 +303,16 @@ function buildServer() {
     {
       title: "Risk board",
       description: "Where a decision's risk is concentrated, and what happens if importance changes.",
+      _meta: cspFor(origin),
     },
     async (uri) => ({
       contents: [
-        { uri: uri.href, mimeType: "text/html;profile=mcp-app", text: riskBoardHtml() },
+        {
+          uri: uri.href,
+          mimeType: "text/html;profile=mcp-app",
+          text: riskBoardHtml(origin),
+          _meta: cspFor(origin),
+        },
       ],
     })
   );
@@ -426,10 +450,16 @@ function buildServer() {
     {
       title: "Review progress",
       description: "Live per-stage progress for a decision review.",
+      _meta: cspFor(origin),
     },
     async (uri) => ({
       contents: [
-        { uri: uri.href, mimeType: "text/html;profile=mcp-app", text: progressBoardHtml() },
+        {
+          uri: uri.href,
+          mimeType: "text/html;profile=mcp-app",
+          text: progressBoardHtml(origin),
+          _meta: cspFor(origin),
+        },
       ],
     })
   );
@@ -753,7 +783,7 @@ export default async function handler(req, res) {
 
   try {
     // Stateless mode: a fresh server + transport per request, JSON responses.
-    const server = buildServer();
+    const server = buildServer(originOf(req));
     const transport = new StreamableHTTPServerTransport({
       sessionIdGenerator: undefined,
       enableJsonResponse: true,

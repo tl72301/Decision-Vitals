@@ -310,8 +310,14 @@ root.addEventListener("click", async (e) => {
   }
 });
 
+// Injected server-side: the sandboxed iframe's origin is not this server, so a
+// relative fetch never arrives. The matching connect-src is in the resource CSP.
+const API_ORIGIN = "__DV_ORIGIN__";
+
 async function loadBoard(id) {
-  const res = await fetch(`/api/decision-state?id=${encodeURIComponent(id)}&view=risk`);
+  const res = await fetch(
+    `${API_ORIGIN}/api/decision-state?id=${encodeURIComponent(id)}&view=risk`
+  );
   const json = await res.json();
   if (!json.ok) throw new Error(json.error ?? "Could not load the decision.");
   return json.board;

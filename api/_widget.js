@@ -17,26 +17,32 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 
 const BRIDGE_PLACEHOLDER = "/*__MCP_APP_BRIDGE__*/";
 
+// A widget runs in a sandboxed iframe whose origin is NOT this server, so a
+// relative fetch resolves against the sandbox and never reaches the API. The
+// real origin is only known per request, so it is injected at read time.
+const ORIGIN_PLACEHOLDER = "__DV_ORIGIN__";
+
 const cache = new Map();
 
 /** The Assumption Matrix, with the MCP Apps bridge inlined. */
-export function assumptionMatrixHtml() {
-  return widgetHtml("assumption-matrix.html");
+export function assumptionMatrixHtml(origin) {
+  return widgetHtml("assumption-matrix.html", origin);
 }
 
 /** The Pipeline Progress Board, with the MCP Apps bridge inlined. */
-export function progressBoardHtml() {
-  return widgetHtml("progress-board.html");
+export function progressBoardHtml(origin) {
+  return widgetHtml("progress-board.html", origin);
 }
 
 /** The Risk Board, with the MCP Apps bridge inlined. */
-export function riskBoardHtml() {
-  return widgetHtml("risk-board.html");
+export function riskBoardHtml(origin) {
+  return widgetHtml("risk-board.html", origin);
 }
 
 /** Read a widget template and inline the bridge. Cached per function instance. */
-function widgetHtml(file) {
-  const hit = cache.get(file);
+function widgetHtml(file, origin = "") {
+  const key = `${file}\n${origin}`;
+  const hit = cache.get(key);
   if (hit) return hit;
 
   const template = readFileSync(join(HERE, "..", "src", "widgets", file), "utf8");
@@ -56,9 +62,22 @@ function widgetHtml(file) {
   // Replacer function, not a string: a minified bundle contains `$&` and `$'`
   // sequences, which String.replace would interpret as pattern references and
   // splice parts of the template back into the script.
-  const html = template.replace(BRIDGE_PLACEHOLDER, () => inlined);
-  cache.set(file, html);
+  const html = template
+    .replace(BRIDGE_PLACEHOLDER, () => inlined)
+    .replaceAll(ORIGIN_PLACEHOLDER, () => origin);
+  cache.set(key, html);
   return html;
+}
+
+/**
+ * The origin this request arrived on, used both for the widget's own fetches
+ * and for the CSP that has to permit them. Vercel terminates TLS at the edge,
+ * so the forwarded headers are the only accurate source.
+ */
+export function originOf(req) {
+  const proto = req.headers["x-forwarded-proto"] ?? "https";
+  const host = req.headers["x-forwarded-host"] ?? req.headers.host ?? "";
+  return host ? `${String(proto).split(",")[0]}://${String(host).split(",")[0]}` : "";
 }
 
 /**

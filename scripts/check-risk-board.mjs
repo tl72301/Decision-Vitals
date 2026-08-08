@@ -146,8 +146,26 @@ const client = new Client({ name: "risk-probe", version: "1.0.0" }, { capabiliti
 try {
   await client.connect(new StreamableHTTPClientTransport(new URL(url)));
 
-  const resources = (await client.listResources()).resources.map((r) => r.uri);
+  const listed = (await client.listResources()).resources;
+  const resources = listed.map((r) => r.uri);
   check("risk-board resource is advertised", resources.includes("ui://decision-vitals/risk-board"), true);
+
+  // A widget with no declared connectDomains gets connect-src 'none', so every
+  // fetch it makes is blocked inside the iframe with no error the server ever
+  // sees. Assert the declaration on both the listing and the read, and assert
+  // the origin the widget will actually call matches it.
+  for (const r of listed) {
+    check(`${r.name}: csp declares an origin`,
+      (r._meta?.ui?.csp?.connectDomains ?? []).length > 0, true);
+    const content = (await client.readResource({ uri: r.uri })).contents[0];
+    const declared = content._meta?.ui?.csp?.connectDomains ?? [];
+    check(`${r.name}: read carries the same csp`, declared, r._meta.ui.csp.connectDomains);
+    const injected = (content.text.match(/const API_ORIGIN = "([^"]*)"/) || [])[1];
+    if (injected !== undefined) {
+      check(`${r.name}: fetch origin is allowed by its own csp`,
+        declared.includes(injected), true);
+    }
+  }
 
   const tools = (await client.listTools()).tools;
   const tool = tools.find((t) => t.name === "open_risk_board");

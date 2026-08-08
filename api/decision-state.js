@@ -23,6 +23,14 @@ function gate(req, res) {
 }
 
 export default async function handler(req, res) {
+  // A widget calls this from a sandboxed iframe whose origin is not this
+  // server, so the read is cross-origin and needs CORS. Reads are already
+  // ungated (see above); writes stay behind the passphrase regardless.
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "content-type, x-live-passphrase");
+  if (req.method === "OPTIONS") return res.status(204).end();
+
   if (req.method === "GET") {
     const id = req.query?.id;
     if (!id) return res.status(400).json({ ok: false, error: "Missing id." });

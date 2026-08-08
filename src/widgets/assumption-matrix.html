@@ -43,6 +43,20 @@
 
   .loading, .empty { color: var(--fg-dim); font-size: 14px; margin: 0; padding: 8px 0; }
 
+  /* Shown only when the panel has no data. Collapsed by default so it explains
+     on demand rather than presenting a wall of log to someone who just wants
+     to know why the panel is empty. */
+  .trace summary {
+    font-size: 12px; color: var(--fg-faint); cursor: pointer;
+    padding: 4px 0; list-style: revert;
+  }
+  .trace summary:focus-visible { outline: 2px solid #f2c14e; outline-offset: 2px; }
+  .trace pre {
+    font-family: var(--mono); font-size: 11px; line-height: 1.6;
+    color: var(--fg-faint); margin: 4px 0 0; white-space: pre-wrap;
+    word-break: break-word; overflow-x: auto;
+  }
+
   header { padding-bottom: 12px; border-bottom: 1px solid var(--rule); }
   h1 { font-size: 15px; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
   .sub { margin: 4px 0 0; font-size: 13px; color: var(--fg-dim); }
@@ -135,14 +149,37 @@ const esc = (s) =>
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])
   );
 
+// Injected server-side. A widget runs in a sandboxed iframe whose origin is not
+// this server, so a relative fetch resolves against the sandbox and never
+// arrives. The matching connect-src is declared in the resource's CSP.
+const API_ORIGIN = "__DV_ORIGIN__";
+
 let app = null;
 let decisionId = null;
 let state = null;
 const pending = new Map(); // assumptionId -> patch
 
+// A record of what the host actually did, shown when the panel has no data.
+// An empty panel with no explanation is the worst thing this widget can do:
+// it looks identical whether the notification never arrived, arrived without a
+// payload, or arrived and the fetch behind it was blocked.
+const trace = [];
+// Kept outside the markup: render() rebuilds innerHTML, so without this the
+// block snaps shut under the reader every time another line arrives.
+let traceOpen = false;
+function note(msg) {
+  trace.push(`${new Date().toISOString().slice(11, 19)}  ${msg}`);
+  if (!state) render();
+}
+
 function render() {
   if (!state) {
-    root.innerHTML = `<p class="empty">No decision loaded. Ask Claude to open a decision's assumptions.</p>`;
+    root.innerHTML = `
+      <p class="empty">No decision loaded. Ask Claude to open a decision's assumptions.</p>
+      <details class="trace"${traceOpen ? " open" : ""}>
+        <summary>Connection details</summary>
+        <pre>${esc(trace.join("\n") || "nothing received yet")}</pre>
+      </details>`;
     return;
   }
   const list = state.assumptions ?? [];
@@ -230,6 +267,15 @@ root.addEventListener("change", (e) => {
   if (el) patch(el.dataset.id, "tier", el.value);
 });
 
+// `toggle` does not bubble, so it is caught in the capture phase.
+root.addEventListener(
+  "toggle",
+  (e) => {
+    if (e.target.classList?.contains("trace")) traceOpen = e.target.open;
+  },
+  true
+);
+
 root.addEventListener("click", async (e) => {
   const el = e.target.closest("[data-act]");
   if (!el) return;
@@ -286,9 +332,12 @@ root.addEventListener("click", async (e) => {
 });
 
 async function loadState(id) {
-  const res = await fetch(`/api/decision-state?id=${encodeURIComponent(id)}`);
+  const url = `${API_ORIGIN}/api/decision-state?id=${encodeURIComponent(id)}`;
+  note(`fetching ${url}`);
+  const res = await fetch(url);
   const json = await res.json();
   if (!json.ok) throw new Error(json.error ?? "Could not load the decision.");
+  note("fetch ok");
   return json.state;
 }
 
@@ -307,6 +356,24 @@ async function boot() {
     } catch {}
   };
 
+  // Every host-to-app notification is traced, not just the two this widget
+  // acts on. Which ones arrive is the single most useful fact when the panel
+  // comes up empty, and addEventListener composes rather than replacing the
+  // handlers below.
+  for (const evt of ["toolinput", "toolinputpartial", "toolresult", "toolcancelled"]) {
+    app.addEventListener(evt, (params) => {
+      note(`${evt}: params keys [${Object.keys(params ?? {}).join(", ") || "none"}]`);
+      if (evt === "toolresult") {
+        const sc = params?.structuredContent;
+        note(
+          sc
+            ? `  structuredContent keys [${Object.keys(sc).join(", ")}]`
+            : "  no structuredContent on the notification"
+        );
+      }
+    });
+  }
+
   // The handler receives the notification's params DIRECTLY, so the payload is
   // params.structuredContent. Reading params.result.structuredContent silently
   // yields undefined and the widget renders its empty state forever.
@@ -314,8 +381,12 @@ async function boot() {
     const sc = params?.structuredContent;
     if (sc?.decisionId) {
       decisionId = sc.decisionId;
-      state = sc.state ?? (await loadState(decisionId));
-      render();
+      try {
+        state = sc.state ?? (await loadState(decisionId));
+        render();
+      } catch (err) {
+        note(`load failed: ${err?.message ?? err}`);
+      }
     }
   };
 
@@ -328,13 +399,15 @@ async function boot() {
       try {
         state = await loadState(id);
         render();
-      } catch {
-        /* the result notification is the primary path; stay on the empty state */
+      } catch (err) {
+        note(`fallback load failed: ${err?.message ?? err}`);
       }
     }
   };
 
   await app.connect();
+  const host = app.getHostVersion();
+  note(`connected to ${host?.name ?? "an unnamed host"} ${host?.version ?? ""}`.trim());
   try {
     window.__MCP_APP__.applyHostStyleVariables(app.getHostContext());
     window.__MCP_APP__.applyDocumentTheme(app.getHostContext());
