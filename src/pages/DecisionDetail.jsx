@@ -5,6 +5,7 @@ import {
   evidenceByDecision,
   reportsByDecision,
   updateAssumption,
+  correctAssumption,
   deleteAssumption,
   deleteDecision,
 } from "../lib/store.js";
@@ -144,8 +145,9 @@ export default function DecisionDetail() {
           </div>
           {locked && (
             <p className="mb-3 border-l-2 border-line py-1 pl-4 text-sm leading-relaxed text-fg-2">
-              Locked since the first review, so every report stays traceable to
-              the assumptions it judged.
+              These have been reviewed. You can still correct one, and every
+              earlier report keeps the wording it judged. Review the decision
+              again to reassess against a correction.
             </p>
           )}
           {assumptions.length === 0 ? (
@@ -159,8 +161,9 @@ export default function DecisionDetail() {
                   key={a.id}
                   assumption={a}
                   index={i}
-                  locked={locked}
+                  reviewed={locked}
                   onSave={updateAssumption}
+                  onCorrect={correctAssumption}
                   onDelete={deleteAssumption}
                 />
               ))}
