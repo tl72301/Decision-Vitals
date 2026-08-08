@@ -449,3 +449,97 @@ one thing neither of us can currently verify, that Claude renders our widget at
 all, in days rather than after two weeks of migration work. If it renders and
 the correction propagates, the remaining phases are additive and individually
 optional.
+
+---
+
+# Addendum 2: the live A/B test, and two Demo Mode answers
+
+HEAD confirmed `mcp-app-conversion` @ `aba0ec4` before this work.
+
+## The live A/B test: I cannot run it from here
+
+Both routes are closed, verified rather than assumed:
+
+| Route | Result |
+| --- | --- |
+| Run locally against `/api/agent` | **No `ANTHROPIC_API_KEY` in this sandbox.** `api.anthropic.com` is reachable and returns 401. Separately, `vite preview` serves static files only, so `/api/*` does not exist locally at all. |
+| Drive the production deployment | **`decision-vitals.vercel.app` is egress-blocked.** The proxy gateway answers 403 to CONNECT: `connect_rejected, gateway answered 403 to CONNECT, host: decision-vitals.vercel.app:443`. |
+
+The authorisation to spend credits was not the constraint. I have no credentials
+to spend and no network path to the deployment that holds them.
+
+**What I built instead:** `scripts/ab-correction-test.mjs`, which runs the test
+exactly as specified from a machine that can reach the site.
+
+```bash
+DV_URL=https://decision-vitals.vercel.app \
+DV_PASSPHRASE='your-live-passphrase' \
+node scripts/ab-correction-test.mjs
+```
+
+It runs stages 3 to 6 twice against `sample-cafe` with identical decision text,
+identical evidence, and exactly one difference: assumption A1's tier is
+`load_bearing` in run A and `vulnerable` in run B. Payload construction mirrors
+`src/pages/AgentRun.jsx` field for field, so this exercises the real contract
+rather than an approximation. Cost: 8 Managed Agents sessions.
+
+It prints a side-by-side of Risk Ranking (flagging changed rows), the set
+difference of Challenge objections in both directions, both Reporter summaries,
+and a verdict line that says plainly whether the outputs are byte-identical. It
+also writes `scripts/ab-run-control.json` and `scripts/ab-run-corrected.json`.
+
+Send me those two files and I will do the side-by-side analysis. Syntax checked
+and payload construction smoke-tested here; the network path is untested for the
+reason above.
+
+**One thing worth knowing before you spend:** this single run produces three
+things, not one. The answer to whether the claim holds, the demo footage, and
+the corrected-variant recording that Demo Mode needs, see below.
+
+## Q1a. Can a widget render Demo Mode data?
+
+**Yes, and it is the easier path, not the harder one.**
+
+`src/data/samples.json` and `src/data/recordedRuns.json` are plain JSON files in
+the repo. They are imported by client code today (`src/lib/samples.js`,
+`src/lib/replay.js`) but nothing prevents a server route importing them. A
+Demo Mode widget therefore needs no Redis, no browser tab, and no credits. It is
+strictly simpler than the Live Mode path.
+
+**The catch, and it is a real one.** Recordings are keyed
+`recorded[decisionId][agent]` and return fixed output regardless of input. So in
+Demo Mode today, a correction would be accepted by the widget and the replayed
+downstream stages would return exactly what they returned before. That is
+precisely the failure mode the brief calls out: a widget that collects a
+correction and quietly discards it.
+
+**The fix is cheap and it falls out of the A/B test.** Record a second variant
+keyed by decision *and* correction state, for example
+`sample-cafe` and `sample-cafe@a1-supporting`. Run B of the A/B test produces
+exactly that payload. Demo Mode then replays a genuinely different downstream
+analysis for the corrected path, and the demo stays honest because both
+recordings are real captures.
+
+So for portfolio purposes: the demo path works, it needs one extra recording,
+and the run you are about to pay for generates it. I would capture run B's
+outputs into `recordedRuns.json` as part of the slice.
+
+## Q1b. Redis authoritative on the widget path, unconditionally
+
+Confirmed as a design constraint for the slice: **the widget path will never
+read `dv:index`.**
+
+`dv:index` is a browser-written snapshot with a 20-second cadence and a Live
+Mode gate, so anything reading it inherits a dependency on a tab having been
+open. The slice will instead write assumptions and evidence to their own keys
+under a per-decision namespace, written by the server on the correction path and
+read by the server on the render path. No browser participates in either.
+
+Demo Mode decisions bypass Redis entirely and read the static JSON, per Q1a.
+
+## Design tokens: no new tokens
+
+Acknowledged. Widgets will use only tokens already in `src/index.css`. If a
+widget appears to need a colour that does not exist there, I will raise it rather
+than add one. Both host themes will be rendered and shown before the surface
+question is settled.
