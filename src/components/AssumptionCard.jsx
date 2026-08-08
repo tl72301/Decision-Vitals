@@ -4,10 +4,22 @@ import { inputCls, fieldLabel } from "../lib/ui.js";
 import Chip from "./Chip.jsx";
 
 // One assumption as a ledger entry: index, importance, current status, the
-// assumption itself, and the warning signal to watch. Before the first review
-// it can be reworded, reranked, or deleted (delete lives inside Edit, behind
-// a confirm); after a review it is read-only.
-export default function AssumptionCard({ assumption, index, locked, onSave, onDelete }) {
+// assumption itself, and the warning signal to watch.
+//
+// Before the first review it can be reworded, reranked, or deleted. After a
+// review it can still be CORRECTED, which bumps its revision. That is safe
+// because each report snapshots the assumption as it judged it, so correcting
+// one now cannot rewrite what an earlier report appears to have concluded.
+// Delete stays closed after a review: removing an assumption entirely is not a
+// correction, and a re-review is the way to reassess.
+export default function AssumptionCard({
+  assumption,
+  index,
+  reviewed,
+  onSave,
+  onCorrect,
+  onDelete,
+}) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState({
     text: assumption.text,
@@ -29,7 +41,8 @@ export default function AssumptionCard({ assumption, index, locked, onSave, onDe
   }
 
   function save() {
-    onSave(assumption.id, {
+    const write = reviewed ? onCorrect : onSave;
+    write(assumption.id, {
       text: draft.text.trim(),
       signpost: draft.signpost.trim(),
       tier: draft.tier,
@@ -44,8 +57,14 @@ export default function AssumptionCard({ assumption, index, locked, onSave, onDe
     return (
       <li className="rounded-md border border-line-2 bg-ink-800 p-4">
         <label htmlFor={`a-text-${assumption.id}`} className={fieldLabel}>
-          Assumption {ref}
+          {reviewed ? `Correct assumption ${ref}` : `Assumption ${ref}`}
         </label>
+        {reviewed && (
+          <p className="mt-1 text-sm leading-relaxed text-fg-2">
+            Earlier reports keep the wording they judged. Review the decision
+            again to reassess against this correction.
+          </p>
+        )}
         <textarea
           id={`a-text-${assumption.id}`}
           value={draft.text}
@@ -92,7 +111,7 @@ export default function AssumptionCard({ assumption, index, locked, onSave, onDe
             disabled={!draft.text.trim()}
             className="rounded bg-brass px-3 py-2 text-xs font-semibold text-ink-950 transition-colors hover:bg-brass-2 disabled:opacity-40"
           >
-            Save changes
+            {reviewed ? "Save correction" : "Save changes"}
           </button>
           <button
             type="button"
@@ -101,21 +120,23 @@ export default function AssumptionCard({ assumption, index, locked, onSave, onDe
           >
             Cancel
           </button>
-          <button
-            type="button"
-            onClick={() => {
-              if (
-                window.confirm(
-                  `Delete assumption ${ref}? The review will no longer consider it.`
-                )
-              ) {
-                onDelete(assumption.id);
-              }
-            }}
-            className="ml-auto rounded px-3 py-2 text-xs font-medium text-fg-3 transition-colors hover:text-bad"
-          >
-            Delete assumption
-          </button>
+          {!reviewed && (
+            <button
+              type="button"
+              onClick={() => {
+                if (
+                  window.confirm(
+                    `Delete assumption ${ref}? The review will no longer consider it.`
+                  )
+                ) {
+                  onDelete(assumption.id);
+                }
+              }}
+              className="ml-auto rounded px-3 py-2 text-xs font-medium text-fg-3 transition-colors hover:text-bad"
+            >
+              Delete assumption
+            </button>
+          )}
         </div>
       </li>
     );
@@ -132,19 +153,23 @@ export default function AssumptionCard({ assumption, index, locked, onSave, onDe
           <Chip tone={status.chip} dot={status.dot}>
             {status.label}
           </Chip>
-          {assumption.userEdited && (
-            <span className="font-mono text-xs text-fg-3">edited</span>
+          {(assumption.revision ?? 1) > 1 ? (
+            <span className="font-mono text-xs text-fg-3">
+              rev {assumption.revision}
+            </span>
+          ) : (
+            assumption.userEdited && (
+              <span className="font-mono text-xs text-fg-3">edited</span>
+            )
           )}
         </div>
-        {!locked && (
-          <button
-            type="button"
-            onClick={startEdit}
-            className="shrink-0 rounded border border-line px-2.5 py-1 text-xs font-medium text-fg-2 transition-colors hover:border-line-2 hover:text-fg-1"
-          >
-            Edit
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={startEdit}
+          className="shrink-0 rounded border border-line px-2.5 py-1 text-xs font-medium text-fg-2 transition-colors hover:border-line-2 hover:text-fg-1"
+        >
+          {reviewed ? "Correct" : "Edit"}
+        </button>
       </div>
       <p className="mt-2 text-[15px] leading-relaxed text-fg-1">{assumption.text}</p>
       {assumption.signpost && (

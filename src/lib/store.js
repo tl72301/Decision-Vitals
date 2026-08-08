@@ -35,6 +35,8 @@ const STORAGE_KEY = "decision_vitals_state";
  * @property {string} signpost     Observable signal that this assumption is failing.
  * @property {AssumptionStatus} status
  * @property {boolean} userEdited
+ * @property {number} revision       Bumped each time the assumption is corrected after a review.
+ * @property {string|null} correctedAt  ISO string of the latest post-review correction.
  *
  * @typedef {"meeting_notes" | "customer_feedback" | "support_ticket" | "market_update" | "status_update"} SourceType
  *
@@ -70,6 +72,9 @@ const STORAGE_KEY = "decision_vitals_state";
  * @property {string} assumptionId
  * @property {string} status
  * @property {string} [previousStatus]  Status before this review (reports from newer runs only).
+ * @property {string} [assumptionText]   Assumption wording as judged by THIS review.
+ * @property {string} [assumptionTier]   Assumption tier as judged by THIS review.
+ * @property {number} [assumptionRevision]  Assumption revision this review judged.
  * @property {string} rationale
  * @property {ReportReceipt[]} receipts
  *
@@ -298,6 +303,8 @@ export function createAssumptions(inputs = []) {
     signpost: input.signpost ?? "",
     status: input.status ?? "untested",
     userEdited: input.userEdited ?? false,
+    revision: input.revision ?? 1,
+    correctedAt: input.correctedAt ?? null,
   }));
   updateState((s) => ({ ...s, assumptions: [...s.assumptions, ...created] }));
   return created;
@@ -314,6 +321,32 @@ export function updateAssumption(id, patch) {
     ...s,
     assumptions: s.assumptions.map((a) =>
       a.id === id ? (updated = { ...a, ...patch, id: a.id }) : a
+    ),
+  }));
+  return updated;
+}
+
+/**
+ * Correct an assumption after it has already been reviewed. Identical to
+ * updateAssumption except that it records the correction as a new revision,
+ * which the UI surfaces and reports can be read against.
+ * @param {string} id
+ * @param {Partial<Assumption>} patch
+ */
+export function correctAssumption(id, patch) {
+  let updated;
+  updateState((s) => ({
+    ...s,
+    assumptions: s.assumptions.map((a) =>
+      a.id === id
+        ? (updated = {
+            ...a,
+            ...patch,
+            id: a.id,
+            revision: (a.revision ?? 1) + 1,
+            correctedAt: nowIso(),
+          })
+        : a
     ),
   }));
   return updated;
