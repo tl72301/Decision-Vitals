@@ -22,6 +22,13 @@ full case study.
 
 ## Architecture
 
+For the design decisions behind this — why six agents, why the pipeline resumes
+one stage per poll, why reports snapshot the assumption they judged, and where
+the system deliberately does arithmetic instead of asking a model — see
+[`docs/architecture.md`](docs/architecture.md). To show the thing rather than
+read about it, [`docs/demo.md`](docs/demo.md) has two walkthroughs, one of which
+needs no setup.
+
 - **Frontend:** Vite + React + Tailwind, client-side routing (React Router).
   State lives in `localStorage` under one key; sample data is a static JSON
   file. There is no database.
