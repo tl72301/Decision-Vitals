@@ -22,6 +22,10 @@ full case study.
 
 ## Architecture
 
+**Want your own copy?** Decision Vitals is single-owner by design — no accounts,
+no shared database. [`docs/self-hosting.md`](docs/self-hosting.md) walks through
+deploying your own instance on your own API key.
+
 For the design decisions behind this — why six agents, why the pipeline resumes
 one stage per poll, why reports snapshot the assumption they judged, and where
 the system deliberately does arithmetic instead of asking a model — see
