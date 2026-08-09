@@ -47,15 +47,21 @@ export function deriveHealthGrade(assumptions) {
 
 /** Stage payloads, identical in shape to src/pages/AgentRun.jsx. */
 function payloadFor(agent, ctx) {
-  const { decision, assumptions, evidence, out } = ctx;
+  const { decision, assumptions, evidence, out, prior } = ctx;
   const mappings = out.evidence_review?.mappings ?? [];
   const challenges = out.challenge?.challenges ?? [];
   const rankings = out.risk_ranking?.rankings ?? [];
+  // Prior decisions go to the two stages that can act on them: Evidence Review
+  // weighs what happened last time as context, Challenge argues from it. Risk
+  // Ranking and Reporter work from this decision's own outputs, so adding
+  // history there would only dilute the input. The key is absent, not empty,
+  // when there is nothing related — an empty array reads as "we looked and
+  // there is no history", which is a different claim.
   switch (agent) {
     case "evidence_review":
-      return { decision, assumptions, evidence };
+      return prior ? { decision, assumptions, evidence, priorDecisions: prior } : { decision, assumptions, evidence };
     case "challenge":
-      return { decision, assumptions, mappings };
+      return prior ? { decision, assumptions, mappings, priorDecisions: prior } : { decision, assumptions, mappings };
     case "risk_ranking":
       return { assumptions, mappings, challenges };
     case "reporter":
@@ -102,6 +108,7 @@ export async function advanceReview(decisionId, progress) {
 
   const ctx = buildContext(state);
   ctx.out = outputs;
+  ctx.prior = await recallPrior(decisionId, state, next);
 
   const [agentIds, environmentId] = await Promise.all([
     resolveAgentIds(apiKey),
@@ -122,6 +129,24 @@ export async function advanceReview(decisionId, progress) {
   });
 
   return { done: false, stage: next, outputs: { ...outputs, [next]: output }, report: null };
+}
+
+/**
+ * Prior decisions to hand this stage, or null.
+ *
+ * Memory is an enhancement, never a dependency: a store that is missing,
+ * unreachable, or slow must not fail a review the user is paying for. Any
+ * error here degrades to "no history" rather than propagating, which is also
+ * what makes the feature safe to ship before it has ever been exercised live.
+ */
+async function recallPrior(decisionId, state, stage) {
+  if (stage !== "evidence_review" && stage !== "challenge") return null;
+  try {
+    const { recallRelated, priorContext } = await import("./_memory.js");
+    return priorContext(await recallRelated(decisionId, state));
+  } catch {
+    return null;
+  }
 }
 
 /** Shared context builder for both the one-shot and incremental paths. */
@@ -284,11 +309,22 @@ export async function finishReview(decisionId, outputs, stageLog = []) {
     stages: stageLog,
   };
 
-  await writeDecisionState(decisionId, {
+  const next = await writeDecisionState(decisionId, {
     ...state,
     assumptions: nextAssumptions,
     reports: [...prior, report],
   });
+
+  // Record what this review concluded, so the next related decision can be
+  // told about it. After the state write, and swallowing its own errors: the
+  // report is the thing the user paid for, and a memory-store failure must not
+  // turn a completed review into a failed one.
+  try {
+    const { rememberDecision } = await import("./_memory.js");
+    await rememberDecision(decisionId, next ?? { ...state, assumptions: nextAssumptions }, report);
+  } catch {
+    /* memory is an enhancement; the review stands without it */
+  }
 
   return report;
 }
