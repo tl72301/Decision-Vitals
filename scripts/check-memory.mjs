@@ -5,7 +5,7 @@
 // breaks a review" guarantee are all checked without spending credits.
 //
 // What this CANNOT check is whether the real memory-store endpoints accept
-// these bodies. That needs one live run — see docs/phase-0-findings.md.
+// these bodies. That needs one live run against a real memory store.
 //
 // Run: node scripts/check-memory.mjs
 
