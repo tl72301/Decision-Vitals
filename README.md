@@ -48,7 +48,8 @@ needs no setup.
   verdicts rather than left to the model.
 - **Serverless routes (Vercel, under `/api`):**
   - `api/setup.js`: idempotently creates or updates the six agents from
-    `agents.json` (matched by name) and returns their IDs.
+    `agents.json` (matched by name) and returns their IDs. Gated by the Live
+    Mode passphrase, passed as `?key=`.
   - `api/agent.js`: `POST { agent, payload }` runs one specialist as a
     Managed Agents session, polls until idle, parses the JSON reply (one
     retry with a "JSON only" nudge), and returns it.
@@ -192,9 +193,12 @@ emails were already pulled).
    - Optional: `KV_REST_API_URL` / `KV_REST_API_TOKEN` (Upstash Redis) to
      enable the MCP server and Gmail pull; `GOOGLE_CLIENT_ID` /
      `GOOGLE_CLIENT_SECRET` / `GOOGLE_REFRESH_TOKEN` for Gmail pull.
-3. Visit `/api/setup` once. It registers the six agents and returns their
-   IDs; the agents appear in the Claude Console. Repeat calls are no-ops.
-4. To edit a prompt: change `agents.json`, push, and hit `/api/setup` again.
+3. Visit `https://<your-site>/api/setup?key=<LIVE_MODE_PASSPHRASE>` once. It
+   registers the six agents and returns their IDs; the agents appear in the
+   Claude Console. Repeat calls are no-ops. Without the key it returns 401 and
+   makes no API calls.
+4. To edit a prompt: change `agents.json`, push, and visit the same
+   `/api/setup?key=<LIVE_MODE_PASSPHRASE>` URL again.
 
 ## Development
 
