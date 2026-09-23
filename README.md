@@ -212,9 +212,11 @@ npm run dev      # local dev server (requires vercel dev for the /api routes)
 
 node scripts/check-mcp-client.mjs   # a real MCP client, over real HTTP
 node scripts/check-risk-board.mjs   # risk scoring, then the same over MCP
+node scripts/check-memory.mjs       # cross-decision memory against a stubbed store
+node scripts/check-setup-gate.mjs   # /api/setup refuses callers without the passphrase
 ```
 
-Both checks stand up the handler behind a real HTTP server and connect a genuine
+The first two checks stand up the handler behind a real HTTP server and connect a genuine
 MCP `Client` to it. That is deliberate: the two worst bugs in this project both
 passed handler-level tests and failed the moment a real client connected — once
 because a capability was declared as a boolean where the schema wanted an
