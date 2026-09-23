@@ -38,7 +38,7 @@ In Vercel → your project → **Settings → Environment Variables**, scope **P
 | Variable | Value |
 |---|---|
 | `ANTHROPIC_API_KEY` | Your key from console.anthropic.com. Read only on the server; it never reaches a browser. |
-| `LIVE_MODE_PASSPHRASE` | Any secret phrase you invent. This unlocks Live Mode and gates the MCP endpoint. |
+| `LIVE_MODE_PASSPHRASE` | Any secret phrase you invent. This unlocks Live Mode and gates the MCP endpoint and agent setup (Step 3). |
 
 **Pick a fresh passphrase — don't reuse a password.** It travels in a URL later,
 so treat it as a bearer token: anyone holding it can read and write your
@@ -48,16 +48,21 @@ Redeploy after saving (Vercel doesn't apply new variables to an existing build).
 
 ## Step 3 — Register the six agents
 
-Visit once, in a browser:
+Visit once, in a browser, with the passphrase you set in Step 2:
 
 ```
-https://<your-site>.vercel.app/api/setup
+https://<your-site>.vercel.app/api/setup?key=<LIVE_MODE_PASSPHRASE>
 ```
 
 It reads `agents.json` and creates the six specialists in your Anthropic
 account, returning a slug → id map. It's idempotent — safe to call again, and
-it's how you push a prompt edit later (change `agents.json`, push, hit
-`/api/setup` again).
+it's how you push a prompt edit later (change `agents.json`, push, visit the
+same URL again).
+
+Without the key it returns **401** and makes no API calls, so someone who finds
+your deployment's URL can't overwrite prompt edits you've made in the Claude
+Console. (If you left `LIVE_MODE_PASSPHRASE` unset, this route is open, like
+every other gated route.)
 
 **You now have a working app.** Open the site. Demo Mode replays recorded runs
 for free; Live Mode asks for your passphrase and spends real credits.

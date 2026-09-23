@@ -9,6 +9,12 @@
 // the Claude Console (and /api/agent) can find each agent.
 //
 // A prompt edit is: change agents.json, push, hit /api/setup once.
+//
+// Gated by the Live Mode passphrase, passed as ?key= so the route stays usable
+// by visiting it in a browser:
+//   https://<your-site>/api/setup?key=<LIVE_MODE_PASSPHRASE>
+// It writes to the owner's agent definitions, so an open route would let anyone
+// revert prompt edits made in the Claude Console and read the agent IDs back.
 
 import {
   AGENTS,
@@ -73,6 +79,20 @@ export default async function handler(req, res) {
   if (req.method !== "POST" && req.method !== "GET") {
     res.setHeader("Allow", "GET, POST");
     return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  // Same rule as every other route: when LIVE_MODE_PASSPHRASE is unset the
+  // deployment is ungated. Checked before the API key is read, so a caller
+  // without the passphrase learns nothing about how the deployment is configured.
+  const required = process.env.LIVE_MODE_PASSPHRASE;
+  if (required) {
+    const urlKey = new URL(req.url, "http://localhost").searchParams.get("key");
+    if (urlKey !== required) {
+      return res.status(401).json({
+        ok: false,
+        error: "Passphrase required. Add ?key=<LIVE_MODE_PASSPHRASE> to this URL.",
+      });
+    }
   }
 
   let apiKey;
