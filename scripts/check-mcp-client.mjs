@@ -34,7 +34,7 @@ globalThis.fetch = async (url, init = {}) => {
 };
 
 const { createServer } = await import("node:http");
-const handler = (await import("/home/user/Decision-Vitals/api/mcp.js")).default;
+const handler = (await import(new URL("../api/mcp.js", import.meta.url))).default;
 
 // Wrap the Vercel-style handler in a real HTTP server, parsing the body the
 // way Vercel does, so a genuine MCP client talks to it over the wire.
@@ -51,8 +51,8 @@ await new Promise(r => server.listen(0, r));
 const port = server.address().port;
 const url = `http://127.0.0.1:${port}/api/mcp?key=${encodeURIComponent(PASSPHRASE)}`;
 
-const { Client } = await import("/home/user/Decision-Vitals/node_modules/@modelcontextprotocol/sdk/dist/esm/client/index.js");
-const { StreamableHTTPClientTransport } = await import("/home/user/Decision-Vitals/node_modules/@modelcontextprotocol/sdk/dist/esm/client/streamableHttp.js");
+const { Client } = await import("@modelcontextprotocol/sdk/client/index.js");
+const { StreamableHTTPClientTransport } = await import("@modelcontextprotocol/sdk/client/streamableHttp.js");
 
 const client = new Client({ name: "probe", version: "1.0.0" }, { capabilities: {} });
 try {
