@@ -129,9 +129,10 @@ npm run build                       # production build
 node scripts/check-mcp-client.mjs   # connects a real MCP client over real HTTP
 node scripts/check-risk-board.mjs   # risk scoring, then the same over MCP
 node scripts/check-memory.mjs       # cross-decision memory against a stubbed store
+node scripts/check-setup-gate.mjs   # /api/setup refuses callers without the passphrase
 ```
 
-All four should pass with no environment variables set — they stub what they need.
+All five should pass with no environment variables set — they stub what they need.
 
 ---
 
