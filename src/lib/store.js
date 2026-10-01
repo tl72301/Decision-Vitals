@@ -76,7 +76,10 @@ const STORAGE_KEY = "decision_vitals_state";
  * @property {string} [assumptionTier]   Assumption tier as judged by THIS review.
  * @property {number} [assumptionRevision]  Assumption revision this review judged.
  * @property {string} rationale
- * @property {ReportReceipt[]} receipts
+ * @property {ReportReceipt[]} receipts  Only quotes verified against the cited evidence.
+ * @property {number} [droppedReceipts]  Quotes removed because the evidence does not contain them.
+ * @property {{from: string, to: string, rule: string, evidenceIds: string[]}} [override]
+ *   Set when a code rule overrode Risk Ranking's status (see src/lib/grading.js).
  *
  * @typedef {Object} ReportAction
  * @property {"shaping" | "hedging"} type
@@ -91,6 +94,7 @@ const STORAGE_KEY = "decision_vitals_state";
  * @property {string} createdAt     ISO string.
  * @property {"healthy" | "watch" | "at_risk"} healthGrade
  * @property {HealthGrade} previousHealthGrade  Grade before this review (null on older reports).
+ * @property {HealthGrade} [reporterHealthGrade]  The Reporter's grade, when it disagreed with the derived one.
  * @property {string} summary
  * @property {ReportFinding[]} findings
  * @property {string[]} challengeHighlights
@@ -544,6 +548,8 @@ export function createReport(input) {
     createdAt: input.createdAt ?? nowIso(),
     healthGrade: input.healthGrade ?? "healthy",
     previousHealthGrade: input.previousHealthGrade ?? null,
+    // Set only when the Reporter's written grade disagreed with the derived one.
+    reporterHealthGrade: input.reporterHealthGrade ?? null,
     summary: input.summary ?? "",
     findings: input.findings ?? [],
     challengeHighlights: input.challengeHighlights ?? [],
