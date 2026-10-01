@@ -1,58 +1,24 @@
 // src/lib/review.js
 //
 // Turns the raw pipeline outputs into persisted state at the end of a review:
-//   1. apply each assumption's status from Risk Ranking (the authoritative step)
-//   2. set the decision's health grade (Reporter's, validated; else derived)
+//   1. grade the outputs under the shared rules in ./grading.js: statuses from
+//      Risk Ranking (with the strong-contradiction override), the health grade
+//      derived from those statuses, receipts checked against the evidence
+//   2. apply each assumption's final status and the decision's grade
 //   3. build and save the Report object, numbered by the run
 //
-// The health-grade derivation mirrors PLAN.md Sections 5 & 6 so the app enforces
-// the same rule even if a model returns an off-schema grade.
+// The rules live in ./grading.js so api/_review-core.js applies exactly the
+// same ones; neither path takes the Reporter's word for the grade.
 
 import {
   assumptionsByDecision,
+  evidenceByDecision,
   updateAssumption,
   updateDecision,
   createReport,
   getDecision,
 } from "./store.js";
-
-const VALID_STATUS = new Set(["holding", "weakened", "invalidated", "needs_review"]);
-const VALID_GRADE = new Set(["healthy", "watch", "at_risk"]);
-const VALID_CONFIDENCE = new Set(["low", "medium", "high"]);
-
-/** Derive the grade from current assumption statuses (PLAN.md rules). */
-export function deriveHealthGrade(decisionId) {
-  const assumptions = assumptionsByDecision(decisionId);
-  const isLoadBearing = (a) => a.tier === "load_bearing";
-
-  if (assumptions.some((a) => isLoadBearing(a) && a.status === "invalidated")) {
-    return "at_risk";
-  }
-  if (
-    assumptions.some(
-      (a) => isLoadBearing(a) && (a.status === "weakened" || a.status === "needs_review")
-    ) ||
-    assumptions.some((a) => a.status === "invalidated")
-  ) {
-    return "watch";
-  }
-  return "healthy";
-}
-
-function normalizeFindings(findings) {
-  if (!Array.isArray(findings)) return [];
-  return findings.map((f) => ({
-    assumptionId: f?.assumptionId ?? null,
-    status: f?.status ?? "needs_review",
-    rationale: f?.rationale ?? "",
-    receipts: Array.isArray(f?.receipts)
-      ? f.receipts.map((r) => ({
-          evidenceId: r?.evidenceId ?? null,
-          quote: r?.quote ?? "",
-        }))
-      : [],
-  }));
-}
+import { gradeReview } from "./grading.js";
 
 function normalizeActions(actions) {
   if (!Array.isArray(actions)) return [];
@@ -65,13 +31,14 @@ function normalizeActions(actions) {
 
 /**
  * Apply pipeline outputs and persist a numbered Report.
+ * Throws ReviewRejected, before changing anything, if Risk Ranking's output
+ * cannot be graded.
  * @param {string} decisionId
  * @param {{id: string, runNumber: number}} run  the AgentRun this report belongs to
  * @param {Record<string, any>} outputs  keyed by agent slug (risk_ranking, reporter, …)
  * @returns {import("./store.js").Report}
  */
 export function buildAndSaveReport(decisionId, run, outputs) {
-  const rr = outputs.risk_ranking ?? {};
   const rep = outputs.reporter ?? {};
 
   // 0. Snapshot the pre-review state so the report can show what moved, and
@@ -84,46 +51,27 @@ export function buildAndSaveReport(decisionId, run, outputs) {
   const asJudged = new Map(judged.map((a) => [a.id, a]));
   const previousHealthGrade = getDecision(decisionId)?.healthGrade ?? null;
 
-  // 1. Statuses from Risk Ranking; fall back to Reporter findings if absent.
-  const rankings = Array.isArray(rr.rankings) ? rr.rankings : [];
-  if (rankings.length > 0) {
-    for (const r of rankings) {
-      if (r?.assumptionId && VALID_STATUS.has(r.status)) {
-        updateAssumption(r.assumptionId, { status: r.status });
-      }
-    }
-  } else if (Array.isArray(rep.findings)) {
-    for (const f of rep.findings) {
-      if (f?.assumptionId && VALID_STATUS.has(f.status)) {
-        updateAssumption(f.assumptionId, { status: f.status });
-      }
-    }
-  }
+  // 1. Grade first, so a rejected review leaves the store untouched.
+  const graded = gradeReview({
+    assumptions: judged,
+    evidence: evidenceByDecision(decisionId),
+    outputs,
+  });
 
-  // 2. Health grade: trust the Reporter's if valid, otherwise derive it.
-  const healthGrade = VALID_GRADE.has(rep.healthGrade)
-    ? rep.healthGrade
-    : deriveHealthGrade(decisionId);
+  // 2. Final statuses and the derived grade.
+  for (const [id, status] of graded.statusById) {
+    updateAssumption(id, { status });
+  }
+  const { healthGrade } = graded;
   updateDecision(decisionId, { healthGrade });
 
   // 3. Persist the Report, numbered by its run. Each finding carries the
   // status the assumption had before this review, so reports can show
-  // Holding -> Weakened style movement.
-  // Risk Ranking is the only stage that says how sure it is, and the Reporter
-  // does not carry it through. Joining it onto the finding is what lets the
-  // Risk Board tell a confident reading apart from a guess. Mirrors the same
-  // join in api/_review-core.js.
-  const confidenceById = new Map(
-    rankings
-      .filter((r) => r?.assumptionId && VALID_CONFIDENCE.has(r.confidence))
-      .map((r) => [r.assumptionId, r.confidence])
-  );
-
-  const findings = normalizeFindings(rep.findings).map((f) => {
+  // Holding -> Weakened style movement, plus the assumption as judged.
+  const findings = graded.findings.map((f) => {
     const a = asJudged.get(f.assumptionId);
     return {
       ...f,
-      confidence: confidenceById.get(f.assumptionId) ?? null,
       previousStatus: priorStatus.get(f.assumptionId) ?? "untested",
       assumptionText: a?.text ?? "",
       assumptionTier: a?.tier ?? "lower_risk",
@@ -136,6 +84,7 @@ export function buildAndSaveReport(decisionId, run, outputs) {
     runNumber: run.runNumber,
     healthGrade,
     previousHealthGrade,
+    reporterHealthGrade: graded.reporterHealthGrade,
     summary: rep.summary ?? "",
     findings,
     challengeHighlights: Array.isArray(rep.challengeHighlights)

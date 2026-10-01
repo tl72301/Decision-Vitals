@@ -42,8 +42,13 @@ converges; asked separately, they disagree, and the disagreement is the signal.
 
 **A hard rule that a prompt cannot soften.** A load-bearing assumption with any
 strong contradicting evidence cannot be graded "holding." That rule lives in
-Risk Ranking's contract and is re-derived in code (`deriveHealthGrade`) so an
-off-schema grade from the model is overridden rather than trusted.
+Risk Ranking's contract and is enforced again in code (`src/lib/grading.js`),
+in both the browser and the server pipeline: a "holding" verdict against strong
+contradicting evidence is moved to needs review and the override is shown on
+the report. The overall grade is always derived from the statuses, never taken
+from the Reporter, and a quote that does not appear in the evidence it cites is
+dropped rather than shown as a receipt. A ranking that skips an assumption is
+rejected before the Reporter is paid to write it up.
 
 **Cost that follows difficulty.** The two genuinely open-ended roles run a
 Sonnet-class model; the four schema-bound ones run Haiku. Each stage returns

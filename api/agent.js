@@ -13,6 +13,7 @@ import {
   resolveEnvironmentId,
 } from "./_agents.js";
 import { runOneAgent } from "./_run-agent.js";
+import { denyLive } from "./_auth.js";
 
 export const config = { maxDuration: 60 };
 
@@ -24,15 +25,13 @@ export default async function handler(req, res) {
     return res.status(405).json({ ok: false, error: "Method not allowed" });
   }
 
-  // Live Mode gate: when LIVE_MODE_PASSPHRASE is set, every real agent run
-  // must present it. Demo Mode never reaches this route.
-  const requiredPassphrase = process.env.LIVE_MODE_PASSPHRASE;
-  if (requiredPassphrase && req.headers["x-live-passphrase"] !== requiredPassphrase) {
-    return res.status(401).json({
-      ok: false,
-      error: "Live Mode requires the correct passphrase. Unlock it via the header toggle.",
-    });
-  }
+  // Live Mode gate: every real agent run must present the passphrase, and
+  // with none configured no run is allowed. Demo Mode never reaches this route.
+  const denied = denyLive(
+    req.headers["x-live-passphrase"],
+    "Live Mode requires the correct passphrase. Unlock it via the header toggle."
+  );
+  if (denied) return res.status(denied.status).json({ ok: false, error: denied.error });
 
   const body = req.body ?? {};
   const { agent: agentSlug, payload } = body;

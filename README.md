@@ -189,7 +189,7 @@ emails were already pulled).
    - `ANTHROPIC_API_KEY`: your Claude API key. Read only in `/api`; it never
      reaches the browser.
    - `LIVE_MODE_PASSPHRASE`: any secret phrase. Required to unlock Live Mode;
-     without it set, Live Mode is not gated.
+     without it set, Live Mode and every other live route refuse requests.
    - Optional: `KV_REST_API_URL` / `KV_REST_API_TOKEN` (Upstash Redis) to
      enable the MCP server and Gmail pull; `GOOGLE_CLIENT_ID` /
      `GOOGLE_CLIENT_SECRET` / `GOOGLE_REFRESH_TOKEN` for Gmail pull.
@@ -214,6 +214,9 @@ node scripts/check-mcp-client.mjs   # a real MCP client, over real HTTP
 node scripts/check-risk-board.mjs   # risk scoring, then the same over MCP
 node scripts/check-memory.mjs       # cross-decision memory against a stubbed store
 node scripts/check-setup-gate.mjs   # /api/setup refuses callers without the passphrase
+node scripts/check-live-auth.mjs    # every live route refuses without a configured passphrase
+node scripts/check-grading.mjs      # contradictory model output, graded by the rules anyway
+node scripts/check-review-lock.mjs  # overlapping polls never pay for a stage twice
 ```
 
 The first two checks stand up the handler behind a real HTTP server and connect a genuine

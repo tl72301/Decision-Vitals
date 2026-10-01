@@ -44,7 +44,7 @@ function check(label, actual, expected) {
 
 // ---- 1. the arithmetic ----------------------------------------------------
 
-const { scoreAssumption, buildRiskBoard } = await import("/home/user/Decision-Vitals/api/_risk.js");
+const { scoreAssumption, buildRiskBoard } = await import(new URL("../api/_risk.js", import.meta.url));
 
 const s = (tier, status, confidence) =>
   scoreAssumption({ tier, status }, confidence ? { confidence } : undefined);
@@ -124,7 +124,7 @@ check("a never-reviewed decision still scores", [fresh.reviewed, fresh.rows[0].e
 // ---- 3. through a real MCP client -----------------------------------------
 
 const { createServer } = await import("node:http");
-const handler = (await import("/home/user/Decision-Vitals/api/mcp.js")).default;
+const handler = (await import(new URL("../api/mcp.js", import.meta.url))).default;
 
 const server = createServer(async (req, res) => {
   const chunks = [];
@@ -138,8 +138,8 @@ const server = createServer(async (req, res) => {
 await new Promise((r) => server.listen(0, r));
 const url = `http://127.0.0.1:${server.address().port}/api/mcp?key=${encodeURIComponent(PASSPHRASE)}`;
 
-const { Client } = await import("/home/user/Decision-Vitals/node_modules/@modelcontextprotocol/sdk/dist/esm/client/index.js");
-const { StreamableHTTPClientTransport } = await import("/home/user/Decision-Vitals/node_modules/@modelcontextprotocol/sdk/dist/esm/client/streamableHttp.js");
+const { Client } = await import("@modelcontextprotocol/sdk/client/index.js");
+const { StreamableHTTPClientTransport } = await import("@modelcontextprotocol/sdk/client/streamableHttp.js");
 
 console.log("client:");
 const client = new Client({ name: "risk-probe", version: "1.0.0" }, { capabilities: {} });
@@ -188,7 +188,7 @@ try {
 
   // The widget's fallback path must return the same shape as the tool, or a
   // missed notification produces a subtly different board.
-  const stateHandler = (await import("/home/user/Decision-Vitals/api/decision-state.js")).default;
+  const stateHandler = (await import(new URL("../api/decision-state.js", import.meta.url))).default;
   const captured = {};
   await stateHandler(
     { method: "GET", query: { id: "sample-cafe", view: "risk" }, headers: {} },

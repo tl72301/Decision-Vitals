@@ -16,34 +16,17 @@ import {
   writeDecisionState,
   activeAssumptions,
 } from "./_state.js";
+import {
+  checkRankings,
+  deriveHealthGrade,
+  gradeReview,
+} from "../src/lib/grading.js";
 
 const DEADLINE_MS = 290_000;
 
-const VALID_STATUS = new Set(["holding", "weakened", "invalidated", "needs_review"]);
-const VALID_GRADE = new Set(["healthy", "watch", "at_risk"]);
-const VALID_CONFIDENCE = new Set(["low", "medium", "high"]);
-
-/**
- * Derive the grade from assumption statuses. Mirrors deriveHealthGrade() in
- * src/lib/review.js: a critical assumption that is invalidated puts the whole
- * decision at risk, and that rule is enforced here rather than trusted to the
- * model.
- */
-export function deriveHealthGrade(assumptions) {
-  const critical = (a) => a.tier === "load_bearing";
-  if (assumptions.some((a) => critical(a) && a.status === "invalidated")) {
-    return "at_risk";
-  }
-  if (
-    assumptions.some(
-      (a) => critical(a) && (a.status === "weakened" || a.status === "needs_review")
-    ) ||
-    assumptions.some((a) => a.status === "invalidated")
-  ) {
-    return "watch";
-  }
-  return "healthy";
-}
+// The grading rules are shared with the browser pipeline (src/lib/review.js)
+// so a review graded here and one graded in the app reach the same verdict.
+export { deriveHealthGrade };
 
 /** Stage payloads, identical in shape to src/pages/AgentRun.jsx. */
 function payloadFor(agent, ctx) {
@@ -127,6 +110,8 @@ export async function advanceReview(decisionId, progress) {
     payload: payloadFor(next, ctx),
     deadline: Date.now() + 50_000,
   });
+  // Reject an ungradeable ranking now rather than pay for the Reporter first.
+  if (next === "risk_ranking") checkRankings(ctx.assumptions, output);
 
   return { done: false, stage: next, outputs: { ...outputs, [next]: output }, report: null };
 }
@@ -230,6 +215,7 @@ export async function runReviewForDecision(decisionId) {
       payload: payloadFor(agentSlug, ctx),
       deadline,
     });
+    if (agentSlug === "risk_ranking") checkRankings(ctx.assumptions, output);
     ctx.out[agentSlug] = output;
     stageLog.push({ agent: agentSlug, sessionId, durationMs: Date.now() - t0 });
   }
@@ -244,48 +230,30 @@ export async function runReviewForDecision(decisionId) {
 export async function finishReview(decisionId, outputs, stageLog = []) {
   const state = await readDecisionState(decisionId);
   if (!state) throw new Error(`No decision "${decisionId}".`);
-  const ctx = { out: outputs };
 
-  // Apply statuses, then derive the grade under the same rules the app uses.
-  const rep = ctx.out.reporter ?? {};
-  const rankings = ctx.out.risk_ranking?.rankings ?? [];
-  const statusById = new Map(
-    rankings
-      .filter((r) => r?.assumptionId && VALID_STATUS.has(r.status))
-      .map((r) => [r.assumptionId, r.status])
-  );
-
-  // Risk Ranking is the only stage that reports how sure it is. The Reporter
-  // does not carry it through, so it is joined on here: without it the risk
-  // score has a single real input and a confident reading is indistinguishable
-  // from a guess.
-  const confidenceById = new Map(
-    rankings
-      .filter((r) => r?.assumptionId && VALID_CONFIDENCE.has(r.confidence))
-      .map((r) => [r.assumptionId, r.confidence])
-  );
+  // Grade under the shared rules before writing anything, so a rejected review
+  // leaves the stored decision exactly as it was.
+  const rep = outputs.reporter ?? {};
+  const graded = gradeReview({
+    assumptions: state.assumptions,
+    evidence: state.evidence ?? [],
+    outputs,
+  });
+  const { healthGrade } = graded;
 
   const priorStatus = new Map(state.assumptions.map((a) => [a.id, a.status]));
   const nextAssumptions = state.assumptions.map((a) =>
-    statusById.has(a.id) ? { ...a, status: statusById.get(a.id) } : a
+    graded.statusById.has(a.id) ? { ...a, status: graded.statusById.get(a.id) } : a
   );
-
-  const healthGrade = VALID_GRADE.has(rep.healthGrade)
-    ? rep.healthGrade
-    : deriveHealthGrade(nextAssumptions.filter((a) => !a.outOfScope));
 
   // Findings carry the assumption as judged, so a later correction cannot
   // rewrite what this report concluded. Same contract as src/lib/review.js.
   const judged = new Map(state.assumptions.map((a) => [a.id, a]));
-  const findings = (Array.isArray(rep.findings) ? rep.findings : []).map((f) => {
-    const a = judged.get(f?.assumptionId);
+  const findings = graded.findings.map((f) => {
+    const a = judged.get(f.assumptionId);
     return {
-      assumptionId: f?.assumptionId ?? null,
-      status: f?.status ?? "needs_review",
-      confidence: confidenceById.get(f?.assumptionId) ?? null,
-      rationale: f?.rationale ?? "",
-      receipts: Array.isArray(f?.receipts) ? f.receipts : [],
-      previousStatus: priorStatus.get(f?.assumptionId) ?? "untested",
+      ...f,
+      previousStatus: priorStatus.get(f.assumptionId) ?? "untested",
       assumptionText: a?.text ?? "",
       assumptionTier: a?.tier ?? "lower_risk",
       assumptionRevision: a?.revision ?? 1,
@@ -300,6 +268,7 @@ export async function finishReview(decisionId, outputs, stageLog = []) {
     createdAt: new Date().toISOString(),
     healthGrade,
     previousHealthGrade: prior.length ? prior[prior.length - 1].healthGrade : null,
+    reporterHealthGrade: graded.reporterHealthGrade,
     summary: rep.summary ?? "",
     findings,
     challengeHighlights: Array.isArray(rep.challengeHighlights)

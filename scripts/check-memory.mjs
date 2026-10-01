@@ -62,7 +62,7 @@ globalThis.fetch = async (url, init = {}) => {
 };
 
 const { renderMemory, rememberDecision, recallRelated, priorContext } =
-  await import("/home/user/Decision-Vitals/api/_memory.js");
+  await import(new URL("../api/_memory.js", import.meta.url));
 
 const decision = (id, title, statement, assumptionText) => ({
   decision: { id, title, statement },
@@ -130,7 +130,7 @@ globalThis.fetch = async (url) => {
     : "AGENTS-DOWN";
   throw new Error(down);
 };
-const { advanceReview } = await import("/home/user/Decision-Vitals/api/_review-core.js");
+const { advanceReview } = await import(new URL("../api/_review-core.js", import.meta.url));
 let reached = null;
 try {
   await advanceReview("sample-cafe", { outputs: {} });

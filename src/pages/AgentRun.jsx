@@ -10,6 +10,7 @@ import {
   purgeOrphanRuns,
 } from "../lib/store.js";
 import { buildAndSaveReport } from "../lib/review.js";
+import { checkRankings } from "../lib/grading.js";
 import { btnPrimary } from "../lib/ui.js";
 import Spinner from "../components/Spinner.jsx";
 import JsonView from "../components/JsonView.jsx";
@@ -162,6 +163,9 @@ export default function AgentRun() {
       const t0 = performance.now();
       try {
         const output = await runAgent(agent, payload, { decisionId: id });
+        // An incomplete ranking cannot be graded, so stop here rather than
+        // pay for a Reporter run whose report would be rejected anyway.
+        if (agent === "risk_ranking") checkRankings(assumptionsForAgent, output);
         outputs[agent] = output;
         fullRunRef.current.agents[agent] = { input: payload, output };
         working[i] = {
@@ -185,7 +189,12 @@ export default function AgentRun() {
 
     // All four finished: build the numbered Report, apply assumption statuses,
     // and set the decision's health grade.
-    buildAndSaveReport(id, run, outputs);
+    try {
+      buildAndSaveReport(id, run, outputs);
+    } catch (err) {
+      setError(`The report could not be built: ${err.message}`);
+      return;
+    }
     setDone(true);
   }
 

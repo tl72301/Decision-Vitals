@@ -54,6 +54,24 @@ export async function kvDel(key) {
   await cmd("DEL", key);
 }
 
+/**
+ * Take a short-lived lock. Returns a token when acquired, null when someone
+ * else holds it. The lease expires on its own, so a holder that dies cannot
+ * wedge the key.
+ */
+export async function kvAcquireLock(key, leaseMs) {
+  const token = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+  const ok = await cmd("SET", key, token, "NX", "PX", String(leaseMs));
+  return ok === "OK" ? token : null;
+}
+
+/** Release a lock, but only if this caller still holds it. */
+export async function kvReleaseLock(key, token) {
+  // Not atomic, but the window only matters if the lease ran out while the
+  // holder was still working, and the lease is sized well past a stage's run.
+  if ((await cmd("GET", key)) === token) await cmd("DEL", key);
+}
+
 export const KEYS = {
   index: "dv:index",
   inbox: "dv:inbox",

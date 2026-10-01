@@ -31,7 +31,14 @@ import {
 } from "@modelcontextprotocol/ext-apps/server";
 import { z } from "zod";
 import { randomUUID } from "node:crypto";
-import { kvConfigured, kvGetJson, kvSetJson, KEYS } from "./_kv.js";
+import {
+  kvConfigured,
+  kvGetJson,
+  kvSetJson,
+  kvAcquireLock,
+  kvReleaseLock,
+  KEYS,
+} from "./_kv.js";
 import {
   readDecisionState,
   writeDecisionState,
@@ -50,6 +57,7 @@ import {
   writeTaskRecord,
 } from "./_task-store.js";
 import { STAGES, STAGE_LABEL } from "./_review-core.js";
+import { denyLive } from "./_auth.js";
 
 const MATRIX_URI = "ui://decision-vitals/assumption-matrix";
 const BOARD_URI = "ui://decision-vitals/progress-board";
@@ -636,11 +644,35 @@ const STAGE_NAME = {
  *
  * A failing stage marks the task failed with the stage that failed and why,
  * rather than leaving a task that never resolves.
+ *
+ * Only one poll may advance a task at a time. A stage takes 10 to 50 seconds
+ * while polls arrive every 1.5, from the host's tasks/get, a Progress Board,
+ * or a retry after a timeout; without the lock each overlapping poll would
+ * start its own paid session for the same stage, and two polls arriving at
+ * the end would each save a report. A poll that finds the lock taken returns
+ * the task as it stands.
  */
+const ADVANCE_LEASE_MS = 90_000; // past a stage's 50s deadline plus overhead
+
 async function advanceReviewTask(record) {
+  if (!record.pipeline?.decisionId) return record;
+  const lock = `dv:task:${record.task.taskId}:advance`;
+  const token = await kvAcquireLock(lock, ADVANCE_LEASE_MS);
+  if (!token) return record;
+  try {
+    // Re-read under the lock: the record passed in may predate a stage that
+    // another poll finished while this one waited.
+    const fresh = (await readTaskRecord(record.task.taskId)) ?? record;
+    if (fresh.task.status !== "working") return fresh;
+    return await advanceLocked(fresh);
+  } finally {
+    await kvReleaseLock(lock, token).catch(() => {});
+  }
+}
+
+async function advanceLocked(record) {
   const { advanceReview } = await import("./_review-core.js");
   const pipeline = record.pipeline;
-  if (!pipeline?.decisionId) return record;
 
   const startedAt = Date.now();
   try {
@@ -731,18 +763,18 @@ export default async function handler(req, res) {
   }
 
   // Same gate as the rest of Live Mode: the passphrase, passed as ?key= or a
-  // bearer token, since MCP clients can't easily set custom headers.
-  const required = process.env.LIVE_MODE_PASSPHRASE;
-  if (required) {
-    const urlKey = new URL(req.url, "http://localhost").searchParams.get("key");
-    const bearer = (req.headers.authorization ?? "").replace(/^Bearer\s+/i, "");
-    if (urlKey !== required && bearer !== required) {
-      return res.status(401).json({
-        jsonrpc: "2.0",
-        error: { code: -32001, message: "Unauthorized: pass ?key=<passphrase> in the connector URL." },
-        id: null,
-      });
-    }
+  // bearer token, since MCP clients can't easily set custom headers. Fails
+  // closed: with no passphrase configured, the endpoint refuses everyone.
+  const urlKey = new URL(req.url, "http://localhost").searchParams.get("key");
+  const bearer = (req.headers.authorization ?? "").replace(/^Bearer\s+/i, "");
+  const unauthorized = "Unauthorized: pass ?key=<passphrase> in the connector URL.";
+  const denied = denyLive(urlKey, unauthorized) && denyLive(bearer, unauthorized);
+  if (denied) {
+    return res.status(denied.status).json({
+      jsonrpc: "2.0",
+      error: { code: -32001, message: denied.error },
+      id: null,
+    });
   }
 
   if (req.method !== "POST") {

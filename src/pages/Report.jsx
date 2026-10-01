@@ -127,6 +127,13 @@ function FindingRow({ finding, assumption, index }) {
           Corrected since this review. Re-review to reassess.
         </p>
       )}
+      {finding.override && (
+        <p className="mt-1 font-mono text-xs text-fg-3">
+          Assessed as {statusMeta(finding.override.from).label}; set to{" "}
+          {statusMeta(finding.override.to).label} because a critical assumption
+          with strong contradicting evidence cannot be holding.
+        </p>
+      )}
       {finding.rationale && (
         <p className="mt-1 max-w-prose text-[15px] leading-relaxed text-fg-2">
           {finding.rationale}
@@ -138,6 +145,13 @@ function FindingRow({ finding, assumption, index }) {
             <Receipt key={i} receipt={r} />
           ))}
         </ul>
+      )}
+      {finding.droppedReceipts > 0 && (
+        <p className="mt-2 font-mono text-xs text-fg-3">
+          {finding.droppedReceipts === 1
+            ? "1 quote was left out because the cited evidence does not contain it."
+            : `${finding.droppedReceipts} quotes were left out because the cited evidence does not contain them.`}
+        </p>
       )}
     </li>
   );
@@ -199,6 +213,13 @@ export default function Report() {
         {report.summary && (
           <p className="mt-4 max-w-prose text-base leading-relaxed text-fg-2">
             {report.summary}
+          </p>
+        )}
+        {report.reporterHealthGrade && (
+          <p className="mt-2 max-w-prose font-mono text-xs text-fg-3">
+            The summary was written against a grade of{" "}
+            {healthGradeMeta(report.reporterHealthGrade).label}. The grade shown is
+            computed from the assumption statuses below.
           </p>
         )}
 
