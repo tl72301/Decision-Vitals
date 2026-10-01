@@ -12,11 +12,12 @@
 
 import { readDecisionState, writeDecisionState } from "./_state.js";
 import { buildRiskBoard } from "./_risk.js";
+import { denyLive } from "./_auth.js";
 
 function gate(req, res) {
-  const required = process.env.LIVE_MODE_PASSPHRASE;
-  if (required && req.headers["x-live-passphrase"] !== required) {
-    res.status(401).json({ ok: false, error: "Passphrase required." });
+  const denied = denyLive(req.headers["x-live-passphrase"]);
+  if (denied) {
+    res.status(denied.status).json({ ok: false, error: denied.error });
     return false;
   }
   return true;

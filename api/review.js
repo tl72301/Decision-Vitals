@@ -19,6 +19,7 @@
 // cannot poll.
 
 import { runReviewForDecision } from "./_review-core.js";
+import { denyLive } from "./_auth.js";
 
 export const config = { maxDuration: 60 };
 
@@ -28,10 +29,8 @@ export default async function handler(req, res) {
     return res.status(405).json({ ok: false, error: "Method not allowed" });
   }
 
-  const required = process.env.LIVE_MODE_PASSPHRASE;
-  if (required && req.headers["x-live-passphrase"] !== required) {
-    return res.status(401).json({ ok: false, error: "Passphrase required." });
-  }
+  const denied = denyLive(req.headers["x-live-passphrase"]);
+  if (denied) return res.status(denied.status).json({ ok: false, error: denied.error });
 
   const decisionId = req.body?.decisionId;
   if (!decisionId) {

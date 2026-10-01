@@ -23,6 +23,7 @@ import {
   requireApiKey,
   listAllAgents,
 } from "./_agents.js";
+import { denyLive } from "./_auth.js";
 
 function agentBody(def) {
   return {
@@ -81,19 +82,15 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  // Same rule as every other route: when LIVE_MODE_PASSPHRASE is unset the
-  // deployment is ungated. Checked before the API key is read, so a caller
-  // without the passphrase learns nothing about how the deployment is configured.
-  const required = process.env.LIVE_MODE_PASSPHRASE;
-  if (required) {
-    const urlKey = new URL(req.url, "http://localhost").searchParams.get("key");
-    if (urlKey !== required) {
-      return res.status(401).json({
-        ok: false,
-        error: "Passphrase required. Add ?key=<LIVE_MODE_PASSPHRASE> to this URL.",
-      });
-    }
-  }
+  // Same gate as every other live route, and like them it fails closed: with
+  // LIVE_MODE_PASSPHRASE unset the route refuses. Checked before the API key
+  // is read, so a caller without the passphrase learns nothing about how the
+  // deployment is configured.
+  const denied = denyLive(
+    new URL(req.url, "http://localhost").searchParams.get("key"),
+    "Passphrase required. Add ?key=<LIVE_MODE_PASSPHRASE> to this URL."
+  );
+  if (denied) return res.status(denied.status).json({ ok: false, error: denied.error });
 
   let apiKey;
   try {

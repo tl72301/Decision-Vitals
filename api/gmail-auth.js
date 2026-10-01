@@ -7,6 +7,8 @@
 // GOOGLE_CLIENT_SECRET (from a Google Cloud OAuth "Web application" client whose
 // authorized redirect URI is exactly this route's URL).
 
+import { denyLive } from "./_auth.js";
+
 const SCOPE = "https://www.googleapis.com/auth/gmail.readonly";
 
 function page(title, bodyHtml) {
@@ -35,8 +37,11 @@ export default async function handler(req, res) {
 
   // Step 1: start consent (gated by the passphrase so strangers can't trigger it).
   if (!code) {
-    const required = process.env.LIVE_MODE_PASSPHRASE;
-    if (required && url.searchParams.get("key") !== required) {
+    const denied = denyLive(url.searchParams.get("key"));
+    if (denied?.status === 503) {
+      return res.status(503).send(page("Gmail setup", "<h2>Live operations are disabled</h2><p>Set <code>LIVE_MODE_PASSPHRASE</code> in Vercel and redeploy first.</p>"));
+    }
+    if (denied) {
       return res.status(401).send(page("Gmail setup", "<h2>Passphrase required</h2><p>Add <code>?key=YOUR_PASSPHRASE</code> to this URL.</p>"));
     }
     const auth = new URL("https://accounts.google.com/o/oauth2/v2/auth");

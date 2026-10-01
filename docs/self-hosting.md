@@ -38,7 +38,7 @@ In Vercel → your project → **Settings → Environment Variables**, scope **P
 | Variable | Value |
 |---|---|
 | `ANTHROPIC_API_KEY` | Your key from console.anthropic.com. Read only on the server; it never reaches a browser. |
-| `LIVE_MODE_PASSPHRASE` | Any secret phrase you invent. This unlocks Live Mode and gates the MCP endpoint and agent setup (Step 3). |
+| `LIVE_MODE_PASSPHRASE` | Any secret phrase you invent. This unlocks Live Mode and gates the MCP endpoint and agent setup (Step 3). Without it, all of those refuse every request. |
 
 **Pick a fresh passphrase — don't reuse a password.** It travels in a URL later,
 so treat it as a bearer token: anyone holding it can read and write your
@@ -61,8 +61,8 @@ same URL again).
 
 Without the key it returns **401** and makes no API calls, so someone who finds
 your deployment's URL can't overwrite prompt edits you've made in the Claude
-Console. (If you left `LIVE_MODE_PASSPHRASE` unset, this route is open, like
-every other gated route.)
+Console. (If you left `LIVE_MODE_PASSPHRASE` unset, this route returns **503**,
+like every other gated route, until you set it and redeploy.)
 
 **You now have a working app.** Open the site. Demo Mode replays recorded runs
 for free; Live Mode asks for your passphrase and spends real credits.

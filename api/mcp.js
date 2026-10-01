@@ -50,6 +50,7 @@ import {
   writeTaskRecord,
 } from "./_task-store.js";
 import { STAGES, STAGE_LABEL } from "./_review-core.js";
+import { denyLive } from "./_auth.js";
 
 const MATRIX_URI = "ui://decision-vitals/assumption-matrix";
 const BOARD_URI = "ui://decision-vitals/progress-board";
@@ -731,18 +732,18 @@ export default async function handler(req, res) {
   }
 
   // Same gate as the rest of Live Mode: the passphrase, passed as ?key= or a
-  // bearer token, since MCP clients can't easily set custom headers.
-  const required = process.env.LIVE_MODE_PASSPHRASE;
-  if (required) {
-    const urlKey = new URL(req.url, "http://localhost").searchParams.get("key");
-    const bearer = (req.headers.authorization ?? "").replace(/^Bearer\s+/i, "");
-    if (urlKey !== required && bearer !== required) {
-      return res.status(401).json({
-        jsonrpc: "2.0",
-        error: { code: -32001, message: "Unauthorized: pass ?key=<passphrase> in the connector URL." },
-        id: null,
-      });
-    }
+  // bearer token, since MCP clients can't easily set custom headers. Fails
+  // closed: with no passphrase configured, the endpoint refuses everyone.
+  const urlKey = new URL(req.url, "http://localhost").searchParams.get("key");
+  const bearer = (req.headers.authorization ?? "").replace(/^Bearer\s+/i, "");
+  const unauthorized = "Unauthorized: pass ?key=<passphrase> in the connector URL.";
+  const denied = denyLive(urlKey, unauthorized) && denyLive(bearer, unauthorized);
+  if (denied) {
+    return res.status(denied.status).json({
+      jsonrpc: "2.0",
+      error: { code: -32001, message: denied.error },
+      id: null,
+    });
   }
 
   if (req.method !== "POST") {

@@ -16,7 +16,9 @@ self-host it, understand these before putting anything sensitive in it:
   URLs as a `?key=` query parameter, so treat it as a bearer token: anyone
   holding it can read your decisions, file evidence, start reviews, and
   overwrite your agent definitions. Generate a random value; never reuse a
-  password. **Leave it unset and all of those routes are open.**
+  password. **Leave it unset and all of those routes refuse every request**
+  (503), so a deployment with an API key but no passphrase cannot be spent
+  from.
 - **One deliberate exception.** Reading a single decision's state
   (`GET /api/decision-state?id=…`) needs no passphrase, so the panels inside a
   Claude conversation can load their data without putting the passphrase into

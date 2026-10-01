@@ -10,7 +10,8 @@
 //
 // The network is stubbed and every request bound for the Anthropic API is
 // counted, so "no API request on a 401" is asserted rather than assumed. Run
-// against the pre-#19 file, this check fails its six gate assertions.
+// against the pre-#19 file, this check fails its six gate assertions; against
+// the fail-open gate that followed it, it fails the four unset assertions.
 //
 // Throwaway values only. No real key or passphrase is read or needed.
 //
@@ -87,11 +88,17 @@ check("correct key over POST -> 200", r.status === 200, r);
 r = await hit("PUT", `/api/setup?key=${encodeURIComponent(PASS)}`);
 check("unsupported method -> 405", r.status === 405, r);
 
-// Unset means ungated, the same rule every other gated route follows.
+// Unset fails closed, the same rule every live route follows (api/_auth.js).
+// An empty key must not match an empty configuration either.
 console.log("with LIVE_MODE_PASSPHRASE unset:");
 delete process.env.LIVE_MODE_PASSPHRASE;
 r = await hit("GET", "/api/setup");
-check("no passphrase configured -> proceeds, 200", r.status === 200, r);
+check("no passphrase configured -> 503", r.status === 503, r);
+check("no passphrase configured -> no Anthropic request", r.apiRequests === 0, r);
+r = await hit("GET", "/api/setup?key=");
+check("no passphrase configured, empty key -> 503", r.status === 503, r);
+r = await hit("GET", "/api/setup?key=anything");
+check("no passphrase configured, any key -> 503", r.status === 503 && r.apiRequests === 0, r);
 
 console.log(failures === 0 ? "\nall checks passed" : `\n${failures} check(s) failed`);
 process.exit(failures === 0 ? 0 : 1);
