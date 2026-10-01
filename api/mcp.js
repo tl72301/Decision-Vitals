@@ -31,7 +31,14 @@ import {
 } from "@modelcontextprotocol/ext-apps/server";
 import { z } from "zod";
 import { randomUUID } from "node:crypto";
-import { kvConfigured, kvGetJson, kvSetJson, KEYS } from "./_kv.js";
+import {
+  kvConfigured,
+  kvGetJson,
+  kvSetJson,
+  kvAcquireLock,
+  kvReleaseLock,
+  KEYS,
+} from "./_kv.js";
 import {
   readDecisionState,
   writeDecisionState,
@@ -637,11 +644,35 @@ const STAGE_NAME = {
  *
  * A failing stage marks the task failed with the stage that failed and why,
  * rather than leaving a task that never resolves.
+ *
+ * Only one poll may advance a task at a time. A stage takes 10 to 50 seconds
+ * while polls arrive every 1.5, from the host's tasks/get, a Progress Board,
+ * or a retry after a timeout; without the lock each overlapping poll would
+ * start its own paid session for the same stage, and two polls arriving at
+ * the end would each save a report. A poll that finds the lock taken returns
+ * the task as it stands.
  */
+const ADVANCE_LEASE_MS = 90_000; // past a stage's 50s deadline plus overhead
+
 async function advanceReviewTask(record) {
+  if (!record.pipeline?.decisionId) return record;
+  const lock = `dv:task:${record.task.taskId}:advance`;
+  const token = await kvAcquireLock(lock, ADVANCE_LEASE_MS);
+  if (!token) return record;
+  try {
+    // Re-read under the lock: the record passed in may predate a stage that
+    // another poll finished while this one waited.
+    const fresh = (await readTaskRecord(record.task.taskId)) ?? record;
+    if (fresh.task.status !== "working") return fresh;
+    return await advanceLocked(fresh);
+  } finally {
+    await kvReleaseLock(lock, token).catch(() => {});
+  }
+}
+
+async function advanceLocked(record) {
   const { advanceReview } = await import("./_review-core.js");
   const pipeline = record.pipeline;
-  if (!pipeline?.decisionId) return record;
 
   const startedAt = Date.now();
   try {

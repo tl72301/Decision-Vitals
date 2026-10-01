@@ -130,9 +130,12 @@ node scripts/check-mcp-client.mjs   # connects a real MCP client over real HTTP
 node scripts/check-risk-board.mjs   # risk scoring, then the same over MCP
 node scripts/check-memory.mjs       # cross-decision memory against a stubbed store
 node scripts/check-setup-gate.mjs   # /api/setup refuses callers without the passphrase
+node scripts/check-live-auth.mjs    # every live route refuses without a configured passphrase
+node scripts/check-grading.mjs      # contradictory model output, graded by the rules anyway
+node scripts/check-review-lock.mjs  # overlapping polls never pay for a stage twice
 ```
 
-All five should pass with no environment variables set — they stub what they need.
+All eight should pass with no environment variables set — they stub what they need.
 
 ---
 
